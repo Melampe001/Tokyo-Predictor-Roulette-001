@@ -41,12 +41,19 @@ class MartingaleAdvisor {
 
 /// Manages the complete game state including history, results, and betting
 class GameStateManager {
+  static const double _initialBet = 10.0;
+  
   final RouletteLogic _rouletteLogic = RouletteLogic();
   final MartingaleAdvisor _martingaleAdvisor = MartingaleAdvisor();
   
   List<int> _history = [];
   int? _currentResult;
-  double _currentBet = 10.0;
+  late double _currentBet;
+
+  GameStateManager() {
+    _martingaleAdvisor.baseBet = _initialBet;
+    _currentBet = _initialBet;
+  }
 
   List<int> get history => List.unmodifiable(_history);
   String get result => _currentResult?.toString() ?? 'Presiona Girar';
@@ -73,6 +80,6 @@ class GameStateManager {
     _history.clear();
     _currentResult = null;
     _martingaleAdvisor.reset();
-    _currentBet = 10.0;
+    _currentBet = _initialBet;
   }
 }
