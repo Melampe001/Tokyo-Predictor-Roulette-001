@@ -12,7 +12,7 @@ This is a Flutter-based educational roulette simulator application with predicti
 - **Language**: Dart
 - **Backend Services**:
   - Firebase Core
-  - Firebase Remote Config (for dynamic updates every 4 months)
+  - Firebase Remote Config (for periodic feature toggles and configuration updates)
   - Cloud Firestore (email storage)
   - Firebase Auth (authentication)
   - Firebase Messaging (push notifications for invitations)
@@ -43,7 +43,7 @@ android/                      # Android-specific configuration
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/Melampe001/Tokyo-Predictor-Roulette-001.git
+   git clone <repository-url>
    cd Tokyo-Predictor-Roulette-001
    ```
 
@@ -57,7 +57,7 @@ android/                      # Android-specific configuration
      ```bash
      flutterfire configure
      ```
-   - Replace Stripe publishable key in `lib/main.dart`
+   - Configure Stripe publishable key using environment variables or secure configuration (see Security Considerations section)
 
 4. **Run the app**:
    ```bash
