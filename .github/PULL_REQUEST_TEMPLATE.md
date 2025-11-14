@@ -31,4 +31,9 @@ Plantilla corta para insertar en el checklist (copiar EXACTO):
 1. 
 2. 
 
+## Checklist de Integración y Agentes
+
+- [ ] Punto del checklist — Responsable: @team/owner
+  - Nota importante: Tipo de agente requerido: 
+
 ## Notas adicionales
