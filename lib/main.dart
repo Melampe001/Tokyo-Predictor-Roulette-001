@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'firebase_options.dart';  // Genera con flutterfire configure
+import 'roulette_logic.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -58,16 +59,11 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  String result = 'Presiona Girar';
-  List<int> history = [];
-  double bet = 10.0;
+  final GameStateManager _gameState = GameStateManager();
 
   void spinRoulette() {
-    // Lógica RNG simple (mejora con RNG seguro)
-    int res = (0 + (37 * (DateTime.now().millisecondsSinceEpoch % 37))).toInt();
     setState(() {
-      result = res.toString();
-      history.add(res);
+      _gameState.spin();
     });
   }
 
@@ -79,8 +75,8 @@ class _MainScreenState extends State<MainScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Resultado: $result'),
-            Text('Historia: ${history.join(', ')}'),
+            Text('Resultado: ${_gameState.result}'),
+            Text('Historia: ${_gameState.history.join(', ')}'),
             ElevatedButton(onPressed: spinRoulette, child: Text('Girar Ruleta')),
             // Agrega más widgets para Martingale, predicciones, etc.
           ],
