@@ -13,9 +13,15 @@ Por favor completa la siguiente plantilla antes de crear el PR. Asegúrate de ma
 
 ## Checklist (obligatorio completar los aplicables)
 
-- [ ] He seguido las guías de estilo y he ejecutado `make fmt`
-- [ ] He ejecutado `make test` y los tests pasan
+- [ ] He seguido las guías de estilo y he ejecutado `dart format .`
+- [ ] He ejecutado `flutter analyze` y no hay errores
+- [ ] He ejecutado `flutter test` y los tests pasan
 - [ ] He actualizado la documentación cuando procede
+- [ ] Los workflows de CI pasan (verificar en la pestaña Actions)
+  - [ ] ✅ CI - Pipeline principal
+  - [ ] ✅ Build - Android/iOS/Web builds
+  - [ ] ✅ Test - Tests unitarios y de performance
+  - [ ] ✅ Lint - Análisis y formato
 
 Plantilla corta para insertar en el checklist (copiar EXACTO):
 

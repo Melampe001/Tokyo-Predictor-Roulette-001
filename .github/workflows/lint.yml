@@ -1,0 +1,93 @@
+name: Lint
+
+on:
+  push:
+    branches: [ main, develop, copilot/** ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  analyze:
+    name: Dart Analyze
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.0'
+          channel: 'stable'
+          cache: true
+      
+      - name: Get dependencies
+        run: flutter pub get
+      
+      - name: Run Flutter analyze
+        run: flutter analyze --no-fatal-infos
+      
+      - name: Check for analysis issues
+        run: |
+          if flutter analyze 2>&1 | grep -q "error •"; then
+            echo "❌ Analysis found errors"
+            exit 1
+          else
+            echo "✅ Analysis passed"
+          fi
+
+  format:
+    name: Dart Format
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.0'
+          channel: 'stable'
+          cache: true
+      
+      - name: Get dependencies
+        run: flutter pub get
+      
+      - name: Check formatting
+        run: dart format --set-exit-if-changed .
+      
+      - name: Verify format
+        run: |
+          if dart format --output=none --set-exit-if-changed .; then
+            echo "✅ All files are properly formatted"
+          else
+            echo "❌ Some files need formatting. Run 'dart format .' locally"
+            exit 1
+          fi
+
+  pub-check:
+    name: Pub Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.0'
+          channel: 'stable'
+          cache: true
+      
+      - name: Get dependencies
+        run: flutter pub get
+      
+      - name: Run pub outdated
+        run: flutter pub outdated
+        continue-on-error: true
+      
+      - name: Check pub dependencies
+        run: flutter pub deps
