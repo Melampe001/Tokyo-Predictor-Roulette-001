@@ -32,7 +32,7 @@ jobs:
           cache: true
 
       - name: Accept Android licenses
-        run: yes | flutter doctor --android-licenses || echo "Unable to accept licenses automatically"
+        run: yes | flutter doctor --android-licenses
         shell: bash
 
       - name: Restore Android keystore and write key.properties

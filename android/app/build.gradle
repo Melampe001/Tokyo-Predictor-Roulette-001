@@ -5,10 +5,17 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 } else {
     // Fallback: leer desde variables de entorno (definir en CI)
-    keystoreProperties.setProperty('storeFile', System.getenv('ANDROID_KEYSTORE_PATH') ?: '')
-    keystoreProperties.setProperty('storePassword', System.getenv('KEYSTORE_PASSWORD') ?: '')
-    keystoreProperties.setProperty('keyAlias', System.getenv('KEY_ALIAS') ?: '')
-    keystoreProperties.setProperty('keyPassword', System.getenv('KEY_PASSWORD') ?: '')
+    def envKeystore = System.getenv('ANDROID_KEYSTORE_PATH')
+    if (envKeystore) keystoreProperties.setProperty('storeFile', envKeystore)
+    
+    def envStorePass = System.getenv('KEYSTORE_PASSWORD')
+    if (envStorePass) keystoreProperties.setProperty('storePassword', envStorePass)
+    
+    def envAlias = System.getenv('KEY_ALIAS')
+    if (envAlias) keystoreProperties.setProperty('keyAlias', envAlias)
+    
+    def envKeyPass = System.getenv('KEY_PASSWORD')
+    if (envKeyPass) keystoreProperties.setProperty('keyPassword', envKeyPass)
 }
 // END
 
@@ -63,11 +70,16 @@ android {
         multiDexEnabled true
     }
 
+    // Check if signing configuration is available
+    def hasSigningConfig = {
+        def storeFilePath = keystoreProperties.getProperty('storeFile')
+        return storeFilePath && storeFilePath.trim().length() > 0
+    }
+
     signingConfigs {
         release {
-            def storeFilePath = keystoreProperties.getProperty('storeFile')
-            if (storeFilePath && storeFilePath.trim().length() > 0) {
-                storeFile rootProject.file(storeFilePath)
+            if (hasSigningConfig()) {
+                storeFile rootProject.file(keystoreProperties.getProperty('storeFile'))
                 storePassword keystoreProperties.getProperty('storePassword')
                 keyAlias keystoreProperties.getProperty('keyAlias')
                 keyPassword keystoreProperties.getProperty('keyPassword')
@@ -80,8 +92,7 @@ android {
 
     buildTypes {
         release {
-            def storeFilePath = keystoreProperties.getProperty('storeFile')
-            if (storeFilePath && storeFilePath.trim().length() > 0) {
+            if (hasSigningConfig()) {
                 signingConfig signingConfigs.release
             }
             minifyEnabled true
