@@ -19,6 +19,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Java
+        id: setup-java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -62,8 +63,6 @@ EOF
       - name: Build App Bundle (AAB)
         run: |
           flutter build appbundle --release
-        env:
-          JAVA_HOME: /opt/hostedtoolcache/temurin/${{ env.JAVA_VERSION }}/x64
 
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
