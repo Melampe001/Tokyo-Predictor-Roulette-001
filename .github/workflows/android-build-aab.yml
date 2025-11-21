@@ -47,11 +47,11 @@ jobs:
 
           # Escribir key.properties para Gradle/Flutter
           cat > "$GITHUB_WORKSPACE/android/key.properties" <<EOF
-          storeFile=android/app/Tokyoapps.jks
-          storePassword=${KEYSTORE_PASSWORD}
-          keyAlias=${KEY_ALIAS}
-          keyPassword=${KEY_PASSWORD}
-          EOF
+storeFile=android/app/Tokyoapps.jks
+storePassword=${KEYSTORE_PASSWORD}
+keyAlias=${KEY_ALIAS}
+keyPassword=${KEY_PASSWORD}
+EOF
           echo "Keystore restaurado y key.properties creado."
 
       - name: Install flutter dependencies
