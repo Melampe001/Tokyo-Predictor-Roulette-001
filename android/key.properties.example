@@ -1,0 +1,5 @@
+# EXAMPLE - do not put secrets in the repo
+storeFile=/path/to/your-release-key.jks
+storePassword=TU_KEYSTORE_PASSWORD
+keyAlias=TU_KEY_ALIAS
+keyPassword=TU_KEY_PASSWORD
