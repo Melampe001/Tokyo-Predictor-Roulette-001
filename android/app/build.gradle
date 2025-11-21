@@ -67,7 +67,7 @@ android {
         release {
             def storeFilePath = keystoreProperties.getProperty('storeFile')
             if (storeFilePath && storeFilePath.trim().length() > 0) {
-                storeFile file(storeFilePath)
+                storeFile rootProject.file(storeFilePath)
                 storePassword keystoreProperties.getProperty('storePassword')
                 keyAlias keystoreProperties.getProperty('keyAlias')
                 keyPassword keystoreProperties.getProperty('keyPassword')
