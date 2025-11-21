@@ -68,10 +68,13 @@ android {
             def storeFilePath = keystoreProperties.getProperty('storeFile')
             if (storeFilePath && storeFilePath.trim().length() > 0) {
                 storeFile file(storeFilePath)
+                storePassword keystoreProperties.getProperty('storePassword')
+                keyAlias keystoreProperties.getProperty('keyAlias')
+                keyPassword keystoreProperties.getProperty('keyPassword')
+            } else {
+                // Signing configuration is incomplete - build will fail if release signing is required
+                logger.warn('WARNING: storeFile not configured. Release builds will not be signed.')
             }
-            storePassword keystoreProperties.getProperty('storePassword')
-            keyAlias keystoreProperties.getProperty('keyAlias')
-            keyPassword keystoreProperties.getProperty('keyPassword')
         }
     }
 

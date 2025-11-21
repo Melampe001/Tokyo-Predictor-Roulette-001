@@ -31,7 +31,7 @@ jobs:
           cache: true
 
       - name: Accept Android licenses
-        run: yes | ${ANDROID_SDK_ROOT:-$HOME/Android/Sdk}/cmdline-tools/latest/bin/sdkmanager --licenses
+        run: flutter doctor --android-licenses || echo "Unable to accept licenses automatically"
         shell: bash
 
       - name: Restore Android keystore and write key.properties
