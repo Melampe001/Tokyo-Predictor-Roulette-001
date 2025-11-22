@@ -1,0 +1,73 @@
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-aab:
+    name: Build Android App Bundle (AAB)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      FLUTTER_CHANNEL: 'stable'
+      JAVA_VERSION: '11'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        id: setup-java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          cache: true
+
+      - name: Accept Android licenses
+        run: yes | flutter doctor --android-licenses
+        shell: bash
+
+      - name: Restore Android keystore and write key.properties
+        shell: bash
+        run: |
+          if [ -z "$ANDROID_KEYSTORE_BASE64" ]; then
+            echo "ERROR: ANDROID_KEYSTORE_BASE64 not set"
+            exit 1
+          fi
+          mkdir -p "$GITHUB_WORKSPACE/android/app"
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$GITHUB_WORKSPACE/android/app/Tokyoapps.jks"
+          chmod 600 "$GITHUB_WORKSPACE/android/app/Tokyoapps.jks"
+
+          # Escribir key.properties para Gradle/Flutter
+          cat > "$GITHUB_WORKSPACE/android/key.properties" <<EOF
+storeFile=app/Tokyoapps.jks
+storePassword=${KEYSTORE_PASSWORD}
+keyAlias=${KEY_ALIAS}
+keyPassword=${KEY_PASSWORD}
+EOF
+          echo "Keystore restaurado y key.properties creado."
+
+      - name: Install flutter dependencies
+        run: |
+          flutter --version
+          flutter pub get
+
+      - name: Build App Bundle (AAB)
+        run: |
+          flutter build appbundle --release
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: appbundle
+          path: build/app/outputs/bundle/release/app-release.aab

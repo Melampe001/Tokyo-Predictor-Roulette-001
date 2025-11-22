@@ -1,0 +1,119 @@
+// BEGIN: Carga de propiedades de keystore con fallback a variables de entorno
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+} else {
+    // Fallback: leer desde variables de entorno (definir en CI)
+    def envKeystore = System.getenv('ANDROID_KEYSTORE_PATH')
+    if (envKeystore) keystoreProperties.setProperty('storeFile', envKeystore)
+    
+    def envStorePass = System.getenv('KEYSTORE_PASSWORD')
+    if (envStorePass) keystoreProperties.setProperty('storePassword', envStorePass)
+    
+    def envAlias = System.getenv('KEY_ALIAS')
+    if (envAlias) keystoreProperties.setProperty('keyAlias', envAlias)
+    
+    def envKeyPass = System.getenv('KEY_PASSWORD')
+    if (envKeyPass) keystoreProperties.setProperty('keyPassword', envKeyPass)
+}
+// END
+
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
+
+android {
+    namespace "com.tokyoapps.roulette_predicciones"
+    compileSdkVersion 34
+    ndkVersion flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    defaultConfig {
+        applicationId "com.tokyoapps.roulette_predicciones"
+        minSdkVersion 21
+        targetSdkVersion 34
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+        multiDexEnabled true
+    }
+
+    // Check if signing configuration is available
+    def hasSigningConfig = {
+        def storeFilePath = keystoreProperties.getProperty('storeFile')
+        return storeFilePath && storeFilePath.trim().length() > 0
+    }
+
+    signingConfigs {
+        release {
+            if (hasSigningConfig()) {
+                storeFile rootProject.file(keystoreProperties.getProperty('storeFile'))
+                storePassword keystoreProperties.getProperty('storePassword')
+                keyAlias keystoreProperties.getProperty('keyAlias')
+                keyPassword keystoreProperties.getProperty('keyPassword')
+            } else {
+                // Signing configuration is incomplete - build will fail if release signing is required
+                logger.warn('WARNING: storeFile not configured. Release builds will not be signed.')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            if (hasSigningConfig()) {
+                signingConfig signingConfigs.release
+            }
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+flutter {
+    source '../..'
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation platform('com.google.firebase:firebase-bom:32.7.0')
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-firestore'
+    implementation 'com.google.firebase:firebase-messaging'
+    implementation 'com.google.firebase:firebase-config'
+}
+
+apply plugin: 'com.google.gms.google-services'
