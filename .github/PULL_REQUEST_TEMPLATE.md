@@ -31,4 +31,36 @@ Plantilla corta para insertar en el checklist (copiar EXACTO):
 1. 
 2. 
 
+## Checklist de Integración y Agentes
+
+- [ ] 1) Build y compilación — Responsable: @team/owner
+  - Tipo de agente requerido: CI runner (por ejemplo GitHub Actions: ubuntu-latest, macos-latest)
+
+- [ ] 2) Tests unitarios y de integración — Responsable: @team/owner
+  - Tipo de agente requerido: CI runner + emulador/device-farm según el caso
+
+- [ ] 3) Lint y formato — Responsable: @team/owner
+  - Tipo de agente requerido: Bot/Action (dart analyze, dart format)
+
+- [ ] 4) Seguridad y dependencias — Responsable: @team/owner
+  - Tipo de agente requerido: Dependabot/Snyk + revisor humano
+
+- [ ] 5) Accesibilidad y localización — Responsable: @team/owner
+  - Tipo de agente requerido: Revisor humano + linters automáticos
+
+- [ ] 6) Performance y tamaño — Responsable: @team/owner
+  - Tipo de agente requerido: Job de benchmarking automatizado + revisor humano
+
+- [ ] 7) Pruebas en dispositivos reales — Responsable: @team/owner
+  - Tipo de agente requerido: Device farm o equipo humano con dispositivos
+
+- [ ] 8) Breaking changes y compatibilidad de API — Responsable: @team/owner
+  - Tipo de agente requerido: Revisor humano (owner) + detector automatizado
+
+- [ ] 9) Licencias y cumplimiento legal — Responsable: @team/owner
+  - Tipo de agente requerido: Revisor legal + escáner automatizado
+
+- [ ] 10) Documentación y PR template — Responsable: @team/owner
+  - Tipo de agente requerido: Autor humano y revisor documental
+
 ## Notas adicionales
