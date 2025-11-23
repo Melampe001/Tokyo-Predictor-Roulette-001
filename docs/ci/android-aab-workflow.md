@@ -6,6 +6,14 @@ This document describes the GitHub Actions workflow for building signed Android 
 
 The `android-aab.yml` workflow automates the process of building and signing Android AAB files in a secure manner, without storing sensitive keystore files or passwords in the repository.
 
+## Prerequisites
+
+Before using this workflow, ensure your Flutter project's Android configuration is set up correctly:
+
+1. **Gradle build configuration**: The `android/app/build.gradle` file must be configured to read signing properties from environment variables. See the code snippet in the main README.md for the recommended configuration pattern.
+
+2. **Flutter project structure**: Ensure your Flutter project has the standard Android directory structure with proper build files.
+
 ## Workflow File
 
 - **Location:** `.github/workflows/android-aab.yml`

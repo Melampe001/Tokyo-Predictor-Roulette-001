@@ -114,6 +114,8 @@ keyPassword=your_key_password
 
 **Important:** The `key.properties` file is gitignored and should never be committed!
 
+Alternatively, you can use environment variables directly (as the CI workflow does). See the code snippet in the main README.md for how to configure your `android/app/build.gradle` to support both methods.
+
 ## Additional Resources
 
 - [Android App Signing Documentation](https://developer.android.com/studio/publish/app-signing)
