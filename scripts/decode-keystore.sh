@@ -25,11 +25,15 @@ fi
 KEYSTORE_FILE=$(mktemp "${TMPDIR:-/tmp}/keystore.XXXXXX.jks")
 
 # Decode the base64 content and write to the temporary file
-if ! echo "$KEYSTORE_BASE64" | base64 -d > "$KEYSTORE_FILE" 2>/dev/null; then
+if ! echo "$KEYSTORE_BASE64" | base64 -d > "$KEYSTORE_FILE" 2>/tmp/decode_error.log; then
     echo "Error: Failed to decode KEYSTORE_BASE64. Please verify the base64 encoding is valid." >&2
-    rm -f "$KEYSTORE_FILE"
+    if [ -s /tmp/decode_error.log ]; then
+        echo "Error: Decode operation failed. Check base64 format." >&2
+    fi
+    rm -f "$KEYSTORE_FILE" /tmp/decode_error.log
     exit 2
 fi
+rm -f /tmp/decode_error.log
 
 # Set restrictive permissions (read/write only for owner)
 chmod 600 "$KEYSTORE_FILE"

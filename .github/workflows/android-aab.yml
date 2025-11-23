@@ -50,22 +50,37 @@ jobs:
       env:
         KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
       run: |
-        # Run the decode-keystore script
-        export KEYSTORE_PATH=$(./scripts/decode-keystore.sh)
+        # Run the decode-keystore script and capture output
+        KEYSTORE_PATH=$(./scripts/decode-keystore.sh)
+        SCRIPT_EXIT=$?
         
-        # Validate the keystore path
+        # Check if script succeeded
+        if [ $SCRIPT_EXIT -ne 0 ]; then
+          echo "::error::Keystore decode script failed with exit code $SCRIPT_EXIT"
+          exit 1
+        fi
+        
+        # Validate the keystore path exists
         if [ -z "$KEYSTORE_PATH" ] || [ ! -f "$KEYSTORE_PATH" ]; then
           echo "::error::Failed to create keystore file"
           exit 1
         fi
         
-        # Ensure the path is in a temporary directory
-        case "$KEYSTORE_PATH" in
-          /tmp/*|"${TMPDIR}"*)
+        # Ensure the path is in a temporary directory and doesn't contain path traversal
+        # Resolve to absolute path and check it doesn't escape tmp
+        REAL_PATH=$(readlink -f "$KEYSTORE_PATH" 2>/dev/null || echo "$KEYSTORE_PATH")
+        case "$REAL_PATH" in
+          /tmp/keystore.*.jks|"${TMPDIR}"keystore.*.jks)
+            # Valid pattern: must be in /tmp or TMPDIR and match expected filename
+            if [[ "$REAL_PATH" =~ \.\./  ]]; then
+              echo "::error::Keystore path contains path traversal"
+              rm -f "$KEYSTORE_PATH"
+              exit 1
+            fi
             echo "Keystore path validated: $KEYSTORE_PATH"
             ;;
           *)
-            echo "::error::Keystore path is not in a secure temporary directory"
+            echo "::error::Keystore path is not in expected temporary directory format"
             rm -f "$KEYSTORE_PATH"
             exit 1
             ;;
