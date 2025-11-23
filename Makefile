@@ -15,7 +15,7 @@ help:
 # Formatear código Dart usando dart format
 fmt:
 	@echo "🎨 Formateando código Dart..."
-	dart format lib/ test/
+	dart format .
 	@echo "✅ Formato completado"
 
 # Construir aplicación Flutter (APK para Android)
@@ -37,5 +37,10 @@ lint:
 	@echo "✅ Análisis completado"
 
 # Pipeline CI manual: ejecuta todos los comandos en secuencia
-ci: fmt lint test build
+ci:
+	@echo "🚀 Iniciando pipeline CI..."
+	@$(MAKE) fmt
+	@$(MAKE) lint
+	@$(MAKE) test
+	@$(MAKE) build
 	@echo "✅ Pipeline CI completado exitosamente"
