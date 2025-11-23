@@ -2,6 +2,8 @@
 
 Esta guía detalla el proceso completo para generar el APK release de la aplicación Tokyo Roulette Predicciones.
 
+> **💡 Para configuración de CI/CD y builds automáticos**: Ver [docs/CI-CD-SETUP.md](docs/CI-CD-SETUP.md)
+
 ## Tabla de Contenidos
 
 1. [Preparativos](#preparativos)
@@ -227,6 +229,8 @@ Cada push y pull request a las ramas `main` o ramas de features activa automáti
 
 Puedes descargar el APK generado desde:
 - GitHub Actions > Selecciona el workflow run > Artifacts > Descarga `app-release`
+
+**Para configuración detallada de CI/CD y secretos de firma**, consulta [docs/CI-CD-SETUP.md](docs/CI-CD-SETUP.md)
 
 ---
 

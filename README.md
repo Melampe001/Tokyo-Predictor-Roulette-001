@@ -11,6 +11,8 @@ Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y mod
 
 Para una guía completa sobre cómo generar el APK, firma, y automatización, consulta **[BUILD.md](BUILD.md)**.
 
+Para información sobre CI/CD y construcción automática, consulta **[docs/CI-CD-SETUP.md](docs/CI-CD-SETUP.md)**.
+
 ### Build Rápido
 ```bash
 # Usando el script automatizado (recomendado)
