@@ -1,0 +1,19 @@
+{
+  "project": "tokyo_roulette_predicciones",
+  "version": "1.0.0",
+  "environment": {
+    "development": {
+      "debug": true,
+      "verbose_logging": true
+    },
+    "production": {
+      "debug": false,
+      "verbose_logging": false
+    }
+  },
+  "features": {
+    "stripe_payments": true,
+    "firebase_integration": true,
+    "in_app_purchases": true
+  }
+}
