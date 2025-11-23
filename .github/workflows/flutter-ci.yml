@@ -27,6 +27,9 @@ jobs:
     name: Análisis de código y pruebas
     runs-on: ubuntu-latest
     
+    permissions:
+      contents: read
+    
     steps:
       - name: Checkout del código
         uses: actions/checkout@v4
@@ -75,6 +78,9 @@ jobs:
     name: Construir APK Release
     needs: analyze-and-test
     runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
     
     # Matriz para probar con diferentes canales de Flutter (opcional)
     strategy:
@@ -208,6 +214,9 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     
+    permissions:
+      contents: read
+    
     steps:
       - name: Checkout del código
         uses: actions/checkout@v4
@@ -259,6 +268,9 @@ jobs:
     needs: [build-apk, build-appbundle]
     runs-on: ubuntu-latest
     if: always()
+    
+    permissions:
+      contents: read
     
     steps:
       - name: Generar resumen
