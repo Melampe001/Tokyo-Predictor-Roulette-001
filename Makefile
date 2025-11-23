@@ -1,4 +1,4 @@
-.PHONY: fmt build test lint ci help
+.PHONY: help fmt build test lint ci
 
 # Ayuda por defecto
 help:
@@ -39,8 +39,5 @@ lint:
 # Pipeline CI manual: ejecuta todos los comandos en secuencia
 ci:
 	@echo "🚀 Iniciando pipeline CI..."
-	@$(MAKE) fmt
-	@$(MAKE) lint
-	@$(MAKE) test
-	@$(MAKE) build
+	@$(MAKE) fmt && $(MAKE) lint && $(MAKE) test && $(MAKE) build
 	@echo "✅ Pipeline CI completado exitosamente"
