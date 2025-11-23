@@ -72,17 +72,18 @@ if [[ ! -s "$KEYSTORE_FILE" ]]; then
 fi
 
 # Set restrictive permissions (owner read/write only)
-chmod 600 "$KEYSTORE_FILE"
-
-if [[ $? -ne 0 ]]; then
+if ! chmod 600 "$KEYSTORE_FILE"; then
     error "Failed to set permissions on keystore file"
     rm -f "$KEYSTORE_FILE"
     exit 3
 fi
 
+# Get permissions in a portable way
+PERMS=$(stat -c '%a' "$KEYSTORE_FILE" 2>/dev/null || stat -f '%OLp' "$KEYSTORE_FILE" 2>/dev/null || echo "unknown")
+
 info "Keystore decoded successfully"
 info "File: $KEYSTORE_FILE"
-info "Permissions: $(stat -c '%a' "$KEYSTORE_FILE" 2>/dev/null || stat -f '%OLp' "$KEYSTORE_FILE" 2>/dev/null)"
+info "Permissions: $PERMS"
 
 # Output the keystore path (this is captured by the caller)
 echo "$KEYSTORE_FILE"
