@@ -37,18 +37,5 @@ lint:
 	@echo "✅ Análisis completado"
 
 # Pipeline CI manual: ejecuta todos los comandos en secuencia
-ci:
-	@echo "🚀 Iniciando pipeline CI..."
-	@echo "🎨 Formateando código Dart..."
-	@dart format .
-	@echo "✅ Formato completado"
-	@echo "🔍 Analizando código Dart..."
-	@dart analyze
-	@echo "✅ Análisis completado"
-	@echo "🧪 Ejecutando pruebas..."
-	@flutter test
-	@echo "✅ Pruebas completadas"
-	@echo "🔨 Construyendo aplicación Flutter..."
-	@flutter build apk --release
-	@echo "✅ Build completado"
+ci: fmt lint test build
 	@echo "✅ Pipeline CI completado exitosamente"
