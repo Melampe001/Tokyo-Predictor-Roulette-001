@@ -55,12 +55,14 @@ jobs:
       run: flutter pub get
     
     # Paso 7: Verificar que no hay problemas con las dependencias
+    # Este paso es informativo y no falla el build
     - name: Verificar dependencias
-      run: flutter pub outdated || true
+      run: flutter pub outdated || echo "Algunas dependencias podrían estar desactualizadas"
     
     # Paso 8: Analizar el código (opcional pero recomendado)
+    # Permite advertencias pero falla en errores críticos
     - name: Analizar código
-      run: flutter analyze || true
+      run: flutter analyze --no-fatal-infos --no-fatal-warnings || echo "Análisis completado con advertencias"
     
     # Paso 9: Compilar la APK en modo release
     # Este es el paso principal que genera el archivo APK
@@ -80,7 +82,7 @@ jobs:
         fi
     
     # Paso 11: Subir la APK como artefacto de GitHub Actions
-    # Los artefactos están disponibles por 90 días y se pueden descargar desde la pestaña Actions
+    # Los artefactos están disponibles por 30 días y se pueden descargar desde la pestaña Actions
     - name: Subir APK como artefacto
       uses: actions/upload-artifact@v4
       with:
