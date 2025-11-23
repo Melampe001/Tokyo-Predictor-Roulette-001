@@ -52,6 +52,25 @@ jobs:
       run: |
         # Run the decode-keystore script
         export KEYSTORE_PATH=$(./scripts/decode-keystore.sh)
+        
+        # Validate the keystore path
+        if [ -z "$KEYSTORE_PATH" ] || [ ! -f "$KEYSTORE_PATH" ]; then
+          echo "::error::Failed to create keystore file"
+          exit 1
+        fi
+        
+        # Ensure the path is in a temporary directory
+        case "$KEYSTORE_PATH" in
+          /tmp/*|"${TMPDIR}"*)
+            echo "Keystore path validated: $KEYSTORE_PATH"
+            ;;
+          *)
+            echo "::error::Keystore path is not in a secure temporary directory"
+            rm -f "$KEYSTORE_PATH"
+            exit 1
+            ;;
+        esac
+        
         echo "KEYSTORE_PATH=$KEYSTORE_PATH" >> $GITHUB_ENV
         echo "::add-mask::$KEYSTORE_PATH"
     

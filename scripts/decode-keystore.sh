@@ -21,8 +21,8 @@ if [ -z "$KEYSTORE_BASE64" ]; then
     exit 1
 fi
 
-# Create a temporary file for the keystore
-KEYSTORE_FILE=$(mktemp /tmp/keystore.XXXXXX.jks)
+# Create a temporary file for the keystore in the system's secure temporary directory
+KEYSTORE_FILE=$(mktemp "${TMPDIR:-/tmp}/keystore.XXXXXX.jks")
 
 # Decode the base64 content and write to the temporary file
 if ! echo "$KEYSTORE_BASE64" | base64 -d > "$KEYSTORE_FILE" 2>/dev/null; then
