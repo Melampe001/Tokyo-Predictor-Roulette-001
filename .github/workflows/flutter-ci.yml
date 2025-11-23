@@ -1,0 +1,279 @@
+name: Flutter CI - Build APK
+
+# Este workflow construye el APK de Android automáticamente en cada push y PR
+on:
+  push:
+    branches: 
+      - main
+      - develop
+      - 'feature/**'
+      - 'release/**'
+  pull_request:
+    branches: 
+      - main
+      - develop
+
+  # Permite ejecución manual desde la pestaña Actions
+  workflow_dispatch:
+
+# Variables de entorno globales
+env:
+  FLUTTER_VERSION: '3.24.0'  # Versión de Flutter a usar
+  JAVA_VERSION: '17'         # Versión de Java requerida
+
+jobs:
+  # Job 1: Análisis y pruebas
+  analyze-and-test:
+    name: Análisis de código y pruebas
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+      
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+      
+      - name: Configurar Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+      
+      - name: Verificar instalación de Flutter
+        run: |
+          flutter --version
+          flutter doctor -v
+      
+      - name: Obtener dependencias
+        run: flutter pub get
+      
+      - name: Verificar formato de código
+        run: flutter format --set-exit-if-changed .
+        continue-on-error: true
+      
+      - name: Analizar código
+        run: flutter analyze
+      
+      - name: Ejecutar pruebas unitarias
+        run: flutter test --coverage
+      
+      - name: Subir reporte de cobertura
+        uses: codecov/codecov-action@v4
+        continue-on-error: true
+        with:
+          file: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+
+  # Job 2: Construir APK (ejecuta después de las pruebas)
+  build-apk:
+    name: Construir APK Release
+    needs: analyze-and-test
+    runs-on: ubuntu-latest
+    
+    # Matriz para probar con diferentes canales de Flutter (opcional)
+    strategy:
+      matrix:
+        flutter-channel: ['stable']
+        # Descomentar para probar con múltiples canales:
+        # flutter-channel: ['stable', 'beta']
+    
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+      
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+      
+      - name: Configurar Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: ${{ matrix.flutter-channel }}
+          cache: true
+      
+      - name: Obtener dependencias
+        run: flutter pub get
+      
+      - name: Limpiar build anterior
+        run: flutter clean
+      
+      # Configurar firma del APK (si se proporcionan secretos)
+      - name: Configurar keystore para firma
+        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          echo "Configurando keystore..."
+          echo "$KEYSTORE_BASE64" | base64 -d > android/app/upload-keystore.jks
+          
+          # Crear key.properties
+          cat > android/key.properties << EOF
+          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          storeFile=upload-keystore.jks
+          EOF
+          
+          echo "Keystore configurado exitosamente"
+      
+      - name: Construir APK release
+        run: flutter build apk --release --split-per-abi
+        
+      - name: Construir APK universal
+        run: flutter build apk --release
+      
+      # Listar APKs generados
+      - name: Listar APKs generados
+        run: |
+          echo "APKs generados:"
+          ls -lh build/app/outputs/flutter-apk/
+      
+      # Renombrar APKs con información de versión
+      - name: Preparar APKs para publicación
+        run: |
+          # Obtener versión del pubspec.yaml
+          VERSION=$(grep 'version:' pubspec.yaml | sed 's/version: //' | tr -d ' ')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          
+          # Crear directorio para artefactos
+          mkdir -p artifacts
+          
+          # Copiar APKs al directorio de artefactos
+          cp build/app/outputs/flutter-apk/*.apk artifacts/
+          
+          # Listar artefactos
+          echo "Artefactos preparados:"
+          ls -lh artifacts/
+      
+      # Subir APKs como artefactos del workflow
+      - name: Subir APK Universal como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-universal-${{ matrix.flutter-channel }}
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
+      
+      - name: Subir APKs por arquitectura como artefactos
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-split-per-abi-${{ matrix.flutter-channel }}
+          path: |
+            build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+            build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+            build/app/outputs/flutter-apk/app-x86_64-release.apk
+          retention-days: 30
+      
+      # Generar reporte de tamaño del APK
+      - name: Generar reporte de tamaño
+        run: |
+          echo "## 📊 Reporte de Tamaño de APKs" > apk-size-report.md
+          echo "" >> apk-size-report.md
+          echo "| APK | Tamaño |" >> apk-size-report.md
+          echo "|-----|--------|" >> apk-size-report.md
+          
+          for apk in build/app/outputs/flutter-apk/*.apk; do
+            if [ -f "$apk" ]; then
+              filename=$(basename "$apk")
+              size=$(ls -lh "$apk" | awk '{print $5}')
+              echo "| $filename | $size |" >> apk-size-report.md
+            fi
+          done
+          
+          echo "" >> apk-size-report.md
+          echo "Canal de Flutter: ${{ matrix.flutter-channel }}" >> apk-size-report.md
+          echo "Versión de la app: ${{ env.VERSION }}" >> apk-size-report.md
+          
+          cat apk-size-report.md
+      
+      - name: Subir reporte de tamaño
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-size-report-${{ matrix.flutter-channel }}
+          path: apk-size-report.md
+          retention-days: 30
+
+  # Job 3: Construir App Bundle (para Google Play Store)
+  build-appbundle:
+    name: Construir App Bundle (AAB)
+    needs: analyze-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+      
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+      
+      - name: Configurar Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+      
+      - name: Obtener dependencias
+        run: flutter pub get
+      
+      # Configurar firma del App Bundle
+      - name: Configurar keystore para firma
+        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > android/app/upload-keystore.jks
+          
+          cat > android/key.properties << EOF
+          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          storeFile=upload-keystore.jks
+          EOF
+      
+      - name: Construir App Bundle
+        run: flutter build appbundle --release
+      
+      - name: Subir App Bundle como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-bundle-release
+          path: build/app/outputs/bundle/release/app-release.aab
+          retention-days: 30
+
+  # Job 4: Resumen del build
+  build-summary:
+    name: Resumen del Build
+    needs: [build-apk, build-appbundle]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Generar resumen
+        run: |
+          echo "## 🎉 Build Completado" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Estado de los Jobs:" >> $GITHUB_STEP_SUMMARY
+          echo "- Análisis y pruebas: ${{ needs.analyze-and-test.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Build APK: ${{ needs.build-apk.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Build App Bundle: ${{ needs.build-appbundle.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📥 Artefactos Disponibles:" >> $GITHUB_STEP_SUMMARY
+          echo "Los APKs y App Bundles están disponibles en la pestaña 'Artifacts' de este workflow run." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📝 Próximos pasos:" >> $GITHUB_STEP_SUMMARY
+          echo "1. Descarga los artefactos desde la pestaña 'Actions'" >> $GITHUB_STEP_SUMMARY
+          echo "2. Prueba el APK en dispositivos físicos" >> $GITHUB_STEP_SUMMARY
+          echo "3. Si todo está OK, procede con el release" >> $GITHUB_STEP_SUMMARY
