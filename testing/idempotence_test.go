@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -294,31 +295,13 @@ func TestIdempotenceDocumentation(t *testing.T) {
 
 // containsSection verifica si el contenido contiene una sección
 func containsSection(content, section string) bool {
-	// Buscar en el contenido (case-insensitive simple check)
+	// Importar strings al inicio del archivo si no está ya
+	// Buscar en el contenido usando strings.Contains
 	return len(content) > 0 && (
 		// Buscar como header de markdown
-		stringContains(content, "# "+section) ||
-		stringContains(content, "## "+section) ||
-		stringContains(content, "### "+section) ||
+		strings.Contains(content, "# "+section) ||
+		strings.Contains(content, "## "+section) ||
+		strings.Contains(content, "### "+section) ||
 		// O simplemente como texto
-		stringContains(content, section))
-}
-
-// stringContains es un helper simple para búsqueda de strings
-func stringContains(haystack, needle string) bool {
-	return len(haystack) >= len(needle) && 
-		(haystack == needle || 
-		 len(haystack) > len(needle) && 
-		 (haystack[:len(needle)] == needle || 
-		  stringContainsHelper(haystack[1:], needle)))
-}
-
-func stringContainsHelper(haystack, needle string) bool {
-	if len(haystack) < len(needle) {
-		return false
-	}
-	if haystack[:len(needle)] == needle {
-		return true
-	}
-	return stringContainsHelper(haystack[1:], needle)
+		strings.Contains(content, section))
 }
