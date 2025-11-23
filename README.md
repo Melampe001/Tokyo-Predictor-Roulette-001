@@ -2,6 +2,34 @@
 
 Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y modelo freemium. Incluye integraciones con Stripe para pagos y Firebase para configuraciones remotas.
 
+## 🆕 Nueva Estructura de Agentes y Bots
+
+Este proyecto ahora incluye una arquitectura completa de **agentes y bots automatizados** para análisis y simulación de ruleta:
+
+### 📊 Agentes de Análisis
+- **PredictorAgent**: Predicción de números con múltiples estrategias
+- **RngAnalyzerAgent**: Detección de sesgos en RNG
+- **StatisticalAnalyzerAgent**: Modelado estadístico avanzado
+- **RouletteSimulatorAgent**: Simulación de ruleta europea/americana
+
+### 🤖 Bots de Automatización
+- **BettingBot**: Estrategias de apuestas automatizadas (Martingale, Fibonacci, etc.)
+- **ApiIntegrationBot**: Template para integración con APIs externas
+- **TestBot**: Testing automatizado de todo el stack
+- **CasinoMockBot**: Simulación de casino para pruebas
+
+### 📚 Documentación Completa
+Ver documentación detallada en:
+- `/docs/AGENTS_BOTS_STRUCTURE.md` - Arquitectura completa
+- `/lib/agents/README.md` - Documentación de agentes
+- `/lib/bots/README.md` - Documentación de bots
+- `/lib/examples/README.md` - Ejemplos de uso
+- `/lib/core/README.md` - Infraestructura core
+
+**⚠️ Importante**: Toda la estructura es solo para simulación/educación. No incluye apuestas reales ni integración con casinos reales.
+
+---
+
 ## Instalación
 1. Clona: `git clone https://github.com/Melampe001/Tokyo-Predictor-Roulette-001.git`
 2. `flutter pub get`
@@ -10,21 +38,31 @@ Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y mod
 ## Construir APK
 `flutter build apk --release`
 
-**Disclaimer**: Solo simulación. No promueve gambling real.
+## Ejecutar Ejemplos
+```bash
+# Ejemplo de predictor
+dart run lib/examples/predictor_example.dart
 
-// BEGIN: Carga de propiedades de keystore con fallback a variables de entorno
-def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file('key.properties')
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-} else {
-    // Fallback: leer desde variables de entorno (definir en CI)
-    keystoreProperties.setProperty('storeFile', System.getenv('ANDROID_KEYSTORE_PATH') ?: '')
-    keystoreProperties.setProperty('storePassword', System.getenv('KEYSTORE_PASSWORD') ?: '')
-    keystoreProperties.setProperty('keyAlias', System.getenv('KEY_ALIAS') ?: '')
-    keystoreProperties.setProperty('keyPassword', System.getenv('KEY_PASSWORD') ?: '')
-}
-// END
+# Ejemplo de bot de apuestas
+dart run lib/examples/betting_bot_example.dart
+
+# Workflow completo
+dart run lib/examples/complete_workflow_example.dart
+```
+
+## Tests
+```bash
+# Todos los tests
+flutter test
+
+# Tests de agentes
+flutter test test/agents/
+
+# Tests de bots
+flutter test test/bots/
+```
+
+**Disclaimer**: Solo simulación. No promueve gambling real.
 
 ---
 

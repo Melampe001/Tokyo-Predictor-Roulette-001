@@ -67,7 +67,7 @@ void main() {
       final session = casino.createSession(userId: 'user1', initialBalance: 10.0);
       
       expect(
-        () => casino.processBet(
+        casino.processBet(
           sessionId: session.sessionId,
           betType: 'red',
           betValue: 'red',
