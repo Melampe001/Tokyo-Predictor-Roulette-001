@@ -1,0 +1,7 @@
+# Ignore files created by test runs when scripts execute in testing directory
+.env.local
+assets/
+docs/
+scripts/
+test/
+testing/
