@@ -85,7 +85,7 @@ echo "$KEYSTORE_FILE" > keystore_path.txt
 # Print success message and path
 success "Keystore decoded successfully"
 echo "Keystore path: $KEYSTORE_FILE"
-echo "Keystore size: $(stat -f%z "$KEYSTORE_FILE" 2>/dev/null || stat -c%s "$KEYSTORE_FILE" 2>/dev/null) bytes"
+echo "Keystore size: $(wc -c < "$KEYSTORE_FILE") bytes"
 echo "Permissions: $(ls -l "$KEYSTORE_FILE" | awk '{print $1}')"
 
 # Output the path for the calling script

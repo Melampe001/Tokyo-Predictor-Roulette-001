@@ -96,14 +96,22 @@ jobs:
           echo "::add-mask::$KEY_ALIAS"
           echo "::add-mask::$KEY_PASSWORD"
 
+          # Create key.properties file for Gradle signing
+          echo "storePassword=$KEYSTORE_PASSWORD" > android/key.properties
+          echo "keyPassword=$KEY_PASSWORD" >> android/key.properties
+          echo "keyAlias=$KEY_ALIAS" >> android/key.properties
+          echo "storeFile=$KEYSTORE_PATH" >> android/key.properties
+
+          # Set restrictive permissions on key.properties
+          chmod 600 android/key.properties
+
           # Build the signed AAB using Flutter
           flutter build appbundle \
             --release \
-            --build-number=${{ github.run_number }} \
-            --dart-define=KEYSTORE_PATH="$KEYSTORE_PATH" \
-            --dart-define=KEYSTORE_PASSWORD="$KEYSTORE_PASSWORD" \
-            --dart-define=KEY_ALIAS="$KEY_ALIAS" \
-            --dart-define=KEY_PASSWORD="$KEY_PASSWORD"
+            --build-number=${{ github.run_number }}
+
+          # Remove key.properties file
+          rm -f android/key.properties
 
           # Verify AAB was created
           AAB_PATH="build/app/outputs/bundle/release/app-release.aab"
@@ -126,11 +134,16 @@ jobs:
         if: always()
         run: |
           # Securely remove keystore file
+          # Note: shred may not be available on all systems or effective on SSDs
+          # with wear leveling. Falls back to rm if shred is unavailable.
           if [ -f "$KEYSTORE_PATH" ]; then
             shred -vfz -n 3 "$KEYSTORE_PATH" 2>/dev/null || rm -f "$KEYSTORE_PATH"
           fi
 
           # Remove keystore path file
           rm -f keystore_path.txt
+
+          # Remove key.properties if it exists
+          rm -f android/key.properties
 
           echo "Keystore cleanup completed"

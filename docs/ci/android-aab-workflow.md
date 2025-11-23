@@ -30,6 +30,39 @@ Before the workflow can run successfully, you must configure the following GitHu
 
 **📖 For detailed instructions on creating and configuring these secrets, see:** [config/keystore/README.md](../../config/keystore/README.md)
 
+## Android Project Configuration
+
+The workflow creates a `key.properties` file during the build process with the signing credentials. Your Android project's `build.gradle` file should be configured to read from this file.
+
+If you haven't configured signing yet, add this to `android/app/build.gradle`:
+
+```gradle
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+android {
+    ...
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+        }
+    }
+}
+```
+
+This configuration allows the workflow to provide signing credentials via the temporary `key.properties` file.
+
 ## Workflow Steps
 
 ### 1. Checkout Code
