@@ -1,0 +1,24 @@
+{
+  "description": "Configuración de prueba para la aplicación",
+  "betting": {
+    "base_bet": 1.0,
+    "min_bet": 0.5,
+    "max_bet": 100.0,
+    "currency": "USD"
+  },
+  "martingale": {
+    "enabled": true,
+    "max_multiplier": 64,
+    "reset_on_win": true
+  },
+  "roulette": {
+    "wheel_type": "european",
+    "animation_duration_ms": 3000,
+    "auto_spin": false
+  },
+  "limits": {
+    "max_history": 100,
+    "free_spins": 10,
+    "premium_spins": -1
+  }
+}
