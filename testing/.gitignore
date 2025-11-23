@@ -1,7 +1,7 @@
-# Ignore files created by test runs
+# Ignore files created by test runs when scripts execute in testing directory
 .env.local
-config.example.json
 assets/
 docs/
 scripts/
 test/
+testing/

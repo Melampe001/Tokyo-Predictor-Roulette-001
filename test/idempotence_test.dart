@@ -59,11 +59,12 @@ void main() {
         reason: 'Misma secuencia debe producir mismas apuestas');
       
       // Verificar valores esperados de la estrategia Martingale
-      // Apuesta base = 1.0
-      // false: 1.0 -> pérdida, próxima apuesta = 2.0
-      // false: 2.0 -> pérdida, próxima apuesta = 4.0
-      // true: 4.0 -> ganancia, próxima apuesta = 1.0 (reset)
-      // false: 1.0 -> pérdida, próxima apuesta = 2.0
+      // getNextBet(win) actualiza currentBet basado en el resultado y retorna el nuevo valor
+      // Secuencia: false, false, true, false con baseBet=1.0
+      // getNextBet(false): currentBet = 1.0 * 2 = 2.0, retorna 2.0
+      // getNextBet(false): currentBet = 2.0 * 2 = 4.0, retorna 4.0
+      // getNextBet(true):  currentBet = baseBet = 1.0, retorna 1.0
+      // getNextBet(false): currentBet = 1.0 * 2 = 2.0, retorna 2.0
       expect(bets1, equals([2.0, 4.0, 1.0, 2.0]));
     });
     

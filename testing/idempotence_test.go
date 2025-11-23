@@ -295,8 +295,7 @@ func TestIdempotenceDocumentation(t *testing.T) {
 
 // containsSection verifica si el contenido contiene una sección
 func containsSection(content, section string) bool {
-	// Importar strings al inicio del archivo si no está ya
-	// Buscar en el contenido usando strings.Contains
+	// Buscar en el contenido usando strings.Contains de la biblioteca estándar
 	return len(content) > 0 && (
 		// Buscar como header de markdown
 		strings.Contains(content, "# "+section) ||
