@@ -45,31 +45,23 @@ jobs:
     - name: Verificar versión de Flutter
       run: flutter --version
     
-    # Paso 5: Habilitar soporte para plataformas (Android)
-    - name: Habilitar soporte Android
-      run: flutter config --enable-android
-    
-    # Paso 6: Obtener dependencias del proyecto
+    # Paso 5: Obtener dependencias del proyecto
     # Este comando descarga todas las dependencias especificadas en pubspec.yaml
     - name: Obtener dependencias (flutter pub get)
       run: flutter pub get
     
-    # Paso 7: Verificar que no hay problemas con las dependencias
-    # Este paso es informativo y no falla el build
-    - name: Verificar dependencias
-      run: flutter pub outdated || echo "Algunas dependencias podrían estar desactualizadas"
-    
-    # Paso 8: Analizar el código (opcional pero recomendado)
-    # Permite advertencias pero falla en errores críticos
+    # Paso 6: Analizar el código (opcional pero recomendado)
+    # No falla el build, solo muestra advertencias
     - name: Analizar código
-      run: flutter analyze --no-fatal-infos --no-fatal-warnings || echo "Análisis completado con advertencias"
+      run: flutter analyze --no-fatal-infos --no-fatal-warnings
+      continue-on-error: true
     
-    # Paso 9: Compilar la APK en modo release
+    # Paso 7: Compilar la APK en modo release
     # Este es el paso principal que genera el archivo APK
     - name: Compilar APK (flutter build apk --release)
       run: flutter build apk --release
     
-    # Paso 10: Verificar que la APK se generó correctamente
+    # Paso 8: Verificar que la APK se generó correctamente
     - name: Verificar APK generada
       run: |
         echo "Verificando que la APK fue creada..."
@@ -81,7 +73,7 @@ jobs:
           exit 1
         fi
     
-    # Paso 11: Subir la APK como artefacto de GitHub Actions
+    # Paso 9: Subir la APK como artefacto de GitHub Actions
     # Los artefactos están disponibles por 30 días y se pueden descargar desde la pestaña Actions
     - name: Subir APK como artefacto
       uses: actions/upload-artifact@v4
@@ -93,7 +85,7 @@ jobs:
         # Comprimir el artefacto para ahorrar espacio
         compression-level: 9
     
-    # Paso 12: Mostrar información del artefacto
+    # Paso 10: Mostrar información del artefacto
     - name: Información del artefacto
       run: |
         echo "============================================"
