@@ -37,7 +37,6 @@ jobs:
       uses: subosito/flutter-action@v2
       with:
         flutter-version: 'stable'
-        channel: 'stable'
         # Habilitar caché para acelerar compilaciones futuras
         cache: true
     
@@ -53,7 +52,7 @@ jobs:
     # Paso 6: Analizar el código (opcional pero recomendado)
     # No falla el build, solo muestra advertencias
     - name: Analizar código
-      run: flutter analyze --no-fatal-infos --no-fatal-warnings
+      run: flutter analyze --no-fatal-infos
       continue-on-error: true
     
     # Paso 7: Compilar la APK en modo release
@@ -92,7 +91,14 @@ jobs:
         echo "APK compilada y lista para descargar"
         echo "Nombre del artefacto: app-release-apk"
         echo "Ubicación: build/app/outputs/flutter-apk/app-release.apk"
-        echo "Tamaño: $(du -h build/app/outputs/flutter-apk/app-release.apk | cut -f1)"
+        # Mostrar tamaño del archivo de forma portable
+        if command -v stat &> /dev/null && stat --version &> /dev/null; then
+          # Linux/GNU stat
+          echo "Tamaño: $(stat --format='%s' build/app/outputs/flutter-apk/app-release.apk | numfmt --to=iec 2>/dev/null || stat --format='%s' build/app/outputs/flutter-apk/app-release.apk)"
+        else
+          # Fallback usando ls
+          echo "Tamaño: $(ls -lh build/app/outputs/flutter-apk/app-release.apk | awk '{print $5}')"
+        fi
         echo "============================================"
         echo "Para descargar la APK:"
         echo "1. Ve a la pestaña 'Actions' en GitHub"
