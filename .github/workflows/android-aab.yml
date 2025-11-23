@@ -1,0 +1,87 @@
+name: Build Android AAB
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-aab:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.0'
+          channel: 'stable'
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Verify required secrets
+        run: |
+          if [[ -z "${{ secrets.KEYSTORE_BASE64 }}" ]]; then
+            echo "::error::KEYSTORE_BASE64 secret is not set"
+            exit 1
+          fi
+          if [[ -z "${{ secrets.KEYSTORE_PASSWORD }}" ]]; then
+            echo "::error::KEYSTORE_PASSWORD secret is not set"
+            exit 1
+          fi
+          if [[ -z "${{ secrets.KEY_ALIAS }}" ]]; then
+            echo "::error::KEY_ALIAS secret is not set"
+            exit 1
+          fi
+          if [[ -z "${{ secrets.KEY_PASSWORD }}" ]]; then
+            echo "::error::KEY_PASSWORD secret is not set"
+            exit 1
+          fi
+          echo "All required secrets are present"
+
+      - name: Decode and restore keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          chmod +x scripts/decode-keystore.sh
+          KEYSTORE_PATH=$(scripts/decode-keystore.sh)
+          echo "KEYSTORE_PATH=$KEYSTORE_PATH" >> $GITHUB_ENV
+
+      - name: Build Android AAB (Release)
+        env:
+          ANDROID_KEYSTORE_PATH: ${{ env.KEYSTORE_PATH }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          echo "::add-mask::$KEYSTORE_PASSWORD"
+          echo "::add-mask::$KEY_PASSWORD"
+          flutter build appbundle --release
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release-aab
+          path: build/app/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Cleanup keystore
+        if: always()
+        run: |
+          if [[ -n "$KEYSTORE_PATH" ]] && [[ -f "$KEYSTORE_PATH" ]]; then
+            rm -f "$KEYSTORE_PATH"
+            echo "Keystore cleaned up"
+          fi
