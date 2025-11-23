@@ -33,6 +33,8 @@ jobs:
     
     # Paso 3: Configurar Flutter SDK
     # Usamos la versión estable más reciente de Flutter
+    # Nota: Se usa 'stable' en lugar de una versión específica para obtener
+    # automáticamente las últimas correcciones de seguridad y mejoras
     - name: Configurar Flutter SDK
       uses: subosito/flutter-action@v2
       with:
@@ -91,14 +93,7 @@ jobs:
         echo "APK compilada y lista para descargar"
         echo "Nombre del artefacto: app-release-apk"
         echo "Ubicación: build/app/outputs/flutter-apk/app-release.apk"
-        # Mostrar tamaño del archivo de forma portable
-        if command -v stat &> /dev/null && stat --version &> /dev/null; then
-          # Linux/GNU stat
-          echo "Tamaño: $(stat --format='%s' build/app/outputs/flutter-apk/app-release.apk | numfmt --to=iec 2>/dev/null || stat --format='%s' build/app/outputs/flutter-apk/app-release.apk)"
-        else
-          # Fallback usando ls
-          echo "Tamaño: $(ls -lh build/app/outputs/flutter-apk/app-release.apk | awk '{print $5}')"
-        fi
+        echo "Tamaño: $(ls -lh build/app/outputs/flutter-apk/app-release.apk | awk '{print $5}')"
         echo "============================================"
         echo "Para descargar la APK:"
         echo "1. Ve a la pestaña 'Actions' en GitHub"
