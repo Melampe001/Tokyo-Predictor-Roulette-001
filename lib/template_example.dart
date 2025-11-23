@@ -457,10 +457,16 @@ extension NumListExtension on List<num> {
   double average() => isEmpty ? 0.0 : sum() / length;
 
   /// Encuentra el valor máximo o retorna 0 si está vacía
-  double maxOrZero() => isEmpty ? 0.0 : reduce((a, b) => max(a, b)).toDouble();
+  double maxOrZero() {
+    if (isEmpty) return 0.0;
+    return reduce((a, b) => max(a, b)).toDouble();
+  }
 
   /// Encuentra el valor mínimo o retorna 0 si está vacía
-  double minOrZero() => isEmpty ? 0.0 : reduce((a, b) => min(a, b)).toDouble();
+  double minOrZero() {
+    if (isEmpty) return 0.0;
+    return reduce((a, b) => min(a, b)).toDouble();
+  }
 }
 
 // ============================================================================
