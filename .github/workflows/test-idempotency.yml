@@ -25,6 +25,8 @@ jobs:
   test-scripts-idempotence:
     name: Test Scripts Idempotence
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout código
@@ -70,6 +72,8 @@ jobs:
   test-makefile-idempotence:
     name: Test Makefile Targets Idempotence
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout código
@@ -119,6 +123,8 @@ jobs:
   test-code-idempotence:
     name: Test Code Idempotence
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout código
@@ -167,6 +173,8 @@ jobs:
   test-full-workflow:
     name: Test Full Idempotent Workflow
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout código
@@ -220,6 +228,8 @@ jobs:
   verify-documentation:
     name: Verify Documentation
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout código
@@ -302,6 +312,8 @@ jobs:
   summary:
     name: Test Summary
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     needs: 
       - test-scripts-idempotence
       - test-makefile-idempotence
