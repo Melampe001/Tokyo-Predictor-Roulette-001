@@ -39,5 +39,16 @@ lint:
 # Pipeline CI manual: ejecuta todos los comandos en secuencia
 ci:
 	@echo "🚀 Iniciando pipeline CI..."
-	@$(MAKE) fmt && $(MAKE) lint && $(MAKE) test && $(MAKE) build
+	@echo "🎨 Formateando código Dart..."
+	@dart format .
+	@echo "✅ Formato completado"
+	@echo "🔍 Analizando código Dart..."
+	@dart analyze
+	@echo "✅ Análisis completado"
+	@echo "🧪 Ejecutando pruebas..."
+	@flutter test
+	@echo "✅ Pruebas completadas"
+	@echo "🔨 Construyendo aplicación Flutter..."
+	@flutter build apk --release
+	@echo "✅ Build completado"
 	@echo "✅ Pipeline CI completado exitosamente"
