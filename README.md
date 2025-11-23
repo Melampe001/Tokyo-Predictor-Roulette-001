@@ -8,23 +8,45 @@ Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y mod
 3. `flutter run`
 
 ## Construir APK
-`flutter build apk --release`
+
+### Manualmente
+```bash
+flutter build apk --release
+```
+
+### Automático (CI/CD)
+El proyecto incluye un workflow de GitHub Actions que compila automáticamente la APK en cada push o pull request a las ramas `main` o `master`.
+
+**Ubicación del workflow**: `.github/workflows/build-apk.yml`
+
+**Cómo descargar la APK compilada automáticamente**:
+1. Ve a la pestaña [Actions](../../actions) en GitHub
+2. Selecciona la ejecución del workflow "Build Android APK"
+3. Descarga el artefacto `app-release-apk`
+4. El artefacto estará disponible por 30 días
+
+**Características del workflow**:
+- ✅ Compilación automática con Flutter estable
+- ✅ Caché de dependencias para builds más rápidos
+- ✅ Análisis de código con `flutter analyze`
+- ✅ Artefactos comprimidos y listos para instalar
 
 **Disclaimer**: Solo simulación. No promueve gambling real.
 
-// BEGIN: Carga de propiedades de keystore con fallback a variables de entorno
-def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file('key.properties')
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-} else {
-    // Fallback: leer desde variables de entorno (definir en CI)
-    keystoreProperties.setProperty('storeFile', System.getenv('ANDROID_KEYSTORE_PATH') ?: '')
-    keystoreProperties.setProperty('storePassword', System.getenv('KEYSTORE_PASSWORD') ?: '')
-    keystoreProperties.setProperty('keyAlias', System.getenv('KEY_ALIAS') ?: '')
-    keystoreProperties.setProperty('keyPassword', System.getenv('KEY_PASSWORD') ?: '')
-}
-// END
+---
+
+## CI/CD
+
+El proyecto cuenta con integración continua a través de GitHub Actions:
+
+### Workflow de Build APK
+- **Archivo**: `.github/workflows/build-apk.yml`
+- **Trigger**: Push o PR a ramas `main`/`master`
+- **Output**: APK firmada disponible como artefacto por 30 días
+- **Características**: 
+  - Flutter estable con caché
+  - Análisis estático del código
+  - Verificación automática del build
 
 ---
 
