@@ -50,6 +50,27 @@ const int DEFAULT_TIMEOUT_MS = 5000;
 const String STORAGE_KEY_PREFIX = 'tokyo_roulette_';
 
 // ============================================================================
+// ENUMERACIONES
+// ============================================================================
+// Usa enums para representar un conjunto fijo de valores relacionados
+// Declaradas antes de las clases que las usan
+
+/// Estados posibles del procesador
+enum ProcessorState {
+  /// Estado inicial, listo para procesar
+  idle,
+
+  /// Procesando datos actualmente
+  processing,
+
+  /// Completado exitosamente
+  completed,
+
+  /// Ocurrió un error
+  error,
+}
+
+// ============================================================================
 // CLASE PRINCIPAL - EJEMPLO
 // ============================================================================
 
@@ -302,26 +323,6 @@ class DataProcessor {
 }
 
 // ============================================================================
-// ENUMERACIONES
-// ============================================================================
-// Usa enums para representar un conjunto fijo de valores relacionados
-
-/// Estados posibles del procesador
-enum ProcessorState {
-  /// Estado inicial, listo para procesar
-  idle,
-
-  /// Procesando datos actualmente
-  processing,
-
-  /// Completado exitosamente
-  completed,
-
-  /// Ocurrió un error
-  error,
-}
-
-// ============================================================================
 // CLASES DE DATOS (DATA CLASSES)
 // ============================================================================
 // Clases simples para almacenar datos relacionados
@@ -456,10 +457,10 @@ extension NumListExtension on List<num> {
   double average() => isEmpty ? 0.0 : sum() / length;
 
   /// Encuentra el valor máximo o retorna 0 si está vacía
-  double maxOrZero() => isEmpty ? 0.0 : reduce(max).toDouble();
+  double maxOrZero() => isEmpty ? 0.0 : reduce((a, b) => max(a, b)).toDouble();
 
   /// Encuentra el valor mínimo o retorna 0 si está vacía
-  double minOrZero() => isEmpty ? 0.0 : reduce(min).toDouble();
+  double minOrZero() => isEmpty ? 0.0 : reduce((a, b) => min(a, b)).toDouble();
 }
 
 // ============================================================================
@@ -480,6 +481,10 @@ extension NumListExtension on List<num> {
 List<int> generateRandomNumbers(int count, {int min = 0, int max = 100}) {
   if (count <= 0) {
     throw ArgumentError('count debe ser mayor que 0');
+  }
+
+  if (min >= max) {
+    throw ArgumentError('min debe ser menor que max');
   }
 
   final random = Random();
