@@ -245,6 +245,13 @@ EOF
 
 echo "Ejecutando pre-push hook: Tests..."
 
+# Verificar si Flutter está disponible
+if ! command -v flutter &> /dev/null; then
+    echo "⚠️  Flutter no está instalado, saltando tests."
+    echo "✓ Pre-push hook completado (tests saltados)."
+    exit 0
+fi
+
 # Ejecutar tests de Flutter
 if ! flutter test; then
     echo "❌ Tests fallaron. Push cancelado."
