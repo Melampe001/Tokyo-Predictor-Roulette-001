@@ -30,20 +30,6 @@ Los "créditos" mencionados en la aplicación son puramente **virtuales y sin va
 ## Construir APK
 `flutter build apk --release`
 
-// BEGIN: Carga de propiedades de keystore con fallback a variables de entorno
-def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file('key.properties')
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-} else {
-    // Fallback: leer desde variables de entorno (definir en CI)
-    keystoreProperties.setProperty('storeFile', System.getenv('ANDROID_KEYSTORE_PATH') ?: '')
-    keystoreProperties.setProperty('storePassword', System.getenv('KEYSTORE_PASSWORD') ?: '')
-    keystoreProperties.setProperty('keyAlias', System.getenv('KEY_ALIAS') ?: '')
-    keystoreProperties.setProperty('keyPassword', System.getenv('KEY_PASSWORD') ?: '')
-}
-// END
-
 ---
 
 ## Fases del Proyecto
