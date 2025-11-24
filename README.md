@@ -16,8 +16,6 @@ Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y an�
 ## Construir APK
 `flutter build apk --release`
 
-**Nota Importante**: Este es un proyecto de simulación educativa. No representa ni promueve actividades de apuestas con dinero real. Todos los valores son ficticios y solo tienen propósito académico.
-
 ---
 
 ## Fases del Proyecto
