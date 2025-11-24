@@ -1,0 +1,103 @@
+name: Build Android APK
+
+# Workflow para compilar automáticamente la APK de Android
+# Este workflow se ejecuta en cada push o pull request hacia las ramas main y master
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+# Permisos necesarios para el workflow
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Compilar APK de Android
+    runs-on: ubuntu-latest
+    
+    steps:
+    # Paso 1: Checkout del código del repositorio
+    - name: Checkout del repositorio
+      uses: actions/checkout@v4
+    
+    # Paso 2: Configurar JDK (necesario para compilar Android)
+    # Flutter requiere Java 11 o superior para builds de Android
+    - name: Configurar JDK 11
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+    
+    # Paso 3: Configurar Flutter SDK
+    # Usamos la versión estable más reciente de Flutter
+    # Nota: Se usa 'stable' en lugar de una versión específica para obtener
+    # automáticamente las últimas correcciones de seguridad y mejoras
+    - name: Configurar Flutter SDK
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.38.0'
+        channel: 'stable'
+        # Habilitar caché para acelerar compilaciones futuras
+        cache: true
+    
+    # Paso 4: Verificar la instalación de Flutter
+    - name: Verificar versión de Flutter
+      run: flutter --version
+    
+    # Paso 5: Obtener dependencias del proyecto
+    # Este comando descarga todas las dependencias especificadas en pubspec.yaml
+    - name: Obtener dependencias (flutter pub get)
+      run: flutter pub get
+    
+    # Paso 6: Analizar el código (opcional pero recomendado)
+    # No falla el build, solo muestra advertencias
+    - name: Analizar código
+      run: flutter analyze --no-fatal-infos
+      continue-on-error: true
+    
+    # Paso 7: Compilar la APK en modo release
+    # Este es el paso principal que genera el archivo APK
+    - name: Compilar APK (flutter build apk --release)
+      run: flutter build apk --release
+    
+    # Paso 8: Verificar que la APK se generó correctamente
+    - name: Verificar APK generada
+      run: |
+        echo "Verificando que la APK fue creada..."
+        if [ -f "build/app/outputs/flutter-apk/app-release.apk" ]; then
+          echo "✓ APK generada exitosamente"
+          ls -lh build/app/outputs/flutter-apk/app-release.apk
+        else
+          echo "✗ Error: APK no encontrada"
+          exit 1
+        fi
+    
+    # Paso 9: Subir la APK como artefacto de GitHub Actions
+    # Los artefactos están disponibles por 30 días y se pueden descargar desde la pestaña Actions
+    - name: Subir APK como artefacto
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-release-apk
+        path: build/app/outputs/flutter-apk/app-release.apk
+        # Retener el artefacto por 30 días
+        retention-days: 30
+        # Comprimir el artefacto para ahorrar espacio
+        compression-level: 9
+    
+    # Paso 10: Mostrar información del artefacto
+    - name: Información del artefacto
+      run: |
+        echo "============================================"
+        echo "APK compilada y lista para descargar"
+        echo "Nombre del artefacto: app-release-apk"
+        echo "Ubicación: build/app/outputs/flutter-apk/app-release.apk"
+        echo "Tamaño: $(ls -lh build/app/outputs/flutter-apk/app-release.apk | awk '{print $5}')"
+        echo "============================================"
+        echo "Para descargar la APK:"
+        echo "1. Ve a la pestaña 'Actions' en GitHub"
+        echo "2. Selecciona esta ejecución del workflow"
+        echo "3. Descarga el artefacto 'app-release-apk'"
+        echo "============================================"
