@@ -17,24 +17,24 @@ class RouletteLogic {
   }
 }
 
-class MartingaleAdvisor {
-  double baseBet = 1.0;
-  double currentBet = 1.0;
-  bool lastWin = true;
+class SimulationAdvisor {
+  double baseValue = 1.0;
+  double currentValue = 1.0;
+  bool lastSuccess = true;
 
-  double getNextBet(bool win) {
-    if (win) {
-      currentBet = baseBet;
-      lastWin = true;
+  double getNextValue(bool success) {
+    if (success) {
+      currentValue = baseValue;
+      lastSuccess = true;
     } else {
-      currentBet *= 2;
-      lastWin = false;
+      currentValue *= 2;
+      lastSuccess = false;
     }
-    return currentBet;
+    return currentValue;
   }
 
   void reset() {
-    currentBet = baseBet;
-    lastWin = true;
+    currentValue = baseValue;
+    lastSuccess = true;
   }
 }

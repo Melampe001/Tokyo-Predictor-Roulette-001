@@ -1,6 +1,26 @@
 # Tokyo Roulette Predicciones
 
-Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y modelo freemium. Incluye integraciones con Stripe para pagos y Firebase para configuraciones remotas.
+**Herramienta educativa de simulación estadística** para el análisis de patrones en sistemas de números aleatorios. Este proyecto tiene un propósito exclusivamente educativo y de investigación estadística.
+
+## ⚠️ AVISO LEGAL IMPORTANTE
+
+**PROPÓSITO EXCLUSIVAMENTE EDUCATIVO Y DE SIMULACIÓN**
+
+Este software es una herramienta educativa diseñada para:
+- Demostrar conceptos de probabilidad y estadística
+- Ilustrar el funcionamiento de generadores de números aleatorios (RNG)
+- Analizar estrategias de gestión de recursos en contextos simulados
+- Enseñar principios de desarrollo de software y análisis de datos
+
+**ESTE SOFTWARE NO ESTÁ DISEÑADO NI DEBE SER UTILIZADO PARA:**
+- Realizar apuestas con dinero real
+- Gambling o juegos de azar con dinero real
+- Predecir resultados en casinos o plataformas de apuestas reales
+- Cualquier actividad que involucre dinero real o apuestas legales
+
+Los "créditos" mencionados en la aplicación son puramente **virtuales y sin valor monetario**. Cualquier referencia a pagos o suscripciones se refiere únicamente a funcionalidades premium del software educativo, no a apuestas o juegos de azar.
+
+**El uso de este software para actividades de gambling real es responsabilidad exclusiva del usuario y está expresamente desaconsejado por los desarrolladores.**
 
 ## Instalación
 1. Clona: `git clone https://github.com/Melampe001/Tokyo-Predictor-Roulette-001.git`
@@ -9,8 +29,6 @@ Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y mod
 
 ## Construir APK
 `flutter build apk --release`
-
-**Disclaimer**: Solo simulación. No promueve gambling real.
 
 // BEGIN: Carga de propiedades de keystore con fallback a variables de entorno
 def keystoreProperties = new Properties()

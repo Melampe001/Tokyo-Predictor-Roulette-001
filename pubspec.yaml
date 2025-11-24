@@ -1,5 +1,5 @@
 name: tokyo_roulette_predicciones
-description: Simulador de predicciones para ruleta con modelo freemium.
+description: Herramienta educativa de análisis estadístico y simulación de sistemas RNG. Propósito exclusivamente educativo, no para gambling real.
 publish_to: 'none'
 version: 1.0.0+1
 environment:
