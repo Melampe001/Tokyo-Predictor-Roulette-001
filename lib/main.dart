@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'roulette_logic.dart';
 // TODO: Genera firebase_options.dart con: flutterfire configure
 // import 'firebase_options.dart';
 
@@ -80,15 +81,14 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  final RouletteLogic _rouletteLogic = RouletteLogic();
   String result = 'Presiona Girar';
   List<int> history = [];
   double bet = 10.0;
 
   void spinRoulette() {
-    // TODO: Usar RouletteLogic de roulette_logic.dart para RNG seguro
-    // Implementación temporal con mejor distribución
-    final random = DateTime.now().microsecondsSinceEpoch;
-    final res = random % 37;
+    // Usa RouletteLogic con RNG seguro
+    final res = _rouletteLogic.generateSpin();
     setState(() {
       result = res.toString();
       history.add(res);
