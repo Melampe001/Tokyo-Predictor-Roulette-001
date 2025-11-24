@@ -3,7 +3,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- Otros permisos según necesidad -->
     <application
-        android:label="Tokyo Roulette"
+        android:label="Tokyo Roulette - Simulador"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
