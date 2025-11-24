@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
-import 'firebase_options.dart';  // Genera con flutterfire configure
+import 'firebase_options.dart';
 
+/// Aplicación educativa de simulación de sistemas RNG y análisis estadístico.
+/// PROPÓSITO EXCLUSIVAMENTE EDUCATIVO - No para uso en gambling real.
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  Stripe.publishableKey = 'tu_publishable_key_de_stripe';  // Reemplaza con tu clave
+  Stripe.publishableKey = 'tu_publishable_key_de_stripe';  // Para acceso a funciones premium educativas (no apuestas)
   runApp(MyApp());
 }
 
@@ -60,10 +62,11 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   String result = 'Presiona Girar';
   List<int> history = [];
-  double simulationCredits = 10.0;
+  double simulationCredits = 10.0;  // Créditos virtuales sin valor monetario
 
   void spinRoulette() {
-    // Lógica RNG simple (mejora con RNG seguro)
+    // Generador de números pseudo-aleatorios para fines educativos
+    // En producción, usar RouletteLogic con Random.secure()
     int res = (0 + (37 * (DateTime.now().millisecondsSinceEpoch % 37))).toInt();
     setState(() {
       result = res.toString();
