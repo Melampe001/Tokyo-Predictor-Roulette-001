@@ -1,0 +1,3 @@
+# Flutter wrapper para configuración de Gradle
+sdk.dir=/Users/username/Library/Android/sdk
+flutter.sdk=/path/to/flutter

@@ -8,23 +8,23 @@ Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y mod
 3. `flutter run`
 
 ## Construir APK
-`flutter build apk --release`
+
+Para una guía completa sobre cómo generar el APK, firma, y automatización, consulta **[BUILD.md](BUILD.md)**.
+
+Para información sobre CI/CD y construcción automática, consulta **[docs/CI-CD-SETUP.md](docs/CI-CD-SETUP.md)**.
+
+### Build Rápido
+```bash
+# Usando el script automatizado (recomendado)
+./build-apk.sh
+
+# O manualmente
+flutter build apk --release
+```
+
+El APK se generará en `build/app/outputs/flutter-apk/app-release.apk`
 
 **Disclaimer**: Solo simulación. No promueve gambling real.
-
-// BEGIN: Carga de propiedades de keystore con fallback a variables de entorno
-def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file('key.properties')
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-} else {
-    // Fallback: leer desde variables de entorno (definir en CI)
-    keystoreProperties.setProperty('storeFile', System.getenv('ANDROID_KEYSTORE_PATH') ?: '')
-    keystoreProperties.setProperty('storePassword', System.getenv('KEYSTORE_PASSWORD') ?: '')
-    keystoreProperties.setProperty('keyAlias', System.getenv('KEY_ALIAS') ?: '')
-    keystoreProperties.setProperty('keyPassword', System.getenv('KEY_PASSWORD') ?: '')
-}
-// END
 
 ---
 
