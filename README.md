@@ -1,6 +1,12 @@
 # Tokyo Roulette Predicciones
 
-Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y modelo freemium. Incluye integraciones con Stripe para pagos y Firebase para configuraciones remotas.
+## ⚠️ Aviso Legal y de Simulación
+
+**Este proyecto es un ejercicio de programación con fines estrictamente educativos y analíticos.** Su propósito es simular la lógica de distribución de probabilidad de ciertos sistemas de juego. **No involucra ni promueve el uso de dinero real.** No está conectado a ninguna plataforma de juego en línea. La "moneda" utilizada se denomina **'Créditos de Simulación'** y no tiene ningún valor monetario real. El uso de esta aplicación o su código fuera de su contexto de simulación algorítmica es responsabilidad exclusiva del usuario.
+
+---
+
+Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y análisis de patrones. Sistema académico con créditos de simulación para fines de aprendizaje. Incluye integraciones con Firebase para configuraciones remotas.
 
 ## Instalación
 1. Clona: `git clone https://github.com/Melampe001/Tokyo-Predictor-Roulette-001.git`
@@ -9,22 +15,6 @@ Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y mod
 
 ## Construir APK
 `flutter build apk --release`
-
-**Disclaimer**: Solo simulación. No promueve gambling real.
-
-// BEGIN: Carga de propiedades de keystore con fallback a variables de entorno
-def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file('key.properties')
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-} else {
-    // Fallback: leer desde variables de entorno (definir en CI)
-    keystoreProperties.setProperty('storeFile', System.getenv('ANDROID_KEYSTORE_PATH') ?: '')
-    keystoreProperties.setProperty('storePassword', System.getenv('KEYSTORE_PASSWORD') ?: '')
-    keystoreProperties.setProperty('keyAlias', System.getenv('KEY_ALIAS') ?: '')
-    keystoreProperties.setProperty('keyPassword', System.getenv('KEY_PASSWORD') ?: '')
-}
-// END
 
 ---
 

@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Tokyo Roulette Predicciones',
+      title: 'Tokyo Roulette - Simulador Educativo',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: LoginScreen(),
     );
@@ -60,7 +60,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   String result = 'Presiona Girar';
   List<int> history = [];
-  double bet = 10.0;
+  double simulationCredits = 10.0;
 
   void spinRoulette() {
     // Lógica RNG simple (mejora con RNG seguro)
@@ -74,7 +74,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Ruleta')),
+      appBar: AppBar(title: Text('Simulador - Ruleta Educativa')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -82,7 +82,7 @@ class _MainScreenState extends State<MainScreen> {
             Text('Resultado: $result'),
             Text('Historia: ${history.join(', ')}'),
             ElevatedButton(onPressed: spinRoulette, child: Text('Girar Ruleta')),
-            // Agrega más widgets para Martingale, predicciones, etc.
+            // Agrega más widgets para análisis de patrones, predicciones, etc.
           ],
         ),
       ),
