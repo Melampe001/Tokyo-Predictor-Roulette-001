@@ -33,12 +33,11 @@ jobs:
     
     # Paso 3: Configurar Flutter SDK
     # Usamos la versión estable más reciente de Flutter
-    # Nota: Se usa 'stable' en lugar de una versión específica para obtener
-    # automáticamente las últimas correcciones de seguridad y mejoras
+    # Nota: Se usa 'stable' channel para obtener automáticamente
+    # las últimas correcciones de seguridad y mejoras
     - name: Configurar Flutter SDK
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.38.0'
         channel: 'stable'
         # Habilitar caché para acelerar compilaciones futuras
         cache: true

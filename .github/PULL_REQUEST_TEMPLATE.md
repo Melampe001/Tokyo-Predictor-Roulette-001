@@ -5,6 +5,8 @@ Explica brevemente qué modifica este PR.
 - [ ] Bug fix
 - [ ] Nueva característica
 - [ ] Mejora de documentación
+- [ ] Refactorización
+- [ ] Mejora de rendimiento
 
 ## 🔍 ¿Cómo probar?
 Describe los pasos para revisar el cambio.
@@ -29,13 +31,15 @@ Incluye enlaces o observaciones relevantes.
 
 ---
 
-### Estándares internos y buenas prácticas
+### Estándares internos y buenas prácticas (Flutter/Dart)
 
-- [ ] He corrido `make fmt` antes de hacer commit para asegurar el formato correcto del código.
+- [ ] He ejecutado `dart format .` antes de hacer commit para asegurar el formato correcto del código.
+- [ ] El código sigue las buenas prácticas de Dart y las guías de estilo de Flutter.
+- [ ] He ejecutado `flutter analyze` y no hay errores ni advertencias nuevas.
 - [ ] El cambio respeta la estructura de carpetas y módulos definida en el repositorio.
-- [ ] El código sigue las buenas prácticas de Go y patrones idiomáticos.
 - [ ] Se usó inyección de dependencias donde corresponde.
-- [ ] Incluí pruebas unitarias para nuevas funcionalidades (se recomienda table-driven tests).
-- [ ] El código está documentado, y la documentación relevante se sugiere para actualizar en el directorio `docs/`.
-- [ ] Si se actualizó proto/, ejecuté `make proto`.
-- [ ] Si se modificó ruby/, actualicé la versión en `ruby/lib/billing-platform/version.rb`.
+- [ ] Incluí pruebas unitarias/widget para nuevas funcionalidades.
+- [ ] El código está documentado con comentarios Dart doc donde sea apropiado.
+- [ ] Si agregué nuevas dependencias, actualicé `pubspec.yaml` con versiones compatibles.
+- [ ] Si modifiqué la UI, incluí capturas de pantalla o videos del cambio.
+- [ ] He verificado que no se exponen claves API o datos sensibles en el código.
