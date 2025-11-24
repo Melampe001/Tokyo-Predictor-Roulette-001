@@ -18,23 +18,23 @@ class RouletteLogic {
 }
 
 class MartingaleAdvisor {
-  double baseBet = 1.0;
-  double currentBet = 1.0;
-  bool lastWin = true;
+  double baseAttempt = 1.0;
+  double currentAttempt = 1.0;
+  bool lastSuccess = true;
 
-  double getNextBet(bool win) {
-    if (win) {
-      currentBet = baseBet;
-      lastWin = true;
+  double getNextAttempt(bool success) {
+    if (success) {
+      currentAttempt = baseAttempt;
+      lastSuccess = true;
     } else {
-      currentBet *= 2;
-      lastWin = false;
+      currentAttempt *= 2;
+      lastSuccess = false;
     }
-    return currentBet;
+    return currentAttempt;
   }
 
   void reset() {
-    currentBet = baseBet;
-    lastWin = true;
+    currentAttempt = baseAttempt;
+    lastSuccess = true;
   }
 }
