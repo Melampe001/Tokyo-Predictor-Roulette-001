@@ -17,7 +17,9 @@ dependencies:
   device_info_plus: ^9.1.2  # Info dispositivo/plataforma
   url_launcher: ^6.2.4  # Comentarios via email
   shared_preferences: ^2.2.2  # Storage local
-  charts_flutter: ^0.12.0  # Gráficos
+  # NOTA: charts_flutter está deprecado. Considera usar fl_chart o community_charts_flutter
+  # charts_flutter: ^0.12.0  # Gráficos (DEPRECADO)
+  fl_chart: ^0.65.0  # Gráficos modernos (reemplazo de charts_flutter)
   firebase_messaging: ^14.7.10  # Notificaciones para invitaciones
 dev_dependencies:
   flutter_test:

@@ -1,3 +1,7 @@
+# NOTA: Este workflow es para una posible aplicación web Node.js complementaria.
+# El proyecto principal es una aplicación Flutter. Si no necesitas un backend Node.js,
+# considera eliminar este archivo.
+#
 # This workflow will build and push a node.js application to an Azure Web App when a commit is pushed to your default branch.
 #
 # This workflow assumes you have already created the target Azure App Service web app.
