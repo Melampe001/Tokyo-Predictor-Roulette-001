@@ -1,131 +1,131 @@
-# Privacy Policy for Tokyo Predictor Roulette
+# Política de Privacidad de Tokyo Predictor Roulette
 
-**Last Updated**: November 2024
+**Última Actualización**: Noviembre 2024
 
-TokyoApps/TokRaggcorp ("we", "our", or "us") operates the Tokyo Predictor Roulette mobile application (the "Service").
+TokyoApps/TokRaggcorp ("nosotros", "nuestro" o "nos") opera la aplicación móvil Tokyo Predictor Roulette (el "Servicio").
 
-This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service and the choices you have associated with that data.
+Esta página te informa sobre nuestras políticas respecto a la recopilación, uso y divulgación de datos personales cuando usas nuestro Servicio y las opciones que tienes asociadas con esos datos.
 
-## Contact Information
+## Información de Contacto
 
-**Support Email**: tokraagcorp@gmail.com  
-**Developer**: TokyoApps/TokRaggcorp  
-**Package Name**: com.tokraggcorp.tokyopredictorroulett
+**Correo de Soporte**: tokraagcorp@gmail.com  
+**Desarrollador**: TokyoApps/TokRaggcorp  
+**Nombre del Package**: com.tokraggcorp.tokyopredictorroulett
 
-## Information Collection and Use
+## Recopilación y Uso de Información
 
-We collect several different types of information for various purposes to provide and improve our Service to you.
+Recopilamos varios tipos diferentes de información para diversos propósitos para proporcionarte y mejorar nuestro Servicio.
 
-### Types of Data Collected
+### Tipos de Datos Recopilados
 
-#### Personal Data
+#### Datos Personales
 
-While using our Service, we may ask you to provide us with certain personally identifiable information that can be used to contact or identify you ("Personal Data"). This may include, but is not limited to:
+Al usar nuestro Servicio, podemos pedirte que nos proporciones cierta información de identificación personal que puede usarse para contactarte o identificarte ("Datos Personales"). Esto puede incluir, pero no se limita a:
 
-- Email address (optional, for account creation)
-- Device information (for app optimization)
+- Dirección de correo electrónico (opcional, para creación de cuenta)
+- Información del dispositivo (para optimización de la app)
 
-#### Usage Data
+#### Datos de Uso
 
-We may also collect information on how the Service is accessed and used ("Usage Data"). This Usage Data may include:
+También podemos recopilar información sobre cómo se accede y usa el Servicio ("Datos de Uso"). Estos Datos de Uso pueden incluir:
 
-- Device type and operating system version
-- Time and date of use
-- Time spent on pages of our app
-- Other diagnostic data
+- Tipo de dispositivo y versión del sistema operativo
+- Hora y fecha de uso
+- Tiempo pasado en páginas de nuestra app
+- Otros datos de diagnóstico
 
-### Data Collection Technologies
+### Tecnologías de Recopilación de Datos
 
-- **Firebase Analytics**: For understanding app usage patterns
-- **Firebase Authentication**: For secure user authentication (if applicable)
-- **Crash Reporting**: To improve app stability
+- **Firebase Analytics**: Para entender patrones de uso de la app
+- **Firebase Authentication**: Para autenticación segura de usuarios (si aplica)
+- **Reporte de Fallos**: Para mejorar la estabilidad de la app
 
-## Use of Data
+## Uso de los Datos
 
-TokyoApps/TokRaggcorp uses the collected data for various purposes:
+TokyoApps/TokRaggcorp usa los datos recopilados para varios propósitos:
 
-- To provide and maintain our Service
-- To notify you about changes to our Service
-- To provide customer support
-- To gather analysis or valuable information to improve our Service
-- To monitor the usage of our Service
-- To detect, prevent and address technical issues
+- Para proporcionar y mantener nuestro Servicio
+- Para notificarte sobre cambios en nuestro Servicio
+- Para proporcionar soporte al cliente
+- Para recopilar análisis o información valiosa para mejorar nuestro Servicio
+- Para monitorear el uso de nuestro Servicio
+- Para detectar, prevenir y abordar problemas técnicos
 
-## Data Retention
+## Retención de Datos
 
-We will retain your Personal Data only for as long as is necessary for the purposes set out in this Privacy Policy. We will retain and use your Personal Data to the extent necessary to comply with our legal obligations, resolve disputes, and enforce our legal agreements and policies.
+Retendremos tus Datos Personales solo durante el tiempo necesario para los propósitos establecidos en esta Política de Privacidad. Retendremos y usaremos tus Datos Personales en la medida necesaria para cumplir con nuestras obligaciones legales, resolver disputas y hacer cumplir nuestros acuerdos y políticas legales.
 
-## Data Transfer
+## Transferencia de Datos
 
-Your information may be transferred to — and maintained on — computers located outside of your state, province, country, or other governmental jurisdiction where data protection laws may differ from those of your jurisdiction.
+Tu información puede ser transferida a — y mantenida en — computadoras ubicadas fuera de tu estado, provincia, país u otra jurisdicción gubernamental donde las leyes de protección de datos pueden diferir de las de tu jurisdicción.
 
-Your consent to this Privacy Policy followed by your submission of such information represents your agreement to that transfer.
+Tu consentimiento a esta Política de Privacidad seguido de tu envío de dicha información representa tu acuerdo con esa transferencia.
 
-## Disclosure of Data
+## Divulgación de Datos
 
-### Legal Requirements
+### Requerimientos Legales
 
-TokyoApps/TokRaggcorp may disclose your Personal Data in the good faith belief that such action is necessary to:
+TokyoApps/TokRaggcorp puede divulgar tus Datos Personales en la creencia de buena fe de que tal acción es necesaria para:
 
-- Comply with a legal obligation
-- Protect and defend our rights or property
-- Prevent or investigate possible wrongdoing in connection with the Service
-- Protect the personal safety of users of the Service or the public
-- Protect against legal liability
+- Cumplir con una obligación legal
+- Proteger y defender nuestros derechos o propiedad
+- Prevenir o investigar posibles irregularidades en conexión con el Servicio
+- Proteger la seguridad personal de los usuarios del Servicio o del público
+- Proteger contra responsabilidad legal
 
-## Security of Data
+## Seguridad de los Datos
 
-The security of your data is important to us. We implement industry-standard security measures to protect your personal information. However, no method of transmission over the Internet or method of electronic storage is 100% secure.
+La seguridad de tus datos es importante para nosotros. Implementamos medidas de seguridad estándar de la industria para proteger tu información personal. Sin embargo, ningún método de transmisión por Internet o método de almacenamiento electrónico es 100% seguro.
 
-## Your Data Protection Rights
+## Tus Derechos de Protección de Datos
 
-Depending on your location, you may have certain rights regarding your personal data:
+Dependiendo de tu ubicación, puedes tener ciertos derechos respecto a tus datos personales:
 
-- **Access**: Request copies of your personal data
-- **Rectification**: Request correction of inaccurate data
-- **Erasure**: Request deletion of your personal data
-- **Restriction**: Request restriction of processing
-- **Portability**: Request transfer of your data
-- **Objection**: Object to processing of your personal data
+- **Acceso**: Solicitar copias de tus datos personales
+- **Rectificación**: Solicitar corrección de datos inexactos
+- **Eliminación**: Solicitar eliminación de tus datos personales
+- **Restricción**: Solicitar restricción del procesamiento
+- **Portabilidad**: Solicitar transferencia de tus datos
+- **Objeción**: Oponerte al procesamiento de tus datos personales
 
-To exercise any of these rights, please contact us at: tokraagcorp@gmail.com
+Para ejercer cualquiera de estos derechos, contáctanos en: tokraagcorp@gmail.com
 
-## Children's Privacy
+## Privacidad de Menores
 
-Our Service does not address anyone under the age of 13 ("Children"). We do not knowingly collect personally identifiable information from children under 13. If you become aware that a Child has provided us with Personal Data, please contact us.
+Nuestro Servicio no está dirigido a personas menores de 13 años ("Menores"). No recopilamos intencionalmente información de identificación personal de menores de 13 años. Si te das cuenta de que un Menor nos ha proporcionado Datos Personales, por favor contáctanos.
 
-## Gambling Disclaimer
+## Aviso Legal sobre Juegos de Azar
 
-⚠️ **IMPORTANT**: Tokyo Predictor Roulette is a **SIMULATION and EDUCATIONAL application only**. 
+⚠️ **IMPORTANTE**: Tokyo Predictor Roulette es una **aplicación de SIMULACIÓN y EDUCATIVA únicamente**. 
 
-- This app does NOT promote real gambling
-- No real money is involved in the application
-- The predictions are for entertainment and educational purposes only
-- Past results do not guarantee future outcomes in real gambling scenarios
-- We encourage responsible gaming awareness
+- Esta app NO promueve el juego real con dinero
+- No se involucra dinero real en la aplicación
+- Las predicciones son solo para entretenimiento y propósitos educativos
+- Los resultados pasados no garantizan resultados futuros en escenarios de juego real
+- Fomentamos la conciencia sobre el juego responsable
 
-## Third-Party Services
+## Servicios de Terceros
 
-Our Service may contain links to other sites that are not operated by us. We have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services.
+Nuestro Servicio puede contener enlaces a otros sitios que no son operados por nosotros. No tenemos control sobre y no asumimos responsabilidad por el contenido, políticas de privacidad o prácticas de sitios o servicios de terceros.
 
-### Third-Party SDK Privacy Policies
+### Políticas de Privacidad de SDKs de Terceros
 
-- [Google Firebase Privacy Policy](https://firebase.google.com/support/privacy)
-- [Stripe Privacy Policy](https://stripe.com/privacy) (for in-app purchases)
+- [Política de Privacidad de Google Firebase](https://firebase.google.com/support/privacy)
+- [Política de Privacidad de Stripe](https://stripe.com/privacy) (para compras in-app)
 
-## Changes to This Privacy Policy
+## Cambios a Esta Política de Privacidad
 
-We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last Updated" date.
+Podemos actualizar nuestra Política de Privacidad de vez en cuando. Te notificaremos de cualquier cambio publicando la nueva Política de Privacidad en esta página y actualizando la fecha de "Última Actualización".
 
-You are advised to review this Privacy Policy periodically for any changes. Changes to this Privacy Policy are effective when they are posted on this page.
+Se te aconseja revisar esta Política de Privacidad periódicamente para ver cualquier cambio. Los cambios a esta Política de Privacidad son efectivos cuando se publican en esta página.
 
-## Contact Us
+## Contáctanos
 
-If you have any questions about this Privacy Policy, please contact us:
+Si tienes alguna pregunta sobre esta Política de Privacidad, contáctanos:
 
 - **Email**: tokraagcorp@gmail.com
-- **Developer**: TokyoApps/TokRaggcorp
+- **Desarrollador**: TokyoApps/TokRaggcorp
 
 ---
 
-© 2024 TokyoApps/TokRaggcorp. All rights reserved.
+© 2024 TokyoApps/TokRaggcorp. Todos los derechos reservados.

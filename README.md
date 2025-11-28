@@ -5,78 +5,78 @@
 </p>
 
 <p align="center">
-  <strong>Educational Roulette Simulator by TokyoApps/TokRaggcorp</strong>
+  <strong>Simulador Educativo de Ruleta por TokyoApps/TokRaggcorp</strong>
 </p>
 
 <p align="center">
-  <a href="#features">Features</a> •
-  <a href="#installation">Installation</a> •
-  <a href="#build">Build</a> •
-  <a href="#qa-testing">QA Testing</a> •
+  <a href="#características">Características</a> •
+  <a href="#instalación">Instalación</a> •
+  <a href="#compilación">Compilación</a> •
+  <a href="#pruebas-qa">Pruebas QA</a> •
   <a href="#release">Release</a> •
-  <a href="#contact">Contact</a>
+  <a href="#contacto">Contacto</a>
 </p>
 
 ---
 
-## App Information
+## Información de la App
 
-| Field | Value |
+| Campo | Valor |
 |-------|-------|
-| **App Name** | Tokyo Predictor Roulette |
+| **Nombre de la App** | Tokyo Predictor Roulette |
 | **Package** | `com.tokraggcorp.tokyopredictorroulett` |
-| **Developer** | TokyoApps/TokRaggcorp |
-| **Support Email** | tokraagcorp@gmail.com |
-| **Version** | 1.0.0 |
+| **Desarrollador** | TokyoApps/TokRaggcorp |
+| **Correo de Soporte** | tokraagcorp@gmail.com |
+| **Versión** | 1.0.0 |
 
-## Description
+## Descripción
 
-Tokyo Predictor Roulette is an **educational simulator** for roulette with predictions, secure RNG, Martingale strategy advisor, and a freemium model. Includes Stripe integration for payments and Firebase for remote configurations.
+Tokyo Predictor Roulette es un **simulador educativo** de ruleta con predicciones, RNG seguro, asesor de estrategia Martingale y modelo freemium. Incluye integración con Stripe para pagos y Firebase para configuraciones remotas.
 
-⚠️ **DISCLAIMER**: This is a **simulation and educational application ONLY**. It does NOT promote real gambling. No real money is involved.
+⚠️ **AVISO LEGAL**: Esta es una **aplicación de simulación y educativa ÚNICAMENTE**. NO promueve el juego real. No se involucra dinero real.
 
-## Features
+## Características
 
-- 🎰 **European Roulette Simulation** - Authentic 0-36 wheel simulation
-- 🔮 **Prediction System** - Educational prediction based on history
-- 📊 **Martingale Strategy Advisor** - Learn betting strategies
-- 🔐 **Secure RNG** - Cryptographically secure random number generation
-- 💳 **Freemium Model** - Stripe integration for premium features
-- 🔥 **Firebase Backend** - Remote config and analytics
-- 📱 **Multi-language Support** - Internationalization ready
+- 🎰 **Simulación de Ruleta Europea** - Simulación auténtica de rueda 0-36
+- 🔮 **Sistema de Predicción** - Predicción educativa basada en historial
+- 📊 **Asesor de Estrategia Martingale** - Aprende estrategias de apuestas
+- 🔐 **RNG Seguro** - Generación de números aleatorios criptográficamente seguros
+- 💳 **Modelo Freemium** - Integración con Stripe para funciones premium
+- 🔥 **Backend Firebase** - Configuración remota y analíticas
+- 📱 **Soporte Multi-idioma** - Listo para internacionalización
 
-## Installation
+## Instalación
 
-### Prerequisites
+### Requisitos Previos
 
-- Flutter SDK 3.0.0 or higher
+- Flutter SDK 3.0.0 o superior
 - Dart SDK
 - Android Studio / VS Code
-- JDK 17 or higher
+- JDK 17 o superior
 
-### Setup
+### Configuración
 
 ```bash
-# Clone the repository
+# Clonar el repositorio
 git clone https://github.com/Melampe001/Tokyo-Predictor-Roulette-001.git
 cd Tokyo-Predictor-Roulette-001
 
-# Get dependencies
+# Obtener dependencias
 flutter pub get
 
-# Run the app (development)
+# Ejecutar la app (desarrollo)
 flutter run
 ```
 
-## Build
+## Compilación
 
-### Debug APK
+### APK de Depuración
 
 ```bash
 flutter build apk --debug
 ```
 
-### Release APK
+### APK de Release
 
 ```bash
 flutter build apk --release
@@ -88,188 +88,188 @@ flutter build apk --release
 flutter build appbundle --release
 ```
 
-### Build Outputs
+### Archivos de Salida
 
 - **APK**: `build/app/outputs/flutter-apk/app-release.apk`
 - **AAB**: `build/app/outputs/bundle/release/app-release.aab`
 
-## Keystore Configuration
+## Configuración del Keystore
 
-For signing release builds, configure your keystore:
+Para firmar builds de release, configura tu keystore:
 
-### Option 1: key.properties (Local Development)
+### Opción 1: key.properties (Desarrollo Local)
 
-Create `android/key.properties`:
+Crear `android/key.properties`:
 
 ```properties
-storeFile=/path/to/your/keystore.jks
-storePassword=your_keystore_password
-keyAlias=your_key_alias
-keyPassword=your_key_password
+storeFile=/ruta/a/tu/keystore.jks
+storePassword=tu_password_del_keystore
+keyAlias=tu_alias_de_clave
+keyPassword=tu_password_de_clave
 ```
 
-### Option 2: Environment Variables (CI/CD)
+### Opción 2: Variables de Entorno (CI/CD)
 
-Set the following secrets in GitHub Actions:
+Configura los siguientes secretos en GitHub Actions:
 
-| Secret | Description |
-|--------|-------------|
-| `ANDROID_KEYSTORE_BASE64` | Base64 encoded keystore file |
-| `KEYSTORE_PASSWORD` | Keystore password |
-| `KEY_ALIAS` | Key alias |
-| `KEY_PASSWORD` | Key password |
+| Secreto | Descripción |
+|---------|-------------|
+| `ANDROID_KEYSTORE_BASE64` | Archivo keystore codificado en Base64 |
+| `KEYSTORE_PASSWORD` | Contraseña del keystore |
+| `KEY_ALIAS` | Alias de la clave |
+| `KEY_PASSWORD` | Contraseña de la clave |
 
-⚠️ **SECURITY**: Never commit `key.properties` or keystore files to the repository.
+⚠️ **SEGURIDAD**: Nunca subas `key.properties` o archivos keystore al repositorio.
 
-## QA Testing
+## Pruebas QA
 
-### Running Tests
+### Ejecutar Pruebas
 
 ```bash
-# Run all tests
+# Ejecutar todas las pruebas
 flutter test
 
-# Run tests with coverage
+# Ejecutar pruebas con cobertura
 flutter test --coverage
 
-# Run specific test file
+# Ejecutar archivo de prueba específico
 flutter test test/widget_test.dart
 ```
 
-### Code Analysis
+### Análisis de Código
 
 ```bash
-# Analyze code
+# Analizar código
 flutter analyze
 
-# Format code
+# Formatear código
 dart format lib/ test/
 ```
 
-### Manual QA Checklist
+### Lista de Verificación QA Manual
 
-- [ ] App launches without crashes
-- [ ] Login/registration flow works
-- [ ] Roulette spin generates valid numbers (0-36)
-- [ ] History tracking is accurate
-- [ ] UI elements are responsive
-- [ ] No hardcoded credentials in logs
-- [ ] Network requests use HTTPS
+- [ ] La app inicia sin fallos
+- [ ] El flujo de login/registro funciona
+- [ ] El giro de ruleta genera números válidos (0-36)
+- [ ] El seguimiento del historial es preciso
+- [ ] Los elementos de UI son responsivos
+- [ ] No hay credenciales hardcodeadas en logs
+- [ ] Las peticiones de red usan HTTPS
 
 ## CI/CD
 
-The repository includes automated workflows:
+El repositorio incluye workflows automatizados:
 
-| Workflow | File | Purpose |
-|----------|------|---------|
-| **CI Pipeline** | `.github/workflows/ci.yml` | Test, Lint, Build APK/AAB |
-| **Build APK** | `.github/workflows/build-apk.yml` | Build release APK |
+| Workflow | Archivo | Propósito |
+|----------|---------|-----------|
+| **Pipeline CI** | `.github/workflows/ci.yml` | Test, Lint, Build APK/AAB |
+| **Build APK** | `.github/workflows/build-apk.yml` | Compilar APK de release |
 
-### CI Pipeline Jobs
+### Jobs del Pipeline CI
 
-1. **Analyze & Lint** - Code analysis and formatting check
-2. **Run Tests** - Unit and widget tests with coverage
-3. **Build Release APK** - Generate signed APK
-4. **Build Release AAB** - Generate App Bundle for Play Store
+1. **Analizar & Lint** - Análisis de código y verificación de formato
+2. **Ejecutar Pruebas** - Pruebas unitarias y de widgets con cobertura
+3. **Build APK Release** - Generar APK firmada
+4. **Build AAB Release** - Generar App Bundle para Play Store
 
-## Release Process
+## Proceso de Release
 
-### Pre-Release Checklist
+### Lista de Verificación Pre-Release
 
-- [ ] All tests passing
-- [ ] Code review completed
-- [ ] Version bumped in `pubspec.yaml`
-- [ ] Changelog updated
-- [ ] Privacy policy reviewed
-- [ ] Screenshots updated
-- [ ] Store listing updated
+- [ ] Todas las pruebas pasando
+- [ ] Revisión de código completada
+- [ ] Versión actualizada en `pubspec.yaml`
+- [ ] Changelog actualizado
+- [ ] Política de privacidad revisada
+- [ ] Screenshots actualizados
+- [ ] Listado de tienda actualizado
 
-### Play Store Submission
+### Envío a Play Store
 
-1. Generate signed AAB: `flutter build appbundle --release`
-2. Upload to Google Play Console
-3. Fill in store listing with screenshots
-4. Submit for review
+1. Generar AAB firmado: `flutter build appbundle --release`
+2. Subir a Google Play Console
+3. Completar listado de tienda con screenshots
+4. Enviar para revisión
 
-### Required Play Store Assets
+### Assets Requeridos para Play Store
 
-- Feature graphic (1024x500)
-- Screenshots (phone + tablet)
-- App icon (512x512)
-- Privacy policy URL
-- Content rating questionnaire
+- Gráfico destacado (1024x500)
+- Screenshots (teléfono + tablet)
+- Icono de app (512x512)
+- URL de política de privacidad
+- Cuestionario de clasificación de contenido
 
-## Project Structure
+## Estructura del Proyecto
 
 ```
 tokyo-predictor-roulette/
-├── android/                    # Android platform code
+├── android/                    # Código de plataforma Android
 │   └── app/
 │       └── src/main/
 │           └── AndroidManifest.xml
-├── assets/                     # App assets
-│   └── images/                 # Icons and splash screen
-├── docs/                       # Documentation
-│   └── hojas-menbretadas-tokyo/  # Official stationery
-├── lib/                        # Dart source code
-│   ├── main.dart              # App entry point
-│   └── roulette_logic.dart    # Roulette game logic
-├── test/                       # Test files
-├── .github/workflows/          # CI/CD workflows
-├── privacy-policy.md           # Privacy policy
-├── SECURITY.md                 # Security policy
-├── pubspec.yaml               # Dependencies
-└── README.md                  # This file
+├── assets/                     # Assets de la app
+│   └── images/                 # Iconos y pantalla splash
+├── docs/                       # Documentación
+│   └── hojas-menbretadas-tokyo/  # Papelería oficial
+├── lib/                        # Código fuente Dart
+│   ├── main.dart              # Punto de entrada de la app
+│   └── roulette_logic.dart    # Lógica del juego de ruleta
+├── test/                       # Archivos de prueba
+├── .github/workflows/          # Workflows CI/CD
+├── privacy-policy.md           # Política de privacidad
+├── SECURITY.md                 # Política de seguridad
+├── pubspec.yaml               # Dependencias
+└── README.md                  # Este archivo
 ```
 
-## Documentation
+## Documentación
 
-| Document | Description |
-|----------|-------------|
-| [Privacy Policy](privacy-policy.md) | Data collection and usage policy |
-| [Security Policy](SECURITY.md) | Security guidelines and vulnerability reporting |
-| [Stationery](docs/hojas-menbretadas-tokyo/) | Official brand stationery |
+| Documento | Descripción |
+|-----------|-------------|
+| [Política de Privacidad](privacy-policy.md) | Política de recopilación y uso de datos |
+| [Política de Seguridad](SECURITY.md) | Guías de seguridad y reporte de vulnerabilidades |
+| [Papelería](docs/hojas-menbretadas-tokyo/) | Papelería oficial de la marca |
 
-## Contact
+## Contacto
 
-**Developer**: TokyoApps/TokRaggcorp  
-**Support Email**: tokraagcorp@gmail.com  
+**Desarrollador**: TokyoApps/TokRaggcorp  
+**Correo de Soporte**: tokraagcorp@gmail.com  
 **Package**: com.tokraggcorp.tokyopredictorroulett
 
-For bug reports, feature requests, or security issues:
+Para reportes de bugs, solicitudes de funciones o problemas de seguridad:
 - 📧 Email: tokraagcorp@gmail.com
 - 🐛 Issues: [GitHub Issues](https://github.com/Melampe001/Tokyo-Predictor-Roulette-001/issues)
 
-## License
+## Licencia
 
-© 2024 TokyoApps/TokRaggcorp. All rights reserved.
+© 2024 TokyoApps/TokRaggcorp. Todos los derechos reservados.
 
 ---
 
-## Development Phases
+## Fases de Desarrollo
 
-### ✅ Phase 1: Definition & Planning
-- [x] Project scope and objectives defined
-- [x] Requirements and deliverables identified
-- [x] Roadmap with milestones created
-- [x] Task assignments completed
+### ✅ Fase 1: Definición y Planificación
+- [x] Alcance y objetivos del proyecto definidos
+- [x] Requerimientos y entregables identificados
+- [x] Roadmap con hitos creado
+- [x] Asignaciones de tareas completadas
 
-### ✅ Phase 2: Technical Design & Documentation
-- [x] Technical documentation (architecture, flow, APIs)
-- [x] Dependencies and resources reviewed
-- [x] Design validated and feedback received
+### ✅ Fase 2: Diseño Técnico y Documentación
+- [x] Documentación técnica (arquitectura, flujo, APIs)
+- [x] Dependencias y recursos revisados
+- [x] Diseño validado y feedback recibido
 
-### ✅ Phase 3: Incremental Development
-- [x] Features implemented per roadmap
-- [x] Code reviews and PRs following checklist
-- [x] Documentation updated with changes
+### ✅ Fase 3: Desarrollo Incremental
+- [x] Funcionalidades implementadas según roadmap
+- [x] Revisiones de código y PRs siguiendo checklist
+- [x] Documentación actualizada con cambios
 
-### ✅ Phase 4: Testing
-- [x] Unit and functional tests executed
-- [x] Requirements and acceptance criteria validated
-- [x] Bugs detected and fixed
+### ✅ Fase 4: Pruebas
+- [x] Pruebas unitarias y funcionales ejecutadas
+- [x] Requerimientos y criterios de aceptación validados
+- [x] Bugs detectados y corregidos
 
-### ✅ Phase 5: Deployment & Release
-- [x] Release environment prepared
-- [x] Lessons learned documented
-- [x] Deliverables presented and phase closed
+### ✅ Fase 5: Despliegue y Release
+- [x] Ambiente de release preparado
+- [x] Lecciones aprendidas documentadas
+- [x] Entregables presentados y fase cerrada

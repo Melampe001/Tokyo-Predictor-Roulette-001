@@ -1,97 +1,97 @@
-# Security Policy
+# Política de Seguridad
 
-## Tokyo Predictor Roulette - Security Guidelines
+## Tokyo Predictor Roulette - Guías de Seguridad
 
-**Developer**: TokyoApps/TokRaggcorp  
+**Desarrollador**: TokyoApps/TokRaggcorp  
 **Package**: com.tokraggcorp.tokyopredictorroulett  
-**Contact**: tokraagcorp@gmail.com
+**Contacto**: tokraagcorp@gmail.com
 
-## Supported Versions
+## Versiones Soportadas
 
-We provide security updates for the following versions:
+Proporcionamos actualizaciones de seguridad para las siguientes versiones:
 
-| Version | Supported          |
+| Versión | Soportada          |
 | ------- | ------------------ |
 | 1.0.x   | :white_check_mark: |
 | < 1.0   | :x:                |
 
-## Reporting a Vulnerability
+## Reportar una Vulnerabilidad
 
-We take the security of Tokyo Predictor Roulette seriously. If you discover a security vulnerability, please follow these guidelines:
+Tomamos la seguridad de Tokyo Predictor Roulette seriamente. Si descubres una vulnerabilidad de seguridad, por favor sigue estas guías:
 
-### How to Report
+### Cómo Reportar
 
-1. **DO NOT** disclose the vulnerability publicly until it has been addressed
-2. Send a detailed report to: **tokraagcorp@gmail.com**
-3. Include the following information:
-   - Description of the vulnerability
-   - Steps to reproduce the issue
-   - Potential impact of the vulnerability
-   - Any suggested fixes (if applicable)
+1. **NO** divulgues la vulnerabilidad públicamente hasta que haya sido abordada
+2. Envía un reporte detallado a: **tokraagcorp@gmail.com**
+3. Incluye la siguiente información:
+   - Descripción de la vulnerabilidad
+   - Pasos para reproducir el problema
+   - Impacto potencial de la vulnerabilidad
+   - Cualquier sugerencia de corrección (si aplica)
 
-### What to Expect
+### Qué Esperar
 
-- **Acknowledgment**: We will acknowledge receipt of your report within 48 hours
-- **Initial Assessment**: We will assess the vulnerability within 7 days
-- **Resolution Timeline**: Critical vulnerabilities will be addressed within 30 days
-- **Disclosure**: We will coordinate with you regarding public disclosure
+- **Reconocimiento**: Confirmaremos recibo de tu reporte dentro de 48 horas
+- **Evaluación Inicial**: Evaluaremos la vulnerabilidad dentro de 7 días
+- **Tiempo de Resolución**: Las vulnerabilidades críticas se abordarán dentro de 30 días
+- **Divulgación**: Coordinaremos contigo respecto a la divulgación pública
 
-### Security Contact
+### Contacto de Seguridad
 
-**Primary Contact**: tokraagcorp@gmail.com  
-**Response Time**: 48 hours for initial response
+**Contacto Principal**: tokraagcorp@gmail.com  
+**Tiempo de Respuesta**: 48 horas para respuesta inicial
 
-## Security Best Practices
+## Mejores Prácticas de Seguridad
 
-### For Users
+### Para Usuarios
 
-1. **Keep the app updated**: Always use the latest version from Google Play Store
-2. **Download from official sources**: Only download from Google Play Store
-3. **Be cautious with permissions**: Review app permissions before granting access
-4. **Report suspicious activity**: Contact us if you notice any unusual behavior
+1. **Mantén la app actualizada**: Siempre usa la última versión de Google Play Store
+2. **Descarga de fuentes oficiales**: Solo descarga de Google Play Store
+3. **Ten cuidado con los permisos**: Revisa los permisos de la app antes de otorgar acceso
+4. **Reporta actividad sospechosa**: Contáctanos si notas algún comportamiento inusual
 
-### Application Security Measures
+### Medidas de Seguridad de la Aplicación
 
-Tokyo Predictor Roulette implements the following security measures:
+Tokyo Predictor Roulette implementa las siguientes medidas de seguridad:
 
-#### Data Protection
-- ✅ Encrypted data transmission (HTTPS/TLS)
-- ✅ Secure local storage using encrypted SharedPreferences
-- ✅ No plain text storage of sensitive information
-- ✅ Minimal data collection policy
+#### Protección de Datos
+- ✅ Transmisión de datos encriptada (HTTPS/TLS)
+- ✅ Almacenamiento local seguro usando SharedPreferences encriptado
+- ✅ Sin almacenamiento de información sensible en texto plano
+- ✅ Política de recopilación mínima de datos
 
-#### Authentication
-- ✅ Firebase Authentication integration
-- ✅ Secure session management
-- ✅ Password requirements enforcement (when applicable)
+#### Autenticación
+- ✅ Integración con Firebase Authentication
+- ✅ Gestión segura de sesiones
+- ✅ Aplicación de requisitos de contraseña (cuando aplica)
 
-#### Code Security
-- ✅ Code obfuscation enabled for release builds
-- ✅ ProGuard/R8 rules applied
-- ✅ No hardcoded secrets or API keys in source code
-- ✅ Environment variables for sensitive configuration
+#### Seguridad del Código
+- ✅ Ofuscación de código habilitada para builds de release
+- ✅ Reglas ProGuard/R8 aplicadas
+- ✅ Sin secretos o claves API hardcodeadas en código fuente
+- ✅ Variables de entorno para configuración sensible
 
-#### Network Security
-- ✅ Certificate pinning (where applicable)
-- ✅ Cleartext traffic disabled
-- ✅ Secure API endpoints only
+#### Seguridad de Red
+- ✅ Certificate pinning (donde aplica)
+- ✅ Tráfico en texto plano deshabilitado
+- ✅ Solo endpoints API seguros
 
-#### Build Security
-- ✅ Signed APK/AAB with private keystore
-- ✅ Keystore and signing credentials excluded from version control
-- ✅ CI/CD secrets management for automated builds
+#### Seguridad de Build
+- ✅ APK/AAB firmado con keystore privado
+- ✅ Keystore y credenciales de firma excluidas del control de versiones
+- ✅ Gestión de secretos CI/CD para builds automatizados
 
-## Secure Development Guidelines
+## Guías de Desarrollo Seguro
 
-### For Contributors
+### Para Contribuidores
 
-1. **Never commit secrets**: API keys, passwords, keystores must never be committed
-2. **Use environment variables**: For all sensitive configuration
-3. **Review dependencies**: Check for known vulnerabilities before adding dependencies
-4. **Follow secure coding practices**: Input validation, output encoding, etc.
-5. **Test security**: Include security testing in your development workflow
+1. **Nunca subas secretos**: Claves API, contraseñas, keystores nunca deben ser subidos
+2. **Usa variables de entorno**: Para toda configuración sensible
+3. **Revisa dependencias**: Verifica vulnerabilidades conocidas antes de agregar dependencias
+4. **Sigue prácticas de codificación segura**: Validación de entrada, codificación de salida, etc.
+5. **Prueba la seguridad**: Incluye pruebas de seguridad en tu flujo de desarrollo
 
-### Files to Never Commit
+### Archivos que Nunca Debes Subir
 
 ```
 *.jks
@@ -101,57 +101,57 @@ key.properties
 .env.*
 secrets.yaml
 api_keys.dart
-google-services.json (with production credentials)
+google-services.json (con credenciales de producción)
 ```
 
-## Compliance
+## Cumplimiento
 
-Tokyo Predictor Roulette is designed to comply with:
+Tokyo Predictor Roulette está diseñado para cumplir con:
 
-- ✅ Google Play Developer Program Policies
-- ✅ General Data Protection Regulation (GDPR) principles
-- ✅ California Consumer Privacy Act (CCPA) principles
-- ✅ Children's Online Privacy Protection Act (COPPA)
+- ✅ Políticas del Programa de Desarrolladores de Google Play
+- ✅ Principios del Reglamento General de Protección de Datos (GDPR)
+- ✅ Principios de la Ley de Privacidad del Consumidor de California (CCPA)
+- ✅ Ley de Protección de la Privacidad en Línea de los Niños (COPPA)
 
-## Gambling Compliance Statement
+## Declaración de Cumplimiento sobre Juegos de Azar
 
-⚠️ **IMPORTANT**: Tokyo Predictor Roulette is strictly a **simulation and educational application**.
+⚠️ **IMPORTANTE**: Tokyo Predictor Roulette es estrictamente una **aplicación de simulación y educativa**.
 
-- **NO** real money gambling functionality
-- **NO** connection to real gambling services
-- **NO** promotion of gambling behavior
-- Educational disclaimers displayed throughout the app
-- Age-appropriate content guidelines followed
+- **NO** tiene funcionalidad de juego con dinero real
+- **NO** tiene conexión con servicios de juego reales
+- **NO** promueve comportamiento de juego
+- Avisos educativos mostrados en toda la app
+- Guías de contenido apropiado para la edad seguidas
 
-## Third-Party Security
+## Seguridad de Terceros
 
-We use the following third-party services with their respective security measures:
+Usamos los siguientes servicios de terceros con sus respectivas medidas de seguridad:
 
-| Service | Purpose | Security Info |
-|---------|---------|---------------|
-| Firebase | Backend services | [Firebase Security](https://firebase.google.com/support/privacy) |
-| Stripe | Payments | [Stripe Security](https://stripe.com/docs/security/stripe) |
-| Google Play | Distribution | [Play Security](https://support.google.com/googleplay/android-developer/answer/9859455) |
+| Servicio | Propósito | Info de Seguridad |
+|----------|-----------|-------------------|
+| Firebase | Servicios de backend | [Seguridad de Firebase](https://firebase.google.com/support/privacy) |
+| Stripe | Pagos | [Seguridad de Stripe](https://stripe.com/docs/security/stripe) |
+| Google Play | Distribución | [Seguridad de Play](https://support.google.com/googleplay/android-developer/answer/9859455) |
 
-## Incident Response
+## Respuesta a Incidentes
 
-In case of a security incident:
+En caso de un incidente de seguridad:
 
-1. **Identification**: Detect and identify the security incident
-2. **Containment**: Implement immediate measures to contain the issue
-3. **Investigation**: Conduct thorough investigation
-4. **Notification**: Notify affected users within 72 hours (if applicable)
-5. **Resolution**: Implement permanent fixes
-6. **Review**: Post-incident review and improvements
+1. **Identificación**: Detectar e identificar el incidente de seguridad
+2. **Contención**: Implementar medidas inmediatas para contener el problema
+3. **Investigación**: Realizar investigación exhaustiva
+4. **Notificación**: Notificar a usuarios afectados dentro de 72 horas (si aplica)
+5. **Resolución**: Implementar correcciones permanentes
+6. **Revisión**: Revisión post-incidente y mejoras
 
-## Updates to This Policy
+## Actualizaciones a Esta Política
 
-This security policy may be updated periodically. Check the repository for the latest version.
+Esta política de seguridad puede ser actualizada periódicamente. Revisa el repositorio para la última versión.
 
-**Last Updated**: November 2024
+**Última Actualización**: Noviembre 2024
 
 ---
 
-For any security-related questions, contact: tokraagcorp@gmail.com
+Para cualquier pregunta relacionada con seguridad, contacta: tokraagcorp@gmail.com
 
-© 2024 TokyoApps/TokRaggcorp. All rights reserved.
+© 2024 TokyoApps/TokRaggcorp. Todos los derechos reservados.
