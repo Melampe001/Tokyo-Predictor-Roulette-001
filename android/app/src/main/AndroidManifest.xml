@@ -1,12 +1,21 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Tokyo Roulette by TokyoApps® -->
+    <!-- Simulación inteligente para entretenimiento -->
+    
     <!-- Permisos necesarios para la aplicación -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     
+    <!-- Feature declarations for Play Store -->
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+    
     <application
-        android:label="Tokyo Roulette"
+        android:label="@string/app_name"
         android:icon="@mipmap/ic_launcher"
-        android:usesCleartextTraffic="false">
+        android:usesCleartextTraffic="false"
+        android:allowBackup="true"
+        android:supportsRtl="true">
+        
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -26,5 +35,13 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+            
+        <!-- App metadata for branding -->
+        <meta-data
+            android:name="com.tokyoapps.brand"
+            android:value="TokyoApps®" />
+        <meta-data
+            android:name="com.tokyoapps.slogan"
+            android:value="Simulación inteligente para entretenimiento" />
     </application>
 </manifest>
