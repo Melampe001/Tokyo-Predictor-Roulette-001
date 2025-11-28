@@ -1,6 +1,6 @@
 # Política de Privacidad — TokyoIA Roulette Predictor
 
-**Fecha de vigencia:** 2025-11-27
+**Fecha de vigencia:** 2024-11-27
 
 ---
 
