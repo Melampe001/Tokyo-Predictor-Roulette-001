@@ -168,7 +168,8 @@ Para preguntas sobre privacidad:
 ---
 
 **TokyoIA Apps**  
-Fecha de vigencia: 2025-11-27
+© 2024 TokyoIA Apps. Todos los derechos reservados.  
+Fecha de vigencia: 2024-11-27
 
 ---
 

@@ -112,14 +112,21 @@ class UserModel {
   /// Incluye validación básica de datos.
   ///
   /// [json] - Map con los datos del usuario
-  /// [strict] - Si es true, lanza excepciones en datos inválidos
+  /// [strict] - Si es true, lanza excepciones en datos inválidos o faltantes.
+  ///            Si es false, usa valores por defecto para campos faltantes.
   factory UserModel.fromJson(Map<String, dynamic> json, {bool strict = false}) {
-    // Extraer y validar campos requeridos
+    // Extraer campos requeridos
     final id = json['id']?.toString() ?? '';
     final email = json['email']?.toString() ?? '';
     
-    if (strict && (id.isEmpty || email.isEmpty)) {
-      throw FormatException('Campos requeridos faltantes en JSON: id=$id, email=$email');
+    // En modo strict, validar campos requeridos antes de continuar
+    if (strict) {
+      if (id.isEmpty) {
+        throw FormatException('Campo requerido faltante: id');
+      }
+      if (email.isEmpty) {
+        throw FormatException('Campo requerido faltante: email');
+      }
     }
     
     // Parsear fechas de forma segura
@@ -134,9 +141,13 @@ class UserModel {
         // Timestamp en milisegundos
         createdAt = DateTime.fromMillisecondsSinceEpoch(createdAtValue);
       } else {
+        if (strict) {
+          throw FormatException('Campo createdAt inválido o faltante');
+        }
         createdAt = DateTime.now();
       }
     } catch (e) {
+      if (strict) rethrow;
       createdAt = DateTime.now();
     }
     
@@ -151,12 +162,22 @@ class UserModel {
         updatedAt = DateTime.fromMillisecondsSinceEpoch(updatedAtValue);
       }
     } catch (e) {
+      if (strict) rethrow;
       updatedAt = null;
     }
     
+    // En modo strict, no usar valores por defecto para campos requeridos
+    // En modo no-strict, proporcionar valores por defecto seguros
+    final resolvedId = strict 
+        ? id 
+        : (id.isNotEmpty ? id : 'unknown_${DateTime.now().millisecondsSinceEpoch}');
+    final resolvedEmail = strict 
+        ? email 
+        : (email.isNotEmpty ? email : 'unknown@example.com');
+    
     return UserModel(
-      id: id.isNotEmpty ? id : 'unknown_${DateTime.now().millisecondsSinceEpoch}',
-      email: email.isNotEmpty ? email : 'unknown@example.com',
+      id: resolvedId,
+      email: resolvedEmail,
       displayName: json['displayName']?.toString() ?? json['display_name']?.toString(),
       photoUrl: json['photoUrl']?.toString() ?? json['photo_url']?.toString(),
       createdAt: createdAt,
