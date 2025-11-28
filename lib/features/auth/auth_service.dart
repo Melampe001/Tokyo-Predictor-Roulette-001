@@ -285,8 +285,11 @@ class AuthService {
   // ===========================================================================
   
   /// Valida el formato básico de un email
+  /// Nota: Esta es una validación básica. Para validación completa,
+  /// considera usar un paquete especializado como email_validator.
   bool _isValidEmail(String email) {
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    // Regex más permisivo para emails válidos
+    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     return emailRegex.hasMatch(email.trim());
   }
   

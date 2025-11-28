@@ -111,11 +111,15 @@ class StripeService {
       if (publishableKey.isEmpty) {
         // En desarrollo, podrías tener un fallback a test key
         // ADVERTENCIA: Nunca usar keys de producción aquí
-        // ignore: avoid_print
-        print(
-          '[StripeService] ADVERTENCIA: STRIPE_PUBLISHABLE_KEY no configurada. '
-          'Usa --dart-define=STRIPE_PUBLISHABLE_KEY=pk_xxx',
-        );
+        // NOTE: En producción, usa un framework de logging apropiado
+        assert(() {
+          // ignore: avoid_print
+          print(
+            '[StripeService] ADVERTENCIA: STRIPE_PUBLISHABLE_KEY no configurada. '
+            'Usa --dart-define=STRIPE_PUBLISHABLE_KEY=pk_xxx',
+          );
+          return true;
+        }());
         return false;
       }
       
@@ -128,6 +132,14 @@ class StripeService {
         );
       }
       
+      // Validar que la key tenga el formato correcto de publishable key
+      if (!publishableKey.startsWith('pk_')) {
+        throw SecurityException(
+          'Formato de clave inválido. '
+          'La clave debe ser una Publishable Key (pk_test_xxx o pk_live_xxx).',
+        );
+      }
+      
       // Configurar Stripe
       Stripe.publishableKey = publishableKey;
       
@@ -137,13 +149,21 @@ class StripeService {
       
       _initialized = true;
       
-      // ignore: avoid_print
-      print('[StripeService] Stripe inicializado correctamente');
+      // NOTE: En producción, usa un framework de logging apropiado
+      assert(() {
+        // ignore: avoid_print
+        print('[StripeService] Stripe inicializado correctamente');
+        return true;
+      }());
       
       return true;
     } catch (e) {
-      // ignore: avoid_print
-      print('[StripeService] Error al inicializar Stripe: $e');
+      // NOTE: En producción, usa un framework de logging apropiado
+      assert(() {
+        // ignore: avoid_print
+        print('[StripeService] Error al inicializar Stripe: $e');
+        return true;
+      }());
       return false;
     }
   }

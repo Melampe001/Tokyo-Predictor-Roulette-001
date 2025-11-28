@@ -207,16 +207,19 @@ class UserModel {
       displayName: displayName ?? this.displayName,
       photoUrl: photoUrl ?? this.photoUrl,
       createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? DateTime.now(),
+      updatedAt: updatedAt ?? this.updatedAt,
       isPremium: isPremium ?? this.isPremium,
       isEmailVerified: isEmailVerified ?? this.isEmailVerified,
     );
   }
   
   /// Valida formato básico de email
+  /// Nota: Esta es una validación básica. Para validación completa,
+  /// considera usar un paquete especializado como email_validator.
   static bool _isValidEmail(String email) {
     if (email.isEmpty) return false;
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    // Regex más permisivo para emails válidos
+    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     return emailRegex.hasMatch(email);
   }
   
