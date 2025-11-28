@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tokyo_roulette_predicciones/main.dart';
+import 'package:tokyo_predictor_roulette/main.dart';
 
 void main() {
   testWidgets('Prueba de botón de giro', (tester) async {
