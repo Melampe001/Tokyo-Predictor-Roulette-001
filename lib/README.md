@@ -1,6 +1,10 @@
-# Estructura del Proyecto Flutter - lib/
+# 🎰 TokyoIA Roulette Predictor - Estructura del Proyecto
 
-Este documento describe la arquitectura de carpetas bajo `lib/` siguiendo las mejores prácticas de Flutter para proyectos con Firebase y Stripe.
+Este documento describe la arquitectura completa de la aplicación **TokyoIA Roulette Predictor**, un simulador/predictor probabilístico de ruleta (Europea/Americana) con modelo de suscripciones.
+
+> ⚠️ **IMPORTANTE**: Esta app es un simulador educativo. NO predice resultados de casinos reales. Cumple con las políticas de Google Play Store.
+
+---
 
 ## 📁 Estructura de Carpetas
 
@@ -11,8 +15,18 @@ lib/
 ├── features/                       # Funcionalidades agrupadas por dominio
 │   ├── auth/                       # Autenticación
 │   │   └── auth_service.dart       # Servicio de Firebase Auth
-│   └── payments/                   # Pagos
-│       └── stripe_service.dart     # Servicio de Stripe
+│   ├── payments/                   # Pagos
+│   │   └── stripe_service.dart     # Servicio de Stripe/Google Play Billing
+│   ├── roulette/                   # Módulo de ruleta
+│   │   ├── european_roulette.dart  # Ruleta Europea (0)
+│   │   └── american_roulette.dart  # Ruleta Americana (00)
+│   ├── strategies/                 # Estrategias de apuesta
+│   │   ├── martingale.dart         # Estrategia Martingale
+│   │   ├── fibonacci.dart          # Estrategia Fibonacci
+│   │   ├── dalembert.dart          # Estrategia D'Alembert
+│   │   └── anti_martingale.dart    # Estrategia Anti-Martingale (Paroli)
+│   └── referrals/                  # Sistema de referidos
+│       └── referral_service.dart   # Programa de referidos ético
 ├── models/                         # Modelos de datos/entidades
 │   └── example_model.dart          # Modelo de ejemplo con fromJson
 ├── main.dart                       # Punto de entrada de la aplicación
@@ -55,101 +69,239 @@ Modelos de datos y entidades de la aplicación:
 
 ---
 
-## ✅ Checklist de Verificación
+# ✅ CHECKLIST COMPLETO PARA APP "Predicción Ruleta – TokyoIA"
 
-### 🔒 Seguridad Básica
+---
 
-- [ ] **Firebase**
-  - [ ] `firebase_options.dart` generado con FlutterFire CLI (no manual)
-  - [ ] Reglas de Firestore/Realtime Database configuradas restrictivamente
-  - [ ] Security Rules probadas en emulador local
-  - [ ] `google-services.json` y `GoogleService-Info.plist` en `.gitignore` (opcional)
-  
-- [ ] **Stripe**
-  - [ ] Publishable Key obtenida de variables de entorno (`--dart-define`)
-  - [ ] Secret Key NUNCA en código fuente o cliente
-  - [ ] PaymentIntents creados SIEMPRE en backend
-  - [ ] Webhooks configurados y firma verificada
-  - [ ] Claves de test vs producción correctamente separadas
+## 🧩 1. Definición del Proyecto
 
-- [ ] **Autenticación**
-  - [ ] Validación de email implementada
-  - [ ] Requisitos de contraseña fuertes (mínimo 8 caracteres)
-  - [ ] Verificación de email habilitada
-  - [ ] Mensajes de error no revelan información sensible
-  - [ ] Rate limiting configurado en backend
-  - [ ] Sesiones tienen timeout apropiado
+- [ ] Nombre de la app: TokyoIA Roulette Predictor
+- [ ] Plataformas: Android (Play Store)
+- [ ] Tipo de app: Predictor / simulador probabilístico (no gambling real)
+- [ ] **Motores de Ruleta:**
+  - [ ] Ruleta Americana (00)
+  - [ ] Ruleta Europea (0)
+- [ ] **Modelos probabilísticos:**
+  - [ ] Martingale
+  - [ ] Anti-Martingale
+  - [ ] Fibonacci
+  - [ ] D'Alembert
+  - [ ] Labouchere
+  - [ ] Parámetros ajustables por usuario
+- [ ] RNG interno (pseudoaleatorio)
+- [ ] Tablero y estadísticas en tiempo real
 
-- [ ] **Datos Sensibles**
-  - [ ] No hay credenciales hardcodeadas en código
-  - [ ] `.env` y archivos de configuración en `.gitignore`
-  - [ ] Secrets manejados via CI/CD secrets
-  - [ ] Logs no exponen datos sensibles
+---
 
-### 📦 Integridad de Servicios
+## 💰 2. Planes de Suscripción
 
-- [ ] **FirebaseService**
-  - [ ] Patrón Singleton implementado correctamente
-  - [ ] Manejo de errores de inicialización
-  - [ ] Método `ensureInitialized()` disponible
-  - [ ] No permite reinicialización accidental
+### Free
+- [ ] 1 predictor básico
+- [ ] Resultados limitados
+- [ ] No historial avanzado
 
-- [ ] **AuthService**
-  - [ ] Métodos de registro con validación
-  - [ ] Métodos de login con manejo de errores
-  - [ ] Método de signOut limpia datos locales
-  - [ ] Stream de authStateChanges disponible
-  - [ ] Recuperación de contraseña implementada
+### Advanced
+- [ ] Pago mensual
+- [ ] Pago 6 meses (-10% descuento)
+- [ ] Pago 12 meses (-25% descuento)
+- [ ] Estadísticas avanzadas
+- [ ] Registro de sesiones
+- [ ] Exportación CSV
 
-- [ ] **StripeService**
-  - [ ] Validación de Publishable Key (no acepta Secret Key)
-  - [ ] Métodos de pago retornan resultados tipados
-  - [ ] Manejo de estados: success, failure, cancelled, requiresAction
-  - [ ] Payment Sheet configurado correctamente
+### Premium (full unlock)
+- [ ] Acceso a todos los módulos
+- [ ] Predictores ilimitados
+- [ ] RNG avanzado
+- [ ] Soporte prioritario
+- [ ] Funciones experimentales
 
-- [ ] **Models**
-  - [ ] Factory `fromJson` maneja datos nulos/inválidos
-  - [ ] Método `toJson` serializa correctamente
-  - [ ] Validaciones en constructores
-  - [ ] `copyWith` implementado para inmutabilidad
-  - [ ] `equals` y `hashCode` si se usa en colecciones
+---
 
-### 🏗️ Arquitectura y Código
+## 🔐 3. Pagos e Integraciones
 
-- [ ] **Organización**
-  - [ ] Features separadas en sus propias carpetas
-  - [ ] No hay imports circulares
-  - [ ] Dependencias claras entre capas
-  - [ ] Código común en `/core`
+- [ ] Google Play Billing Library v6+
+- [ ] **Configurar en Play Console:**
+  - [ ] Productos de suscripción
+  - [ ] Suscripción mensual
+  - [ ] Suscripción 6 meses
+  - [ ] Suscripción anual
+  - [ ] Premium "full unlock"
+  - [ ] Pruebas internas con testers
+- [ ] Validación de recibos (server y en app)
+- [ ] **Seguridad de transacciones:**
+  - [ ] SHA-256 signing
+  - [ ] Play Integrity API
 
-- [ ] **Calidad de Código**
-  - [ ] Linter configurado y sin warnings
-  - [ ] Documentación en clases públicas
-  - [ ] Nombres descriptivos de variables y métodos
-  - [ ] Sin código comentado innecesario (excepto TODOs válidos)
+---
 
-- [ ] **Testing**
-  - [ ] Tests unitarios para servicios
-  - [ ] Tests de integración para flujos críticos
-  - [ ] Mocks para Firebase y Stripe en tests
-  - [ ] Coverage mínimo definido
+## 📱 4. Requerimientos Técnicos Android
 
-### 🚀 Preparación para Producción
+- [ ] Android Studio "Ladybug"
+- [ ] SDK mínimo 23
+- [ ] SDK target 34
+- [ ] Java 17 / Kotlin 2.x
+- [ ] Gradle actualizado
+- [ ] **Firmas:**
+  - [ ] Archivo keystore.jks creado y guardado
+  - [ ] Contraseña guardada en GitHub Secrets (NO en código)
+- [ ] **Permisos necesarios:**
+  - [ ] INTERNET
+  - [ ] QUERY_ALL_PACKAGES (solo si aplica y justificar)
+  - [ ] BILLING vía Play Billing API
+  - [ ] POST_NOTIFICATIONS si usas alertas
 
-- [ ] **Variables de Entorno**
-  - [ ] Todas las keys configurables por entorno
-  - [ ] Documentación de variables requeridas
-  - [ ] Valores por defecto seguros
+---
 
-- [ ] **Logging y Monitoreo**
-  - [ ] Crashlytics configurado
-  - [ ] Analytics para eventos importantes
-  - [ ] Logs estructurados (no `print` en producción)
+## 🏗 5. Arquitectura de la App
 
-- [ ] **Performance**
-  - [ ] Inicializaciones lazy cuando sea posible
-  - [ ] No hay llamadas síncronas bloqueantes
-  - [ ] Imágenes y assets optimizados
+- [ ] Clean Architecture (Data – Domain – UI)
+- [ ] **Data sources:**
+  - [ ] RNG interno
+  - [ ] Configuración del jugador
+  - [ ] Módulo de pagos
+  - [ ] API externa (si agregas)
+- [ ] Cifrado local AES256 para datos sensibles
+- [ ] Obfuscación con ProGuard / R8
+
+---
+
+## 🔢 6. Lógica de Predicción / Simulación
+
+- [ ] Implementar RNG pseudoaleatorio (seed + entropy)
+- [ ] **Parámetros:**
+  - [ ] Probabilidad por número
+  - [ ] Cálculo de Hot/Cold
+  - [ ] Ventanas móviles (50, 100, 300 spins)
+- [ ] **Algoritmos incluidos:**
+  - [ ] Martingale
+  - [ ] Fibonacci
+  - [ ] D'Alembert
+  - [ ] Secuencias personalizadas
+- [ ] **Reportes:**
+  - [ ] Heatmap
+  - [ ] Frecuencias
+  - [ ] Sesiones
+  - [ ] Ganancias simuladas
+
+> ⚠️ **NOTA**: Esto NO predice casinos reales, es simulación, como exige Play Store.
+
+---
+
+## 🎨 7. UI / UX
+
+- [ ] Diseño Material 3
+- [ ] Animaciones de ruleta
+- [ ] Resultados en tiempo real
+- [ ] Modo oscuro
+- [ ] Pantalla de suscripciones
+- [ ] Pantalla de estadísticas
+- [ ] Historial
+
+---
+
+## 🔑 8. Seguridad
+
+- [ ] API keys en local.properties (no en GitHub)
+- [ ] Play Integrity API
+- [ ] Firebase AppCheck (opcional)
+- [ ] Cifrado de configuraciones
+- [ ] Anti-debug tools
+- [ ] Validación de firma de la app
+- [ ] R8 + ProGuard configurado
+
+---
+
+## ☁️ 9. Backend Opcional
+
+*(Solo si quieres servidor, no obligatorio)*
+
+- [ ] Python / FastAPI
+- [ ] **Endpoints:**
+  - [ ] Validación de pagos
+  - [ ] Registro de usuario
+  - [ ] Estadísticas avanzadas
+- [ ] **Base de datos:**
+  - [ ] PostgreSQL o Supabase
+- [ ] JWT tokens
+- [ ] **Hosting:**
+  - [ ] Render
+  - [ ] Railway
+  - [ ] Firebase Functions (alternativa)
+
+---
+
+## 🧪 10. Testing
+
+- [ ] Unit tests (Kotlin/Dart)
+- [ ] UI tests (Espresso / Flutter test)
+- [ ] **Pruebas en Play Console:**
+  - [ ] Closed testing
+  - [ ] Internal testing
+  - [ ] Production release
+
+---
+
+## 📦 11. Requisitos para Publicación en Play Store
+
+- [ ] Paquete AAB (NO APK)
+- [ ] Firma con Play App Signing activada
+- [ ] App Bundle sin errores
+- [ ] **Políticas de Play:**
+  - [ ] No gambling real
+  - [ ] "Simulación de juegos de azar"
+  - [ ] RNG explicado en la descripción
+  - [ ] Protección al usuario
+- [ ] **Íconos:**
+  - [ ] 512x512
+  - [ ] 1024x500 banner
+  - [ ] Capturas de pantalla
+- [ ] Descripción completa
+- [ ] Política de privacidad (URL en GitHub Pages)
+
+---
+
+## 📂 12. Repositorio GitHub (Checklist para Copilot)
+
+- [ ] Carpeta /android o proyecto Flutter
+- [ ] Carpeta /backend (si aplica)
+- [ ] Archivo README.md con esta lista
+- [ ] Archivo /docs/privacy-policy.md
+- [ ] **GitHub Secrets configurados:**
+  - [ ] KEYSTORE_PASSWORD
+  - [ ] STORE_FILE
+  - [ ] SIGNING_KEY_ALIAS
+  - [ ] SIGNING_KEY_PASSWORD
+
+---
+
+## 🛠 13. Herramientas / Apps que debes instalar
+
+- [ ] Android Studio
+- [ ] Java 17
+- [ ] Git
+- [ ] GitHub Desktop (opcional)
+- [ ] Python 3.11 (si usas backend)
+- [ ] Node.js (si agregas dashboard)
+- [ ] Postman
+- [ ] Google Cloud CLI
+- [ ] Firebase CLI
+- [ ] Flutter SDK
+
+---
+
+## 🚀 14. Checklist Final Antes de Subir a Play Store
+
+- [ ] Compilar AAB – release
+- [ ] Firmado correcto
+- [ ] Sin permisos no justificados
+- [ ] Pruebas internas superadas
+- [ ] Descripción lista
+- [ ] Capturas subidas
+- [ ] Precios configurados
+- [ ] Suscripciones activas
+- [ ] Protección anti-piratería
+- [ ] Políticas aceptadas
+- [ ] Enviar a revisión
 
 ---
 
@@ -158,18 +310,21 @@ Modelos de datos y entidades de la aplicación:
 - [Firebase Flutter Setup](https://firebase.flutter.dev/docs/overview)
 - [FlutterFire CLI](https://firebase.flutter.dev/docs/cli/)
 - [Stripe Flutter Documentation](https://stripe.com/docs/payments/accept-a-payment?platform=flutter)
+- [Google Play Billing](https://developer.android.com/google/play/billing)
 - [Flutter Best Practices](https://dart.dev/guides/language/effective-dart)
 - [Feature-First Architecture](https://codewithandrea.com/articles/flutter-project-structure/)
+- [Play Store App Content Guidelines](https://support.google.com/googleplay/android-developer/answer/9859455)
 
 ---
 
 ## 📝 Notas para el Desarrollador
 
 1. **Antes de empezar**: Ejecuta `flutterfire configure` para generar `firebase_options.dart`
-2. **Para pagos**: Implementa un backend seguro para crear PaymentIntents
+2. **Para pagos**: Implementa un backend seguro para crear PaymentIntents o usa Google Play Billing
 3. **Testing**: Usa el emulador de Firebase para desarrollo local
 4. **CI/CD**: Configura secrets en GitHub Actions para las keys
 5. **Documentación**: Mantén este README actualizado con cambios de arquitectura
+6. **Play Store**: Asegúrate de cumplir todas las políticas de "Simulación de juegos de azar"
 
 ---
 
