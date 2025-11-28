@@ -97,6 +97,20 @@ api_keys.dart
 # Web related
 lib/generated_plugin_registrant.dart
 
+# Official stationery - CONFIDENTIAL: Do not commit!
+docs/hojas-menbretadas-tokyo/*.pdf
+docs/hojas-menbretadas-tokyo/*.png
+docs/hojas-menbretadas-tokyo/*.jpg
+docs/hojas-menbretadas-tokyo/*.jpeg
+docs/hojas-menbretadas-tokyo/templates/
+
+# Release keystore for CI/CD
+android/app/release-keystore.jks
+
+# Local configuration
+local.properties
+
 # Exceptions to above rules.
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 !/dev/ci/**/Gemfile.lock
+!docs/hojas-menbretadas-tokyo/README.md

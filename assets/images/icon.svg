@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="250" fill="#E60012"/>
+  
+  <!-- Roulette Wheel Outline -->
+  <circle cx="256" cy="256" r="200" fill="#1A237E" stroke="#FFD700" stroke-width="8"/>
+  
+  <!-- Inner Circle -->
+  <circle cx="256" cy="256" r="150" fill="#2E7D32" stroke="#FFD700" stroke-width="4"/>
+  
+  <!-- Center -->
+  <circle cx="256" cy="256" r="40" fill="#E60012" stroke="#FFD700" stroke-width="3"/>
+  
+  <!-- Tokyo Text -->
+  <text x="256" y="270" text-anchor="middle" fill="#FFD700" font-family="Arial, sans-serif" font-size="28" font-weight="bold">T</text>
+  
+  <!-- Decorative Lines -->
+  <line x1="256" y1="106" x2="256" y2="56" stroke="#FFD700" stroke-width="4"/>
+  <line x1="256" y1="406" x2="256" y2="456" stroke="#FFD700" stroke-width="4"/>
+  <line x1="106" y1="256" x2="56" y2="256" stroke="#FFD700" stroke-width="4"/>
+  <line x1="406" y1="256" x2="456" y2="256" stroke="#FFD700" stroke-width="4"/>
+</svg>

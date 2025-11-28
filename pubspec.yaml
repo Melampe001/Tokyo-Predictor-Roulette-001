@@ -1,5 +1,5 @@
-name: tokyo_roulette_predicciones
-description: Simulador de predicciones para ruleta con modelo freemium.
+name: tokyo_predictor_roulette
+description: Tokyo Predictor Roulette - Educational roulette simulator by TokyoApps/TokRaggcorp. Freemium model with predictions and strategies.
 publish_to: 'none'
 version: 1.0.0+1
 environment:
@@ -30,3 +30,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+    - assets/
