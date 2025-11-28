@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tokyo Roulette Launch Background -->
+<!-- TokyoApps® - Simulación inteligente para entretenimiento -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="?android:colorBackground" />
+    <!-- Centered logo placeholder -->
+    <!-- Replace with actual logo: android:drawable="@mipmap/ic_launcher" -->
+</layer-list>
