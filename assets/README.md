@@ -1,28 +1,28 @@
 # Tokyo Predictor Roulette - Assets
 
-Esta carpeta contiene los assets de la app incluyendo iconos y pantallas de splash.
+This folder contains the app assets including icons and splash screens.
 
-## Assets Requeridos
+## Required Assets
 
-### Icono de la App
-- `icon.png` - Icono principal de la app (1024x1024 recomendado)
-- Los iconos adaptativos generados se colocarán en `android/app/src/main/res/`
+### App Icon
+- `icon.png` - Main app icon (1024x1024 recommended)
+- Generated adaptive icons will be placed in `android/app/src/main/res/`
 
-### Pantalla de Splash
-- `splash.png` - Fondo de la pantalla de splash
+### Splash Screen
+- `splash.png` - Splash screen background
 
-## Generación de Iconos
+## Icon Generation
 
-Para generar iconos adaptativos de Android, usa el paquete `flutter_launcher_icons`:
+To generate Android adaptive icons, use the `flutter_launcher_icons` package:
 
 ```bash
 flutter pub add flutter_launcher_icons --dev
 flutter pub run flutter_launcher_icons
 ```
 
-## Configuración de Assets
+## Asset Configuration
 
-Los assets están configurados en `pubspec.yaml`:
+Assets are configured in `pubspec.yaml`:
 
 ```yaml
 flutter:
@@ -30,15 +30,15 @@ flutter:
     - assets/images/
 ```
 
-## Guías de Marca
+## Brand Guidelines
 
-- Color Primario: Tokyo Red (#E60012)
-- Color Secundario: Dark Blue (#1A237E)
-- Fondo: White (#FFFFFF)
+- Primary Color: Tokyo Red (#E60012)
+- Secondary Color: Dark Blue (#1A237E)
+- Background: White (#FFFFFF)
 
-## Contacto
+## Contact
 
-Para assets de marca, contacta: tokraagcorp@gmail.com
+For brand assets, contact: tokraagcorp@gmail.com
 
 ---
 © 2024 TokyoApps/TokRaggcorp
