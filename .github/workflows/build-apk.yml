@@ -19,7 +19,9 @@ permissions:
   contents: read
 
 env:
-  FLUTTER_VERSION: '3.16.0'
+  # Use stable channel to automatically get the latest stable Flutter version
+  # with security fixes and improvements
+  FLUTTER_CHANNEL: 'stable'
 
 jobs:
   # Job 1: Static Analysis and Linting
@@ -33,8 +35,7 @@ jobs:
     - name: Configurar Flutter SDK
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: ${{ env.FLUTTER_VERSION }}
-        channel: 'stable'
+        channel: ${{ env.FLUTTER_CHANNEL }}
         cache: true
     
     - name: Obtener dependencias
@@ -45,7 +46,6 @@ jobs:
     
     - name: Verificar formato de código
       run: dart format --set-exit-if-changed lib/ test/
-      continue-on-error: true
     
     - name: Verificar dependencias obsoletas
       run: flutter pub outdated
@@ -63,8 +63,7 @@ jobs:
     - name: Configurar Flutter SDK
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: ${{ env.FLUTTER_VERSION }}
-        channel: 'stable'
+        channel: ${{ env.FLUTTER_CHANNEL }}
         cache: true
     
     - name: Obtener dependencias
@@ -103,8 +102,7 @@ jobs:
     - name: Configurar Flutter SDK
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: ${{ env.FLUTTER_VERSION }}
-        channel: 'stable'
+        channel: ${{ env.FLUTTER_CHANNEL }}
         cache: true
     
     - name: Verificar versión de Flutter
@@ -159,8 +157,7 @@ jobs:
     - name: Configurar Flutter SDK
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: ${{ env.FLUTTER_VERSION }}
-        channel: 'stable'
+        channel: ${{ env.FLUTTER_CHANNEL }}
         cache: true
     
     - name: Obtener dependencias

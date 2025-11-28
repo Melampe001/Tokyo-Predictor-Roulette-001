@@ -85,10 +85,13 @@ android {
             debuggable true
         }
         release {
-            // Use release signing config if available, otherwise debug
+            // Use release signing config if available
             if (keystorePropertiesFile.exists() || System.getenv("ANDROID_KEYSTORE_PATH")) {
                 signingConfig signingConfigs.release
             } else {
+                // WARNING: Using debug signing for testing/development only
+                // For production releases, configure proper keystore signing
+                println "WARNING: No release keystore configured. Using debug signing for testing."
                 signingConfig signingConfigs.debug
             }
             
