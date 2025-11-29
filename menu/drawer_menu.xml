@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Drawer Menu - TokyoIA Roulette Predictor
+    
+    Este archivo define la estructura del menú lateral (Navigation Drawer)
+    de la aplicación.
+    
+    Para usar en Android nativo (Kotlin/Java):
+    - Coloca este archivo en res/menu/drawer_menu.xml
+    - Referencia con @menu/drawer_menu en tu NavigationView
+    
+    Para Flutter, usar el widget Drawer con ListTiles equivalentes.
+    Ver lib/widgets/app_drawer.dart para la implementación Flutter.
+    
+    Iconos requeridos en res/drawable/:
+    - ic_home.xml
+    - ic_ruleta.xml (o ic_casino)
+    - ic_stats.xml (o ic_analytics)
+    - ic_strategy.xml (o ic_psychology)
+    - ic_subs.xml (o ic_card_membership)
+    - ic_refer.xml (o ic_people)
+    - ic_settings.xml
+-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- Grupo principal con comportamiento de selección única -->
+    <group android:checkableBehavior="single">
+        
+        <!-- Inicio / Dashboard -->
+        <item 
+            android:id="@+id/nav_home" 
+            android:title="Inicio" 
+            android:icon="@drawable/ic_home"/>
+        
+        <!-- Ruleta - Pantalla principal de simulación -->
+        <item 
+            android:id="@+id/nav_ruleta" 
+            android:title="Ruleta" 
+            android:icon="@drawable/ic_ruleta"/>
+        
+        <!-- Predicciones / Estadísticas -->
+        <item 
+            android:id="@+id/nav_predicciones" 
+            android:title="Predicciones" 
+            android:icon="@drawable/ic_stats"/>
+        
+        <!-- Estrategias - Martingale, Fibonacci, etc. -->
+        <item 
+            android:id="@+id/nav_estrategias" 
+            android:title="Estrategias" 
+            android:icon="@drawable/ic_strategy"/>
+        
+        <!-- Suscripciones - Free/Advanced/Premium -->
+        <item 
+            android:id="@+id/nav_subs" 
+            android:title="Suscripciones" 
+            android:icon="@drawable/ic_subs"/>
+        
+        <!-- Referidos - Programa de referidos -->
+        <item 
+            android:id="@+id/nav_referidos" 
+            android:title="Referidos" 
+            android:icon="@drawable/ic_refer"/>
+        
+        <!-- Ajustes - Configuración de la app -->
+        <item 
+            android:id="@+id/nav_settings" 
+            android:title="Ajustes" 
+            android:icon="@drawable/ic_settings"/>
+        
+    </group>
+    
+    <!-- Separador visual (se renderiza automáticamente entre groups) -->
+    
+    <!-- Sección de Soporte -->
+    <item android:title="Soporte">
+        <menu>
+            <!-- Manual de uso -->
+            <item 
+                android:id="@+id/nav_help" 
+                android:title="Manual de uso" />
+            
+            <!-- Política de privacidad -->
+            <item 
+                android:id="@+id/nav_privacy" 
+                android:title="Política de privacidad" />
+            
+            <!-- Términos de servicio -->
+            <item 
+                android:id="@+id/nav_terms" 
+                android:title="Términos de servicio" />
+            
+            <!-- Contactar soporte -->
+            <item 
+                android:id="@+id/nav_contact" 
+                android:title="Contactar soporte" />
+        </menu>
+    </item>
+    
+</menu>
