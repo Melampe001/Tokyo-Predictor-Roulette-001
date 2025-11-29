@@ -4,9 +4,11 @@ name: Build AAB and Artifacts
 # Este workflow genera el Android App Bundle necesario para publicación
 
 on:
+  # NOTA: El workflow NO se ejecuta en push a main porque el proyecto Flutter
+  # aún no tiene la estructura completa. Se activa solo en:
+  # - Tags de versión (cuando el proyecto esté listo para release)
+  # - Manualmente desde GitHub Actions
   push:
-    branches:
-      - main
     tags:
       - 'v*'  # Ejecutar en tags de versión (v1.0.0, v1.2.3, etc.)
   workflow_dispatch:  # Permite ejecución manual desde GitHub Actions
