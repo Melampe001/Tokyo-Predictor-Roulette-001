@@ -2,30 +2,46 @@ name: tokyo_roulette_predicciones
 description: Simulador de predicciones para ruleta con modelo freemium.
 publish_to: 'none'
 version: 1.0.0+1
+
 environment:
   sdk: '>=3.0.0 <4.0.0'
+
 dependencies:
   flutter:
     sdk: flutter
-  flutter_stripe: ^10.0.0  # Para cobros Stripe
-  in_app_purchase: ^3.2.0  # Soporte in-app
-  firebase_core: ^2.24.2  # Firebase base
-  firebase_remote_config: ^4.3.12  # Para updates dinámicos cada 4 meses
-  cloud_firestore: ^4.15.3  # Almacenar emails
-  firebase_auth: ^4.16.0  # Auth para emails
-  intl: ^0.18.1  # Idioma/país
-  device_info_plus: ^9.1.2  # Info dispositivo/plataforma
-  url_launcher: ^6.2.4  # Comentarios via email
-  shared_preferences: ^2.2.2  # Storage local
-  # NOTA: charts_flutter está deprecado. Considera usar fl_chart o community_charts_flutter
-  # charts_flutter: ^0.12.0  # Gráficos (DEPRECADO)
-  fl_chart: ^0.65.0  # Gráficos modernos (reemplazo de charts_flutter)
-  firebase_messaging: ^14.7.10  # Notificaciones para invitaciones
+  # Stripe payments integration
+  flutter_stripe: ^10.0.0
+  # In-app purchases support
+  in_app_purchase: ^3.2.0
+  # Firebase core functionality
+  firebase_core: ^2.24.2
+  # Remote configuration for dynamic updates
+  firebase_remote_config: ^4.3.12
+  # Firestore for email storage
+  cloud_firestore: ^4.15.3
+  # Firebase authentication
+  firebase_auth: ^4.16.0
+  # Internationalization support
+  intl: ^0.18.1
+  # Device information
+  device_info_plus: ^9.1.2
+  # URL launcher for email comments
+  url_launcher: ^6.2.4
+  # Local storage
+  shared_preferences: ^2.2.2
+  # Modern charting library (replacement for deprecated charts_flutter)
+  fl_chart: ^0.65.0
+  # Push notifications
+  firebase_messaging: ^14.7.10
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
   integration_test:
     sdk: flutter
+  # Flutter linting rules
+  flutter_lints: ^3.0.0
+
 flutter:
   uses-material-design: true
   assets:
