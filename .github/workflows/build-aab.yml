@@ -1,0 +1,98 @@
+name: Build Android App Bundle (AAB)
+
+# Workflow for building release AAB for Google Play Store
+# Triggered on version tags and can be manually triggered
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build type'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+          - release
+          - profile
+
+# Only allow one concurrent run per branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Read-only permissions by default
+permissions:
+  contents: read
+
+jobs:
+  build-aab:
+    name: Build Android App Bundle
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Verify Flutter installation
+        run: flutter --version
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze code
+        run: flutter analyze --no-fatal-infos
+        continue-on-error: true
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Build release AAB
+        run: flutter build appbundle --release
+
+      - name: Verify AAB was created
+        run: |
+          echo "Verifying AAB creation..."
+          if [ -f "build/app/outputs/bundle/release/app-release.aab" ]; then
+            echo "✅ AAB generated successfully"
+            ls -lh build/app/outputs/bundle/release/app-release.aab
+          else
+            echo "❌ AAB not found"
+            exit 1
+          fi
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-aab
+          path: build/app/outputs/bundle/release/app-release.aab
+          retention-days: 30
+          compression-level: 9
+
+      - name: Build summary
+        run: |
+          echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **AAB built successfully**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Artifact name:** app-release-aab" >> $GITHUB_STEP_SUMMARY
+          echo "- **Size:** $(ls -lh build/app/outputs/bundle/release/app-release.aab | awk '{print $5}')" >> $GITHUB_STEP_SUMMARY
+          echo "- **Retention:** 30 days" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "1. Download the AAB artifact from the Actions tab" >> $GITHUB_STEP_SUMMARY
+          echo "2. Upload to Google Play Console for review" >> $GITHUB_STEP_SUMMARY

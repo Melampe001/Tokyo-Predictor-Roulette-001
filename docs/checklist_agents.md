@@ -1,85 +1,262 @@
 # Checklist de Integración y Agentes
 
-Este documento se integra en el checklist del repositorio y añade para cada punto una "Nota importante" indicando qué tipo de agente se requiere y cómo activarlo. Pegue o referencie este archivo desde el checklist principal o el template de PR.
+Este documento describe los agentes disponibles en el proyecto Tokyo Roulette, cómo integrarlos, y las mejores prácticas para CI/CD.
 
-Instrucciones de uso:
-- Copiar/pegar las secciones relevantes en el checklist o en el PR template.
-- Rellenar los campos <nombre del agente/job> con los nombres reales de jobs, runners o servicios que use el proyecto.
-- Añadir owners/teams para cada ítem donde corresponda.
+## Índice
 
-Checklist con notas de agente por punto
+1. [Agentes Disponibles](#agentes-disponibles)
+2. [Cómo Integrar Agentes](#cómo-integrar-agentes)
+3. [Checklist de CI/CD](#checklist-de-cicd)
+4. [Plantillas para PRs](#plantillas-para-prs)
 
-1) Build y compilación
-- Descripción: Verificar que el proyecto compila correctamente (analizar platforms si aplica).
-- Nota importante: Identificar si la compilación requiere runners especiales (macOS para iOS, etc.) o contenedores con versiones concretas del SDK.
-- Tipo de agente requerido: CI runner (por ejemplo GitHub Actions: ubuntu-latest, macos-latest).
-- Cómo añadir/activar: Añadir job en .github/workflows/build.yml con matrix por SDK/plataforma; nombrar job 'build' y documentar el runner en el README de CI.
+---
 
-2) Tests unitarios y de integración
-- Descripción: Ejecutar la suite de tests (unit, widget, integration).
-- Nota importante: Algunos tests de integración pueden necesitar emuladores o servicios externos (APIs simuladas).
-- Tipo de agente requerido: CI runner + emulador/servicio mock o device farm para tests instrumentados.
-- Cómo añadir/activar: Añadir workflow 'test' que ejecute 'flutter test' o 'dart test'; para tests de integración agregar steps que inicien emuladores o conecten a device-farm.
+## Agentes Disponibles
 
-3) Lint y formato
-- Descripción: Ejecutar dart analyze y dart format (o flutter format).
-- Nota importante: Definir si el CI aplicará correcciones automáticas por bot o fallará el CI para revisión humana.
-- Tipo de agente requerido: Bot/Action que ejecute formatter y linter, y revisores humanos para reglas no automáticas.
-- Cómo añadir/activar: Añadir job 'lint' en workflows; opcional: action que haga auto-commit de fixes y abra PR.
+### RouletteAgent
 
-4) Seguridad y dependencias
-- Descripción: Escanear dependencias (pub.dev) y buscar vulnerabilidades o licencias problemáticas.
-- Nota importante: Automatizar aviso de dependencias inseguras, pero asignar auditor humano para triage.
-- Tipo de agente requerido: Escáner automatizado (Dependabot, Snyk) + revisor humano.
-- Cómo añadir/activar: Habilitar Dependabot en repo; añadir job de seguridad que ejecute 'dart pub outdated --mode=null-safety' o herramientas externas.
+**Ubicación**: `lib/agents/roulette_agent.dart`
 
-5) Accesibilidad y localización
-- Descripción: Revisar accesibilidad (si aplica) y cobertura de i18n.
-- Nota importante: Herramientas automáticas detectan fallos, pero se necesita validación humana UX/AA.
-- Tipo de agente requerido: Reviewer humano especializado + linters automáticos.
-- Cómo añadir/activar: Incluir checklist de accesibilidad en PR template y asignar reviewer específico.
+**Propósito**: Simulación de ruleta europea con generación segura de números aleatorios.
 
-6) Performance y tamaño
-- Descripción: Verificar que no se introduzcan regresiones de rendimiento o aumentos inesperados del tamaño del binario.
-- Nota importante: Requiere jobs que ejecuten benchmarks y comparen con la línea base histórica.
-- Tipo de agente requerido: Job de benchmarking automatizado + ingeniero de rendimiento humano.
-- Cómo añadir/activar: Añadir workflow 'perf' que publique resultados en artefactos o en comentarios del PR; etiquetar PR si detecta regresión.
+**Características**:
+- Generación de números usando `Random.secure()`
+- Clasificación de colores (rojo, negro, verde)
+- Historial de giros con límite configurable
+- Predicción basada en frecuencia (educativo)
+- Cálculo de estadísticas
 
-7) Pruebas en dispositivos reales
-- Descripción: Validación en dispositivos físicos (Android/iOS) si aplica.
-- Nota importante: Identificar coste y acceso a device farms o equipos físicos.
-- Tipo de agente requerido: Device farm (Firebase Test Lab, BrowserStack) o equipo humano con dispositivos.
-- Cómo añadir/activar: Configurar integration job que envíe builds a device-farm y publique resultados.
+**Ejemplo de uso**:
 
-8) Breaking changes y compatibilidad de API
-- Descripción: Comprobar que cambios en APIs públicas están documentados y versionados.
-- Nota importante: Se requiere aprobación del API owner y, si es biblioteca pública, tests de compatibilidad.
-- Tipo de agente requerido: Revisor humano (owner) + detector automatizado de breaking changes si existe.
-- Cómo añadir/activar: Añadir paso en PR template para indicar si el cambio rompe compatibilidad; asignar owner.
+```dart
+import 'package:tokyo_roulette_predicciones/agents/agents.dart';
 
-9) Licencias y cumplimiento legal
-- Descripción: Revisar cambios en dependencias y licencias.
-- Nota importante: Cualquier dependencia nueva con licencia no compatible necesita revisión legal.
-- Tipo de agente requerido: Revisor legal/human + escáner automatizado.
-- Cómo añadir/activar: Ejecutar job que inspeccione licenses y levantar issue/label para revisión legal.
+// Crear instancia
+final agent = RouletteAgent();
 
-10) Documentación y PR template
-- Descripción: Actualizar docs cuando el cambio afecta comportamiento o APIs.
-- Nota importante: PRs deben incluir pasos para reproducir y indicar agentes que se usaron en las pruebas.
-- Tipo de agente requerido: Autor humano y revisor documental humano; CI puede validar links y formato.
-- Cómo añadir/activar: Añadir entradas obligatorias en PR template: 'Agentes usados', 'Comandos ejecutados', 'Artefactos adjuntos'.
+// Simular un giro
+final result = agent.spin(); // 0-36
 
-Plantilla corta para insertar en PR template (copiar EXACTO):
+// Agregar al historial
+agent.addToHistory(result);
 
-- [ ] Punto del checklist — Responsable: @team/owner
-  - Nota importante: Tipo de agente requerido: <humano|CI job|bot|device-farm|scanner> — Especificar: <nombre del agente/job>
-  - Cómo añadir/activar: <Instrucción breve para configurar el agente o asignación>
+// Obtener color
+final color = RouletteAgent.getColor(result); // 'red', 'black', 'green'
 
-Ejemplo:
-- [ ] Ejecutar pruebas de integración en dispositivos Android — Responsable: @android-team
-  - Nota importante: Tipo de agente requerido: device-farm (Firebase Test Lab) + revisor humano
-  - Cómo añadir/activar: Añadir job 'android-integration' en .github/workflows que publique resultados y cree un artefacto; asignar @android-team.
+// Obtener estadísticas
+final stats = agent.getStatistics();
+print(stats.redPercentage);
+```
 
-Notas finales:
-- Rellenar <nombre del agente/job> con los valores reales del repo.
-- Si quiere, puedo abrir un PR que agregue este archivo y/o insertar la sección en un archivo de checklist existente si me indica la ruta del archivo a modificar.
+### MartingaleAdvisor
+
+**Ubicación**: `lib/agents/martingale_advisor.dart`
+
+**Propósito**: Asesor de estrategia Martingale para fines educativos.
+
+**Características**:
+- Cálculo automático de apuestas
+- Límite máximo de apuesta configurable
+- Multiplicador configurable
+- Estadísticas de sesión
+- Simulación de rondas
+
+**Ejemplo de uso**:
+
+```dart
+import 'package:tokyo_roulette_predicciones/agents/agents.dart';
+
+// Configuración personalizada
+final advisor = MartingaleAdvisor(
+  baseBet: 10.0,
+  maxBet: 1000.0,
+  multiplier: 2.0,
+);
+
+// Procesar resultado de apuesta
+final nextBet = advisor.processBet(won: false); // Duplica
+final resetBet = advisor.processBet(won: true); // Resetea
+
+// Ver estadísticas
+print(advisor.sessionStats);
+
+// Simular 100 rondas
+final results = advisor.simulate(rounds: 100, winProbability: 0.486);
+```
+
+---
+
+## Cómo Integrar Agentes
+
+### Paso 1: Importar el módulo
+
+```dart
+// Importar todos los agentes
+import 'package:tokyo_roulette_predicciones/agents/agents.dart';
+
+// O importar específicos
+import 'package:tokyo_roulette_predicciones/agents/roulette_agent.dart';
+import 'package:tokyo_roulette_predicciones/agents/martingale_advisor.dart';
+```
+
+### Paso 2: Crear instancias
+
+```dart
+// En tu Widget o lógica de negocio
+class GameController {
+  final RouletteAgent _roulette = RouletteAgent();
+  final MartingaleAdvisor _advisor = MartingaleAdvisor(baseBet: 5.0);
+  
+  void playRound(BetType bet) {
+    final result = _roulette.spin();
+    _roulette.addToHistory(result);
+    
+    final won = _evaluateBet(bet, result);
+    _advisor.processBet(won: won);
+  }
+  
+  bool _evaluateBet(BetType bet, int result) {
+    switch (bet) {
+      case BetType.red: return RouletteAgent.isRed(result);
+      case BetType.black: return RouletteAgent.isBlack(result);
+      // ... más casos
+    }
+  }
+}
+```
+
+### Paso 3: Agregar pruebas
+
+```dart
+// test/game_controller_test.dart
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  test('should process round correctly', () {
+    final controller = GameController();
+    controller.playRound(BetType.red);
+    // Assertions...
+  });
+}
+```
+
+---
+
+## Checklist de CI/CD
+
+### 1) Build y Compilación
+
+- **Descripción**: Verificar que el proyecto compila correctamente
+- **Tipo de agente**: CI runner (GitHub Actions: `ubuntu-latest`)
+- **Cómo activar**: Job `build-debug` en `.github/workflows/ci.yml`
+- **Comando local**: `make build` o `flutter build apk --debug`
+
+### 2) Tests Unitarios y Widget
+
+- **Descripción**: Ejecutar la suite de tests
+- **Tipo de agente**: CI runner
+- **Cómo activar**: Job `test` en `.github/workflows/ci.yml`
+- **Comando local**: `make test` o `flutter test --coverage`
+
+### 3) Lint y Formato
+
+- **Descripción**: Ejecutar `flutter analyze` y verificar formato
+- **Tipo de agente**: CI runner
+- **Cómo activar**: Jobs `analyze` y `format` en CI workflow
+- **Comandos locales**:
+  - `make lint` o `flutter analyze`
+  - `make format` o `dart format lib/ test/`
+
+### 4) Build Release APK
+
+- **Descripción**: Generar APK firmada para distribución
+- **Tipo de agente**: CI runner con secretos de keystore
+- **Cómo activar**: `.github/workflows/build-apk.yml`
+- **Comando local**: `make apk` o `flutter build apk --release`
+
+### 5) Build Release AAB
+
+- **Descripción**: Generar AAB para Google Play Store
+- **Tipo de agente**: CI runner con secretos de keystore
+- **Cómo activar**: `.github/workflows/build-aab.yml` (en tags v*)
+- **Comando local**: `make aab` o `flutter build appbundle --release`
+
+### 6) Seguridad y Dependencias
+
+- **Descripción**: Verificar que no hay secretos expuestos
+- **Tipo de agente**: Revisor humano + escáneres automáticos
+- **Verificaciones**:
+  - No hay claves API hardcodeadas
+  - `.gitignore` incluye archivos sensibles
+  - Variables de entorno para secretos
+
+---
+
+## Plantillas para PRs
+
+### Plantilla corta para usar en PRs:
+
+```markdown
+## Checklist
+
+- [ ] Build y compilación — CI: `build-debug`
+- [ ] Tests unitarios — CI: `test` 
+- [ ] Lint y formato — CI: `analyze`, `format`
+- [ ] Documentación actualizada
+- [ ] No hay secretos expuestos
+
+### Agentes modificados
+
+- [ ] RouletteAgent
+- [ ] MartingaleAdvisor
+- [ ] Ninguno
+
+### Comandos ejecutados
+
+```bash
+make ci
+```
+```
+
+### Ejemplo completo:
+
+```markdown
+## 📄 Descripción
+
+Implementa nueva funcionalidad de [descripción].
+
+## Checklist
+
+- [x] Build y compilación — CI: `build-debug` ✅
+- [x] Tests unitarios — CI: `test` ✅
+- [x] Lint y formato — CI: `analyze`, `format` ✅
+- [x] Documentación actualizada
+- [ ] No hay secretos expuestos (verificado)
+
+### Agentes modificados
+
+- [x] RouletteAgent - Agregado método `getStatistics()`
+- [ ] MartingaleAdvisor
+
+### Comandos ejecutados
+
+```bash
+make deps      # Instalar dependencias
+make lint      # Sin errores
+make test      # 45/45 tests pasaron
+make format    # Código formateado
+```
+
+### Screenshots (si aplica)
+
+[Imagen de la nueva funcionalidad]
+```
+
+---
+
+## Notas Importantes
+
+1. **Seguridad**: Nunca commits claves API, keystores, o archivos `key.properties`
+2. **Tests**: Cada agente debe tener tests unitarios correspondientes en `test/agents/`
+3. **Documentación**: Actualiza este archivo y el README cuando agregues nuevos agentes
+4. **Deprecación**: El archivo `lib/roulette_logic.dart` está deprecado; usa `lib/agents/` en su lugar
