@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
+// TODO: Uncomment when Firebase is properly configured
+// import 'package:firebase_core/firebase_core.dart';
+// TODO: Uncomment when Stripe is properly configured
+// import 'package:flutter_stripe/flutter_stripe.dart';
 import 'roulette_logic.dart';
 // TODO: Genera firebase_options.dart con: flutterfire configure
 // import 'firebase_options.dart';
