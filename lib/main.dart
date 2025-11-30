@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
+// Removed unused imports: firebase_core and flutter_stripe.
+// Uncomment and initialize when configured:
+// import 'package:firebase_core/firebase_core.dart';
+// import 'package:flutter_stripe/flutter_stripe.dart';
 import 'roulette_logic.dart';
 // TODO: Genera firebase_options.dart con: flutterfire configure
 // import 'firebase_options.dart';
