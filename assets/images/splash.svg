@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920">
+  <!-- Background -->
+  <rect width="1080" height="1920" fill="#1A237E"/>
+  
+  <!-- Gradient Overlay -->
+  <defs>
+    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1A237E;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0D1B3E;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="1080" height="1920" fill="url(#bg-gradient)"/>
+  
+  <!-- Roulette Wheel -->
+  <circle cx="540" cy="800" r="300" fill="#E60012" stroke="#FFD700" stroke-width="12"/>
+  <circle cx="540" cy="800" r="240" fill="#2E7D32" stroke="#FFD700" stroke-width="6"/>
+  <circle cx="540" cy="800" r="60" fill="#E60012" stroke="#FFD700" stroke-width="4"/>
+  
+  <!-- Title -->
+  <text x="540" y="1300" text-anchor="middle" fill="#FFD700" font-family="Arial, sans-serif" font-size="64" font-weight="bold">TOKYO</text>
+  <text x="540" y="1380" text-anchor="middle" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="48">PREDICTOR</text>
+  <text x="540" y="1450" text-anchor="middle" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="36">ROULETTE</text>
+  
+  <!-- Developer -->
+  <text x="540" y="1800" text-anchor="middle" fill="#888888" font-family="Arial, sans-serif" font-size="24">TokyoApps/TokRaggcorp</text>
+</svg>
