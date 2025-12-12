@@ -12,6 +12,28 @@ Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y mod
 
 **Disclaimer**: Solo simulación. No promueve gambling real.
 
+---
+
+## 📋 Estado del Proyecto y Pendientes
+
+**Estado actual:** 🟡 En desarrollo (40% completado)
+
+Para ver qué falta para finalizar la app, consulta:
+
+- 📊 **[RESUMEN_ESTADO_APP.md](./RESUMEN_ESTADO_APP.md)** - Vista rápida del estado actual (leer primero)
+- 📝 **[PENDIENTES_FINALIZACION.md](./PENDIENTES_FINALIZACION.md)** - Lista completa y detallada de pendientes
+- 🚀 **[PLAN_ACCION_INMEDIATA.md](./PLAN_ACCION_INMEDIATA.md)** - Guía paso a paso para completar el desarrollo
+
+**Pendientes críticos:**
+- ❌ Configurar Firebase (auth, firestore, remote config)
+- ❌ Configurar Stripe para suscripciones
+- ❌ Implementar autenticación funcional
+- ❌ Completar UI de predicciones y estrategia Martingale
+- ❌ Configurar keystore para release
+- ❌ Crear términos y condiciones / política de privacidad
+
+---
+
 ## Configuración de Keystore para Android
 
 Para firmar la APK en modo release, necesitas configurar un keystore:
