@@ -1,8 +1,18 @@
 # Tokyo Roulette Predicciones
 
+![Flutter](https://img.shields.io/badge/Flutter-3.0%2B-blue?logo=flutter)
+![Dart](https://img.shields.io/badge/Dart-3.0%2B-blue?logo=dart)
+![License](https://img.shields.io/badge/License-MIT-green)
+![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS-lightgrey)
+![Status](https://img.shields.io/badge/Status-Completed-success)
+
 Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y modelo freemium. Incluye integraciones con Stripe para pagos y Firebase para configuraciones remotas.
 
-## Características Implementadas
+## 📱 Capturas de Pantalla
+
+> Ver las imágenes en la raíz del proyecto: `Screenshot_*.png`
+
+## ✨ Características Implementadas
 
 ✅ **Simulador de Ruleta Europea** (0-36) con RNG seguro  
 ✅ **Sistema de Predicciones** basado en historial de giros  
@@ -15,25 +25,134 @@ Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y mod
 ✅ **Tests de Widgets** para UI y flujos principales  
 ✅ **Disclaimer de Seguridad** sobre juego responsable
 
-## Instalación
-1. Clona: `git clone https://github.com/Melampe001/Tokyo-Predictor-Roulette-001.git`
-2. `flutter pub get`
-3. `flutter run`
+## 🚀 Inicio Rápido
 
-## Construir APK
-`flutter build apk --release`
+### Requisitos Previos
+- Flutter 3.0 o superior
+- Dart 3.0 o superior
+- Android Studio / VS Code
+- JDK 11+ (para builds de Android)
 
-## Ejecutar Tests
+### Instalación
+
+1. Clona el repositorio:
 ```bash
-# Tests unitarios
+git clone https://github.com/Melampe001/Tokyo-Predictor-Roulette-001.git
+cd Tokyo-Predictor-Roulette-001
+```
+
+2. Instala las dependencias:
+```bash
+flutter pub get
+```
+
+3. Ejecuta la aplicación:
+```bash
+flutter run
+```
+
+## 🏗️ Construir APK
+
+Para generar una APK de release:
+```bash
+flutter build apk --release
+```
+
+La APK se generará en: `build/app/outputs/flutter-apk/app-release.apk`
+
+## 🧪 Ejecutar Tests
+
+```bash
+# Todos los tests
 flutter test
 
 # Tests específicos
 flutter test test/roulette_logic_test.dart
 flutter test test/widget_test.dart
+
+# Con cobertura
+flutter test --coverage
 ```
 
-**Disclaimer**: Solo simulación. No promueve gambling real.
+## 📚 Documentación
+
+- **[Guía de Usuario](docs/USER_GUIDE.md)**: Manual completo de uso de la aplicación
+- **[Arquitectura Técnica](docs/ARCHITECTURE.md)**: Diseño y estructura del código
+- **[Configuración Firebase](docs/FIREBASE_SETUP.md)**: Cómo integrar Firebase (opcional)
+- **[Guía de Contribución](CONTRIBUTING.md)**: Cómo contribuir al proyecto
+- **[Changelog](CHANGELOG.md)**: Historial de cambios y versiones
+
+## 🎯 Uso Básico
+
+1. **Inicia sesión** ingresando un email
+2. **Gira la ruleta** presionando el botón
+3. **Observa el resultado** y tu balance actualizado
+4. **Activa Martingale** desde configuración (opcional)
+5. **Consulta predicciones** basadas en historial
+6. **Resetea el juego** cuando desees comenzar de nuevo
+
+## 🔧 Configuración
+
+### Opciones Disponibles
+
+- **Estrategia Martingale**: Duplica apuesta tras pérdidas
+- **Balance Inicial**: $1000 (configurable en código)
+- **Apuesta Base**: $10 (ajustable)
+
+### Configuración Firebase (Opcional)
+
+Para habilitar características de Firebase, consulta [docs/FIREBASE_SETUP.md](docs/FIREBASE_SETUP.md).
+
+## 🛠️ Tecnologías Utilizadas
+
+- **Flutter**: Framework de UI multiplataforma
+- **Dart**: Lenguaje de programación
+- **Firebase**: Backend as a Service (opcional)
+- **Stripe**: Procesamiento de pagos (futuro)
+- **fl_chart**: Gráficos y visualizaciones (futuro)
+
+## 🤝 Contribuir
+
+¡Las contribuciones son bienvenidas! Por favor lee la [Guía de Contribución](CONTRIBUTING.md) para detalles sobre:
+
+- Cómo reportar bugs
+- Cómo sugerir mejoras
+- Proceso de Pull Requests
+- Convenciones de código
+- Flujo de Git
+
+## 📝 Licencia
+
+Este proyecto está licenciado bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
+
+## ⚠️ Disclaimer
+
+**IMPORTANTE**: Esta es una simulación educativa. No promueve gambling real.
+
+**Disclaimer**: Solo simulación. No promueve juegos de azar reales. Las predicciones son aleatorias y no garantizan resultados. Si tú o alguien que conoces tiene problemas con el juego, busca ayuda profesional.
+
+### Recursos de Ayuda
+- **España**: 900 200 211 (Juego Responsable)
+- **México**: 55 5533 5533 (CONADIC)
+- **Argentina**: 0800 222 1002 (Juego Responsable)
+
+## 📞 Contacto
+
+Para preguntas, sugerencias o reportar problemas:
+- Abre un [Issue](https://github.com/Melampe001/Tokyo-Predictor-Roulette-001/issues)
+- Revisa la [documentación](docs/)
+
+## 🙏 Agradecimientos
+
+- Comunidad de Flutter por el excelente framework
+- Contribuidores del proyecto
+- Usuarios que proporcionaron feedback
+
+---
+
+**Versión**: 1.0.0  
+**Estado**: ✅ Proyecto Completado  
+**Última Actualización**: Diciembre 2024
 
 ## Configuración de Keystore para Android
 
