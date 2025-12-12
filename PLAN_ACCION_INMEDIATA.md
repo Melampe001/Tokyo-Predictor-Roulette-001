@@ -116,6 +116,18 @@ class AuthService {
 
 **Modificar:** `lib/main.dart` (MainScreen)
 
+**Agregar variables en _MainScreenState:**
+```dart
+class _MainScreenState extends State<MainScreen> {
+  final RouletteLogic _rouletteLogic = RouletteLogic();
+  final MartingaleAdvisor _martingaleAdvisor = MartingaleAdvisor(); // AGREGAR
+  String result = 'Presiona Girar';
+  List<int> history = [];
+  double bet = 10.0;
+  // ...
+}
+```
+
 **Agregar widgets:**
 ```dart
 // En MainScreen, agregar:
@@ -529,7 +541,7 @@ flutter clean
 2. Probar que la app compila: `flutter run`
 3. Implementar autenticación básica (Fase 2)
 
-**Tiempo estimado para MVP:** 2-3 semanas de trabajo dedicado
+**Tiempo estimado para MVP:** 50-70 horas de desarrollo (aprox. 1.5-2 semanas a tiempo completo)
 
 ---
 

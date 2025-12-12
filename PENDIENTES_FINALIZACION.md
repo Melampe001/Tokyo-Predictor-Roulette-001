@@ -384,9 +384,9 @@ Esta aplicación de Flutter está en una fase avanzada de desarrollo, pero requi
 
 ## 🎯 ESTIMACIÓN DE ESFUERZO
 
-**MVP (Mínimo viable):** ~40-60 horas de desarrollo
-**V1.0 (Completa):** ~80-120 horas de desarrollo
-**V2.0 (Todas las mejoras):** ~150-200 horas de desarrollo
+**MVP (Mínimo viable):** ~50-70 horas de desarrollo
+**V1.0 (Completa):** ~100-140 horas de desarrollo
+**V2.0 (Todas las mejoras):** ~180-240 horas de desarrollo
 
 ---
 
