@@ -2,6 +2,19 @@
 
 Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y modelo freemium. Incluye integraciones con Stripe para pagos y Firebase para configuraciones remotas.
 
+## Características Implementadas
+
+✅ **Simulador de Ruleta Europea** (0-36) con RNG seguro  
+✅ **Sistema de Predicciones** basado en historial de giros  
+✅ **Estrategia Martingale** configurable y automatizada  
+✅ **Sistema de Balance Virtual** para simulación de apuestas  
+✅ **Historial Visual** de últimos 20 giros con colores (rojo/negro/verde)  
+✅ **Interfaz Moderna** con tarjetas, iconos y diseño limpio  
+✅ **Configuración** de estrategias y opciones de juego  
+✅ **Tests Unitarios** para lógica de ruleta y Martingale  
+✅ **Tests de Widgets** para UI y flujos principales  
+✅ **Disclaimer de Seguridad** sobre juego responsable
+
 ## Instalación
 1. Clona: `git clone https://github.com/Melampe001/Tokyo-Predictor-Roulette-001.git`
 2. `flutter pub get`
@@ -9,6 +22,16 @@ Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y mod
 
 ## Construir APK
 `flutter build apk --release`
+
+## Ejecutar Tests
+```bash
+# Tests unitarios
+flutter test
+
+# Tests específicos
+flutter test test/roulette_logic_test.dart
+flutter test test/widget_test.dart
+```
 
 **Disclaimer**: Solo simulación. No promueve gambling real.
 

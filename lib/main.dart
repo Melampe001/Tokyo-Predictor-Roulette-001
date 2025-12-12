@@ -84,37 +84,336 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   final RouletteLogic _rouletteLogic = RouletteLogic();
+  final MartingaleAdvisor _martingaleAdvisor = MartingaleAdvisor();
+  
   String result = 'Presiona Girar';
   List<int> history = [];
-  double bet = 10.0;
+  int? prediction;
+  double balance = 1000.0;
+  double currentBet = 10.0;
+  bool useMartingale = false;
+  String lastBetResult = '';
 
   void spinRoulette() {
+    // Genera predicción antes del giro
+    if (history.isNotEmpty) {
+      prediction = _rouletteLogic.predictNext(history);
+    }
+    
     // Usa RouletteLogic con RNG seguro
     final res = _rouletteLogic.generateSpin();
+    
+    // Simula resultado de apuesta (ejemplo: apostar al color rojo)
+    final bool isRed = _isRedNumber(res);
+    final bool won = isRed; // Simplificado: asumimos que apostamos a rojo
+    
     setState(() {
       result = res.toString();
       history.add(res);
+      
+      // Actualiza balance
+      if (won) {
+        balance += currentBet;
+        lastBetResult = '¡Ganaste! +${currentBet.toStringAsFixed(2)}';
+      } else {
+        balance -= currentBet;
+        lastBetResult = 'Perdiste -${currentBet.toStringAsFixed(2)}';
+      }
+      
+      // Actualiza apuesta según Martingale si está activado
+      if (useMartingale) {
+        currentBet = _martingaleAdvisor.getNextBet(won);
+        // Asegura que la apuesta no exceda el balance
+        if (currentBet > balance) {
+          currentBet = balance;
+        }
+      }
+      
+      // Limita el historial a los últimos 20 números
+      if (history.length > 20) {
+        history = history.sublist(history.length - 20);
+      }
     });
+  }
+  
+  bool _isRedNumber(int number) {
+    // Números rojos en la ruleta europea
+    const redNumbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
+    return redNumbers.contains(number);
+  }
+  
+  void _resetGame() {
+    setState(() {
+      history.clear();
+      result = 'Presiona Girar';
+      balance = 1000.0;
+      currentBet = 10.0;
+      prediction = null;
+      lastBetResult = '';
+      _martingaleAdvisor.reset();
+    });
+  }
+  
+  void _showSettingsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Configuración'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SwitchListTile(
+              title: const Text('Usar estrategia Martingale'),
+              subtitle: const Text('Duplica la apuesta tras perder'),
+              value: useMartingale,
+              onChanged: (value) {
+                setState(() {
+                  useMartingale = value;
+                  if (value) {
+                    _martingaleAdvisor.baseBet = currentBet;
+                  }
+                });
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cerrar'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Ruleta')),
-      body: Center(
+      appBar: AppBar(
+        title: const Text('Tokyo Roulette Predicciones'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: _showSettingsDialog,
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _resetGame,
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('Resultado: $result'),
-            Text('Historia: ${history.join(', ')}'),
-            ElevatedButton(
-              onPressed: spinRoulette,
-              child: const Text('Girar Ruleta'),
+            // Balance y apuesta actual
+            Card(
+              color: Colors.blue.shade50,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    Text(
+                      'Balance: \$${balance.toStringAsFixed(2)}',
+                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Apuesta actual: \$${currentBet.toStringAsFixed(2)}',
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                    if (lastBetResult.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          lastBetResult,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: lastBetResult.contains('Ganaste') ? Colors.green : Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
             ),
-            // TODO: Agregar más widgets para Martingale, predicciones, etc.
+            const SizedBox(height: 16),
+            
+            // Resultado actual
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  children: [
+                    const Text(
+                      'Resultado',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        color: result == 'Presiona Girar' 
+                          ? Colors.grey.shade300
+                          : _getNumberColor(int.tryParse(result) ?? -1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          result,
+                          style: const TextStyle(
+                            fontSize: 36,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            
+            // Predicción
+            if (prediction != null)
+              Card(
+                color: Colors.amber.shade50,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      const Icon(Icons.lightbulb_outline, size: 32, color: Colors.amber),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Predicción sugerida',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      ),
+                      Text(
+                        prediction.toString(),
+                        style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                      ),
+                      const Text(
+                        '(basada en historial reciente)',
+                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            const SizedBox(height: 16),
+            
+            // Botón girar
+            ElevatedButton.icon(
+              onPressed: balance >= currentBet ? spinRoulette : null,
+              icon: const Icon(Icons.play_circle_outline, size: 32),
+              label: const Text('Girar Ruleta', style: TextStyle(fontSize: 20)),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+            ),
+            const SizedBox(height: 16),
+            
+            // Historial
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Historial Reciente',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 12),
+                    if (history.isEmpty)
+                      const Text('No hay giros todavía', style: TextStyle(color: Colors.grey))
+                    else
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: history.reversed.map((num) {
+                          return Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: _getNumberColor(num),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Center(
+                              child: Text(
+                                num.toString(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            
+            // Info sobre Martingale
+            if (useMartingale)
+              Card(
+                color: Colors.orange.shade50,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: const [
+                          Icon(Icons.show_chart, color: Colors.orange),
+                          SizedBox(width: 8),
+                          Text(
+                            'Estrategia Martingale Activa',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'La apuesta se duplicará automáticamente después de cada pérdida.',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            
+            // Disclaimer
+            const SizedBox(height: 16),
+            const Card(
+              color: Colors.red,
+              child: Padding(
+                padding: EdgeInsets.all(12.0),
+                child: Text(
+                  '⚠️ DISCLAIMER: Esta es una simulación educativa. No promueve juegos de azar reales. Las predicciones son aleatorias y no garantizan resultados.',
+                  style: TextStyle(color: Colors.white, fontSize: 12),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
+  }
+  
+  Color _getNumberColor(int number) {
+    if (number == 0) return Colors.green;
+    if (_isRedNumber(number)) return Colors.red.shade700;
+    return Colors.black;
   }
 }
