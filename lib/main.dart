@@ -117,6 +117,8 @@ class _MainScreenState extends State<MainScreen> {
         lastBetResult = '¡Ganaste! +${currentBet.toStringAsFixed(2)}';
       } else {
         balance -= currentBet;
+        // Asegura que el balance no sea negativo
+        if (balance < 0) balance = 0;
         lastBetResult = 'Perdiste -${currentBet.toStringAsFixed(2)}';
       }
       
@@ -138,7 +140,7 @@ class _MainScreenState extends State<MainScreen> {
   
   bool _isRedNumber(int number) {
     // Números rojos en la ruleta europea
-    const redNumbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
+    const redNumbers = {1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36};
     return redNumbers.contains(number);
   }
   
@@ -372,8 +374,8 @@ class _MainScreenState extends State<MainScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: const [
+                      const Row(
+                        children: [
                           Icon(Icons.show_chart, color: Colors.orange),
                           SizedBox(width: 8),
                           Text(
