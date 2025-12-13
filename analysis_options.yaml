@@ -1,0 +1,25 @@
+# Defines a default set of lint rules enforced for projects at Google.
+include: package:flutter_lints/flutter.yaml
+
+# For more information about the core and recommended set of lints, see
+# https://dart.dev/guides/language/analysis-options
+
+analyzer:
+  errors:
+    missing_required_param: error
+    missing_return: error
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+
+linter:
+  rules:
+    - avoid_print
+    - avoid_empty_else
+    - cancel_subscriptions
+    - close_sinks
+    - prefer_const_constructors
+    - prefer_const_literals_to_create_immutables
+    - prefer_final_fields
+    - unnecessary_null_comparison
+    - use_key_in_widget_constructors
