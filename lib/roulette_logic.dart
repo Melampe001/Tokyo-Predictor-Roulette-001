@@ -29,9 +29,11 @@ class RouletteLogic {
 /// ADVERTENCIA: Esta es una simulación educativa.
 /// La estrategia Martingale tiene riesgos significativos en juegos reales.
 class MartingaleAdvisor {
-  double baseBet = 1.0;
-  double currentBet = 1.0;
+  double baseBet;
+  double currentBet;
   bool lastWin = true;
+
+  MartingaleAdvisor({this.baseBet = 1.0}) : currentBet = baseBet;
 
   /// Calcula la siguiente apuesta basada en el resultado
   /// Si se gana, vuelve a la apuesta base
