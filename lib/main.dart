@@ -106,7 +106,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   final RouletteLogic _rouletteLogic = RouletteLogic();
-  final MartingaleAdvisor _martingaleAdvisor = MartingaleAdvisor();
+  final MartingaleAdvisor _martingaleAdvisor = MartingaleAdvisor(baseBet: 10.0);
   String result = 'Presiona Girar';
   List<int> history = [];
   double bet = 10.0;
@@ -122,7 +122,8 @@ class _MainScreenState extends State<MainScreen> {
     final nextPrediction = _rouletteLogic.predictNext(history);
     
     // Actualizar estrategia Martingale
-    final won = res % 2 == 0; // Simulación simple: par gana
+    // En ruleta real, 0 (verde) generalmente resulta en pérdida para apuestas par/impar
+    final won = res != 0 && res % 2 == 0; // Par gana, pero 0 es pérdida
     final nextBet = _martingaleAdvisor.getNextBet(won);
     
     // Actualizar balance
@@ -301,11 +302,7 @@ class _MainScreenState extends State<MainScreen> {
                                 : num % 2 == 0
                                     ? Colors.red[200]
                                     : Colors.black87,
-                            labelStyle: TextStyle(
-                              color: num == 0 || num % 2 == 0
-                                  ? Colors.white
-                                  : Colors.white,
-                            ),
+                            labelStyle: const TextStyle(color: Colors.white),
                           );
                         }).toList(),
                       ),
