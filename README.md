@@ -12,6 +12,14 @@ Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y mod
 
 **Disclaimer**: Solo simulación. No promueve gambling real.
 
+## Contribuir
+
+¿Quieres contribuir al proyecto? Lee nuestra [Guía de Contribución](CONTRIBUTING.md) para conocer:
+- Proceso de Pull Request
+- Estándares de código
+- Cómo ejecutar pruebas
+- Workflows de CI/CD
+
 ## Configuración de Keystore para Android
 
 Para firmar la APK en modo release, necesitas configurar un keystore:
