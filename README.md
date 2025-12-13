@@ -8,7 +8,12 @@ Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y mod
 3. `flutter run`
 
 ## Construir APK
-`flutter build apk --release`
+Para una guía completa de construcción y configuración, consulta [BUILD_APK.md](BUILD_APK.md).
+
+Comando rápido:
+```bash
+flutter build apk --release
+```
 
 **Disclaimer**: Solo simulación. No promueve gambling real.
 
