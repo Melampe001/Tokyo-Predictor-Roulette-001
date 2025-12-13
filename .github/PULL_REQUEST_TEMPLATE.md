@@ -52,17 +52,17 @@ Incluye enlaces o observaciones relevantes.
 
 > **Referencia**: [Checklist de Agentes completo](/docs/checklist_agents.md)
 
-Marca los que apliquen a tu PR e indica qué agentes/jobs se usaron:
+Marca los que apliquen a tu PR e indica qué agentes/jobs se usaron (escribe "N/A" si no aplica):
 
 - [ ] **Build y compilación** — Job: `___` (Ejemplo: GitHub Actions ubuntu-latest)
 - [ ] **Tests unitarios/integración** — Job: `___` (Ejemplo: flutter test + emuladores)
 - [ ] **Lint y formato** — Job: `___` (Ejemplo: dart analyze, dart format)
 - [ ] **Seguridad y dependencias** — Scanner: `___` (Ejemplo: Dependabot, análisis manual)
-- [ ] **Accesibilidad y localización** — Reviewer: `___`
-- [ ] **Performance y tamaño** — Benchmark: `___`
-- [ ] **Pruebas en dispositivos reales** — Device farm: `___`
-- [ ] **Breaking changes** — Aprobación owner: `___`
-- [ ] **Licencias** — Revisión legal: `___`
+- [ ] **Accesibilidad y localización** — Reviewer: `___` (o N/A)
+- [ ] **Performance y tamaño** — Benchmark: `___` (o N/A)
+- [ ] **Pruebas en dispositivos reales** — Device farm: `___` (o N/A)
+- [ ] **Breaking changes** — Aprobación owner: `___` (o N/A)
+- [ ] **Licencias** — Revisión legal: `___` (o N/A)
 - [ ] **Documentación** — Actualizada: Sí/No
 
 **Comandos ejecutados**:
