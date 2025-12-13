@@ -7,6 +7,20 @@ import 'roulette_logic.dart';
 // TODO: Genera firebase_options.dart con: flutterfire configure
 // import 'firebase_options.dart';
 
+// Constantes del juego
+class GameConstants {
+  static const double initialBalance = 1000.0;
+  static const double defaultBaseBet = 10.0;
+  static const int maxHistoryLength = 20;
+  static const int minSpinsForPrediction = 3;
+  static const int singleNumberPayoutMultiplier = 35; // Pago 35:1 para número único
+}
+
+// Validación de email
+class ValidationPatterns {
+  static final RegExp emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
@@ -58,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     // Simular autenticación (en producción, aquí iría Firebase Auth)
-    // TODO: Integrar Firebase Auth cuando esté configurado
+    // Para implementar Firebase Auth, ver docs/FIREBASE_SETUP.md
     await Future.delayed(const Duration(seconds: 1));
 
     if (!mounted) return;
@@ -133,9 +147,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Por favor ingresa un email';
                     }
-                    // Validación básica de email
-                    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-                    if (!emailRegex.hasMatch(value)) {
+                    // Validación de email usando patrón constante
+                    if (!ValidationPatterns.emailRegex.hasMatch(value)) {
                       return 'Por favor ingresa un email válido';
                     }
                     return null;
@@ -212,7 +225,8 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-    _martingaleAdvisor.baseBet = currentBet;
+    _martingaleAdvisor.baseBet = GameConstants.defaultBaseBet;
+    currentBet = GameConstants.defaultBaseBet;
   }
 
   void spinRoulette() {
@@ -226,7 +240,7 @@ class _MainScreenState extends State<MainScreen> {
       
       // Update balance and win/loss stats
       if (won) {
-        balance += currentBet * 35; // Roulette payout is 35:1 for single number
+        balance += currentBet * GameConstants.singleNumberPayoutMultiplier;
         wins++;
         lastWin = true;
       } else {
@@ -239,12 +253,12 @@ class _MainScreenState extends State<MainScreen> {
       currentBet = _martingaleAdvisor.getNextBet(won);
       
       // Generate prediction for next spin
-      if (history.length >= 3) {
+      if (history.length >= GameConstants.minSpinsForPrediction) {
         predictedNumber = _rouletteLogic.predictNext(history);
       }
       
       // Keep history manageable
-      if (history.length > 20) {
+      if (history.length > GameConstants.maxHistoryLength) {
         history.removeAt(0);
       }
     });
@@ -254,15 +268,15 @@ class _MainScreenState extends State<MainScreen> {
     setState(() {
       history.clear();
       result = 'Presiona Girar';
-      currentBet = 10.0;
+      currentBet = GameConstants.defaultBaseBet;
       predictedNumber = null;
       lastWin = true;
-      balance = 1000.0;
+      balance = GameConstants.initialBalance;
       totalSpins = 0;
       wins = 0;
       losses = 0;
       _martingaleAdvisor.reset();
-      _martingaleAdvisor.baseBet = currentBet;
+      _martingaleAdvisor.baseBet = GameConstants.defaultBaseBet;
     });
   }
 
