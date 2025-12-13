@@ -90,13 +90,17 @@ void main() {
     // Verifica balance inicial
     expect(find.text('Balance: \$1000.00'), findsOneWidget);
     
+    // Constante basada en mecánicas del juego: balance inicial / apuesta mínima
+    const int maxSpinsToDepleteFunds = 100; // 1000.0 / 10.0 = 100 spins máximo
+    
     // Simula múltiples pérdidas hasta que el balance se agote
     // Nota: En una ruleta real, esto requeriría muchos giros
     // pero el balance está protegido contra valores negativos
-    for (int i = 0; i < 150; i++) {
-      final button = find.text('Girar Ruleta');
-      if (tester.widget<ElevatedButton>(button).onPressed != null) {
-        await tester.tap(button);
+    final buttonFinder = find.text('Girar Ruleta');
+    for (int i = 0; i < maxSpinsToDepleteFunds; i++) {
+      final elevatedButton = tester.widget<ElevatedButton>(buttonFinder);
+      if (elevatedButton.onPressed != null) {
+        await tester.tap(buttonFinder);
         await tester.pump();
       } else {
         // El botón está deshabilitado cuando balance < currentBet
@@ -108,13 +112,12 @@ void main() {
     final balanceText = find.textContaining('Balance: \$');
     expect(balanceText, findsOneWidget);
     
-    // Si el balance llegó a 0 o muy bajo, el botón debe estar deshabilitado
-    final button = find.text('Girar Ruleta');
-    final elevatedButton = tester.widget<ElevatedButton>(button);
+    // Verifica que el botón está deshabilitado si el balance es insuficiente
+    final finalButton = tester.widget<ElevatedButton>(buttonFinder);
     
     // Si el balance es 0, el botón debe estar deshabilitado
     if (find.text('Balance: \$0.00').evaluate().isNotEmpty) {
-      expect(elevatedButton.onPressed, isNull);
+      expect(finalButton.onPressed, isNull);
     }
   });
 }
