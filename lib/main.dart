@@ -179,8 +179,10 @@ class _MainScreenState extends State<MainScreen> {
     // Simple prediction based on history (for demo purposes)
     if (_userTier == 'Avanzada' || _userTier == 'Premium') {
       // Martingale-inspired prediction
-      final sum = _history.take(5).reduce((a, b) => a + b);
-      return (sum ~/ _history.length) % 37;
+      final recentHistory = _history.take(5).toList();
+      if (recentHistory.isEmpty) return _random.nextInt(37);
+      final sum = recentHistory.reduce((a, b) => a + b);
+      return (sum ~/ recentHistory.length) % 37;
     }
     
     return null;
