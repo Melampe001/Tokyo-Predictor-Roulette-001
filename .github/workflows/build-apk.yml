@@ -14,9 +14,56 @@ permissions:
   contents: read
 
 jobs:
+  # Job de análisis y pruebas
+  test:
+    name: Análisis y Pruebas
+    runs-on: ubuntu-latest
+    
+    steps:
+    # Paso 1: Checkout del código del repositorio
+    - name: Checkout del repositorio
+      uses: actions/checkout@v4
+    
+    # Paso 2: Configurar Flutter SDK
+    - name: Configurar Flutter SDK
+      uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+        cache: true
+    
+    # Paso 3: Verificar la instalación de Flutter
+    - name: Verificar versión de Flutter
+      run: flutter --version
+    
+    # Paso 4: Obtener dependencias del proyecto
+    - name: Obtener dependencias (flutter pub get)
+      run: flutter pub get
+    
+    # Paso 5: Verificar formato del código
+    - name: Verificar formato (dart format)
+      run: dart format --set-exit-if-changed .
+      continue-on-error: true
+    
+    # Paso 6: Analizar el código
+    - name: Analizar código (flutter analyze)
+      run: flutter analyze
+    
+    # Paso 7: Ejecutar pruebas unitarias
+    - name: Ejecutar pruebas (flutter test)
+      run: flutter test --coverage
+    
+    # Paso 8: Subir reporte de cobertura (opcional)
+    - name: Subir cobertura
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: coverage/lcov.info
+        retention-days: 7
+
   build:
     name: Compilar APK de Android
     runs-on: ubuntu-latest
+    needs: test  # Ejecutar solo si las pruebas pasan
     
     steps:
     # Paso 1: Checkout del código del repositorio
