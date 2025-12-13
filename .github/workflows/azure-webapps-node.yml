@@ -1,3 +1,11 @@
+# ⚠️ WORKFLOW NO APLICABLE - DESHABILITADO
+# Este workflow es para aplicaciones Node.js en Azure.
+# El proyecto actual es una aplicación Flutter móvil.
+# Mantener deshabilitado o considerar eliminar.
+#
+# NOTA: Este workflow está deshabilitado por el trigger 'workflow_dispatch'
+# y no se ejecutará automáticamente en push/PR.
+#
 # NOTA: Este workflow es para una posible aplicación web Node.js complementaria.
 # El proyecto principal es una aplicación Flutter. Si no necesitas un backend Node.js,
 # considera eliminar este archivo.
@@ -22,8 +30,9 @@
 # For more samples to get started with GitHub Action workflows to deploy to Azure: https://github.com/Azure/actions-workflow-samples
 
 on:
-  push:
-    branches: [ "main" ]
+  # DESHABILITADO: Solo se ejecuta manualmente, no en push
+  # push:
+  #   branches: [ "main" ]
   workflow_dispatch:
 
 env:

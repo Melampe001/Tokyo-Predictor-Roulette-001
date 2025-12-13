@@ -1,0 +1,59 @@
+name: Lint and Format
+
+# Workflow para verificar el formato y calidad del código
+# Ejecuta dart analyze y dart format en el código
+
+on:
+  pull_request:
+    branches: [ "main", "master" ]
+  push:
+    branches: [ "main", "master" ]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Análisis de código (dart analyze)
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout del repositorio
+      uses: actions/checkout@v4
+    
+    - name: Configurar Flutter SDK
+      uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+        cache: true
+    
+    - name: Obtener dependencias
+      run: flutter pub get
+    
+    - name: Ejecutar análisis de código
+      run: flutter analyze --no-fatal-infos
+
+  format:
+    name: Verificar formato (dart format)
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout del repositorio
+      uses: actions/checkout@v4
+    
+    - name: Configurar Flutter SDK
+      uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+        cache: true
+    
+    - name: Verificar formato del código
+      run: |
+        echo "Verificando formato del código..."
+        dart format --set-exit-if-changed --output none .
+        if [ $? -eq 0 ]; then
+          echo "✓ Formato correcto"
+        else
+          echo "✗ El código necesita formato. Ejecuta: dart format ."
+          exit 1
+        fi

@@ -1,0 +1,43 @@
+name: Tests
+
+# Workflow para ejecutar pruebas unitarias y de widgets
+# Ejecuta flutter test en el proyecto
+
+on:
+  pull_request:
+    branches: [ "main", "master" ]
+  push:
+    branches: [ "main", "master" ]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Ejecutar pruebas
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout del repositorio
+      uses: actions/checkout@v4
+    
+    - name: Configurar Flutter SDK
+      uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+        cache: true
+    
+    - name: Obtener dependencias
+      run: flutter pub get
+    
+    - name: Ejecutar pruebas
+      run: flutter test --coverage
+    
+    - name: Verificar cobertura de pruebas
+      run: |
+        if [ -f "coverage/lcov.info" ]; then
+          echo "✓ Archivo de cobertura generado"
+          echo "Cobertura de pruebas disponible en coverage/lcov.info"
+        else
+          echo "⚠ No se generó archivo de cobertura"
+        fi
