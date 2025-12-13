@@ -2,6 +2,21 @@
 
 Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y modelo freemium. Incluye integraciones con Stripe para pagos y Firebase para configuraciones remotas.
 
+## Características
+
+- **Simulador de Ruleta Europea**: Ruleta de 37 números (0-36) con RNG seguro
+- **Validación de Email**: Sistema de login con validación básica
+- **Balance Virtual**: Sistema de gestión de balance con monitoreo en tiempo real
+- **Predicciones**: Algoritmo de predicción basado en historial de giros
+- **Estrategia Martingale**: Asesor automático de estrategia con:
+  - Duplicación de apuesta en pérdidas
+  - Reset a apuesta base en victorias
+  - Visualización de mensajes de estrategia
+- **Historial Visual**: Muestra los últimos 10 resultados con código de colores
+- **Protección de Balance**: Previene apuestas cuando el balance es insuficiente
+- **Advertencias Educativas**: Disclaimers sobre riesgos de gambling
+- **Reinicio de Juego**: Funcionalidad para resetear el estado del juego
+
 ## Instalación
 1. Clona: `git clone https://github.com/Melampe001/Tokyo-Predictor-Roulette-001.git`
 2. `flutter pub get`
@@ -63,3 +78,21 @@ Define las siguientes variables de entorno en tu sistema de CI:
 - [ok] Preparar ambiente de release
 - [ok] Documentar lecciones aprendidas
 - [ok] Presentar entregables y cerrar fase
+
+## Estado del Proyecto
+
+✅ **Todos los TODO items completados** (ver [docs/completed_todos.md](docs/completed_todos.md))
+
+### Reciente actualización
+- Implementada validación de email en pantalla de login
+- Agregados widgets completos para Martingale y predicciones
+- Mejorada documentación de configuración Firebase y Stripe
+- Actualizado suite de tests
+- Todas las funcionalidades principales están implementadas
+
+### Próximos pasos para producción
+1. Ejecutar `flutterfire configure` para generar `firebase_options.dart`
+2. Configurar variable de entorno `STRIPE_PUBLISHABLE_KEY`
+3. Descomentar inicializaciones en `lib/main.dart`
+4. Implementar Firebase Authentication completo
+5. (Opcional) Eliminar workflow Azure Node.js si no se necesita backend
