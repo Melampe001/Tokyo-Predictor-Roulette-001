@@ -70,7 +70,10 @@ class RouletteLogic {
       else greens++;
     }
 
-    final mostFrequent = freq.entries.reduce((a, b) => a.value > b.value ? a : b).key;
+    // Protección adicional: verificar que freq no esté vacío antes de reduce
+    final mostFrequent = freq.isNotEmpty 
+        ? freq.entries.reduce((a, b) => a.value > b.value ? a : b).key
+        : null;
 
     return {
       'total': history.length,

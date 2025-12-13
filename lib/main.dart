@@ -106,6 +106,8 @@ class _MainScreenState extends State<MainScreen> {
     final spin = _rouletteLogic.generateSpin();
     
     // Simular apuesta en rojo (ejemplo)
+    // NOTA: En esta versión educativa, siempre se apuesta a rojo para simplificar
+    // En una versión futura, se podría permitir elegir el tipo de apuesta
     final betOnRed = spin.color == RouletteColor.red;
     final won = betOnRed;
     
@@ -345,11 +347,9 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                     if (useMartingale) ...[
                       const SizedBox(height: 8),
-                      Text(
-                        useMartingale
-                            ? 'Activa: La apuesta se duplica tras cada pérdida'
-                            : 'Inactiva: Apuesta fija',
-                        style: const TextStyle(fontSize: 12),
+                      const Text(
+                        'Activa: La apuesta se duplica tras cada pérdida',
+                        style: TextStyle(fontSize: 12),
                       ),
                     ],
                   ],
