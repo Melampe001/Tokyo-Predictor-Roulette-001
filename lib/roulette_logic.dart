@@ -32,10 +32,12 @@ class RouletteLogic {
     if (history.isEmpty) return rng.nextInt(37);
     
     // Usa pesos exponenciales: más reciente = más peso
+    // En history, índice 0 = más antiguo, índice mayor = más reciente
     final weights = <int, double>{};
     for (var i = 0; i < history.length; i++) {
       final num = history[i];
-      // Peso exponencial: números más recientes tienen más peso
+      // Peso exponencial: índices mayores (más recientes) tienen más peso
+      // pow(1.5, i) crece exponencialmente con i
       final weight = pow(1.5, i.toDouble()).toDouble();
       weights[num] = (weights[num] ?? 0.0) + weight;
     }
