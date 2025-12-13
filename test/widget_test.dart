@@ -1,0 +1,37 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:tokyo_roulette_predicciones/main.dart';
+
+void main() {
+  testWidgets('Login screen smoke test', (WidgetTester tester) async {
+    await tester.pumpWidget(const TokyoRouletteApp());
+
+    expect(find.text('Bienvenido'), findsOneWidget);
+    expect(find.text('Registrar y Continuar'), findsOneWidget);
+  });
+
+  testWidgets('Login with email', (WidgetTester tester) async {
+    await tester.pumpWidget(const TokyoRouletteApp());
+
+    await tester.enterText(find.byType(TextField), 'test@email.com');
+    await tester.tap(find.text('Registrar y Continuar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Girar Ruleta'), findsOneWidget);
+  });
+
+  testWidgets('Spin roulette button exists', (WidgetTester tester) async {
+    await tester.pumpWidget(const TokyoRouletteApp());
+    
+    await tester.enterText(find.byType(TextField), 'test@email.com');
+    await tester.tap(find.text('Registrar y Continuar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Girar Ruleta'), findsOneWidget);
+    
+    await tester.tap(find.text('Girar Ruleta'));
+    await tester.pump();
+    
+    // Should show loading indicator
+    expect(find.byType(CircularProgressIndicator), findsWidgets);
+  });
+}
