@@ -47,6 +47,13 @@ android {
         versionName flutterVersionName
     }
 
+    // Helper method to check if keystore is configured
+    def isKeystoreConfigured() {
+        def keystorePropertiesFile = rootProject.file("key.properties")
+        def envKeystore = System.getenv("ANDROID_KEYSTORE_PATH")
+        return keystorePropertiesFile.exists() || envKeystore != null
+    }
+
     // Signing configuration
     signingConfigs {
         release {
@@ -86,10 +93,7 @@ android {
     buildTypes {
         release {
             // Signing - only apply if keystore is configured
-            def keystorePropertiesFile = rootProject.file("key.properties")
-            def envKeystore = System.getenv("ANDROID_KEYSTORE_PATH")
-            
-            if (keystorePropertiesFile.exists() || envKeystore != null) {
+            if (isKeystoreConfigured()) {
                 signingConfig signingConfigs.release
             } else {
                 // Use debug signing if no release keystore configured
