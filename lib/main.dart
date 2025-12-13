@@ -132,6 +132,10 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  // Constants for history management and predictions
+  static const int _historyLimit = 10;
+  static const int _predictionWindow = 5;
+  
   final Random _random = Random();
   int? _lastNumber;
   List<int> _history = [];
@@ -160,8 +164,8 @@ class _MainScreenState extends State<MainScreen> {
     setState(() {
       _lastNumber = number;
       _history.insert(0, number);
-      if (_history.length > 10) {
-        _history = _history.sublist(0, 10);
+      if (_history.length > _historyLimit) {
+        _history = _history.sublist(0, _historyLimit);
       }
       _isSpinning = false;
     });
@@ -179,7 +183,7 @@ class _MainScreenState extends State<MainScreen> {
     // Simple prediction based on history (for demo purposes)
     if (_userTier == 'Avanzada' || _userTier == 'Premium') {
       // Martingale-inspired prediction
-      final recentHistory = _history.take(5).toList();
+      final recentHistory = _history.take(_predictionWindow).toList();
       if (recentHistory.isEmpty) return _random.nextInt(37);
       final sum = recentHistory.reduce((a, b) => a + b);
       return (sum ~/ recentHistory.length) % 37;
