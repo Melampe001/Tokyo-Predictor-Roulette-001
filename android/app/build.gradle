@@ -51,6 +51,10 @@ android {
 
     buildTypes {
         release {
+            // TODO: Configure release signing for production
+            // For development/testing, using debug signing
+            // For production, create a keystore and configure:
+            // signingConfig signingConfigs.release
             signingConfig signingConfigs.debug
         }
     }

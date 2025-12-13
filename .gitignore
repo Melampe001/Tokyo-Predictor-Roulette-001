@@ -48,6 +48,7 @@ app.*.map.json
 /android/gradlew
 /android/gradlew.bat
 /android/gradle/
+/android/key.properties
 
 # iOS related
 /ios/
