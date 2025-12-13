@@ -109,7 +109,7 @@
 - **Archivos de código**: 2 (main.dart, roulette_logic.dart)
 - **Archivos de tests**: 2 (widget_test.dart, roulette_logic_test.dart)
 - **Documentos**: 8
-- **Workflows**: 2 (build-apk.yml, azure-webapps-node.yml)
+- **Workflows**: 1 (build-apk.yml)
 
 ### Dependencias
 - **Producción**: 11 paquetes
