@@ -86,6 +86,9 @@ class _MainScreenState extends State<MainScreen> {
   final RouletteLogic _rouletteLogic = RouletteLogic();
   final MartingaleAdvisor _martingaleAdvisor = MartingaleAdvisor();
   
+  // Configuración de la apuesta (siempre rojo en esta versión educativa)
+  static const RouletteColor _betColor = RouletteColor.red;
+  
   SpinResult? lastSpin;
   List<int> history = [];
   double balance = 1000.0;
@@ -105,10 +108,10 @@ class _MainScreenState extends State<MainScreen> {
     // Generar el giro
     final spin = _rouletteLogic.generateSpin();
     
-    // Simular apuesta en rojo (ejemplo)
+    // Simular apuesta según la configuración (_betColor)
     // NOTA: En esta versión educativa, siempre se apuesta a rojo para simplificar
     // En una versión futura, se podría permitir elegir el tipo de apuesta
-    final won = spin.color == RouletteColor.red;
+    final won = spin.color == _betColor;
     
     setState(() {
       lastSpin = spin;
