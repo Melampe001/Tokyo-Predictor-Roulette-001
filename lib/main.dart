@@ -98,6 +98,8 @@ class _MainScreenState extends State<MainScreen> {
     // Genera predicción antes del giro
     if (history.isNotEmpty) {
       prediction = _rouletteLogic.predictNext(history);
+    } else {
+      prediction = null;
     }
     
     // Usa RouletteLogic con RNG seguro
@@ -153,6 +155,7 @@ class _MainScreenState extends State<MainScreen> {
       prediction = null;
       lastBetResult = '';
       _martingaleAdvisor.reset();
+      _martingaleAdvisor.baseBet = currentBet;
     });
   }
   

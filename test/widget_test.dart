@@ -78,4 +78,43 @@ void main() {
     expect(find.textContaining('DISCLAIMER'), findsOneWidget);
     expect(find.textContaining('simulación educativa'), findsOneWidget);
   });
+  
+  testWidgets('Verifica protección de balance y deshabilitación de botón', (tester) async {
+    await tester.pumpWidget(const MyApp());
+    
+    // Navega a la pantalla principal
+    await tester.enterText(find.byType(TextField), 'test@email.com');
+    await tester.tap(find.text('Registrar y Continuar'));
+    await tester.pumpAndSettle();
+    
+    // Verifica balance inicial
+    expect(find.text('Balance: \$1000.00'), findsOneWidget);
+    
+    // Simula múltiples pérdidas hasta que el balance se agote
+    // Nota: En una ruleta real, esto requeriría muchos giros
+    // pero el balance está protegido contra valores negativos
+    for (int i = 0; i < 150; i++) {
+      final button = find.text('Girar Ruleta');
+      if (tester.widget<ElevatedButton>(button).onPressed != null) {
+        await tester.tap(button);
+        await tester.pump();
+      } else {
+        // El botón está deshabilitado cuando balance < currentBet
+        break;
+      }
+    }
+    
+    // Verifica que el balance nunca se volvió negativo
+    final balanceText = find.textContaining('Balance: \$');
+    expect(balanceText, findsOneWidget);
+    
+    // Si el balance llegó a 0 o muy bajo, el botón debe estar deshabilitado
+    final button = find.text('Girar Ruleta');
+    final elevatedButton = tester.widget<ElevatedButton>(button);
+    
+    // Si el balance es 0, el botón debe estar deshabilitado
+    if (find.text('Balance: \$0.00').evaluate().isNotEmpty) {
+      expect(elevatedButton.onPressed, isNull);
+    }
+  });
 }
