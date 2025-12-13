@@ -92,12 +92,15 @@ class _MainScreenState extends State<MainScreen> {
   double balance = 1000.0;
   double currentBet = 10.0;
   bool useMartingale = false;
+  bool useLicuado = false;
   String lastBetResult = '';
 
   void spinRoulette() {
     // Genera predicción antes del giro
     if (history.isNotEmpty) {
-      prediction = _rouletteLogic.predictNext(history);
+      prediction = useLicuado 
+          ? _rouletteLogic.predictNextLicuado(history)
+          : _rouletteLogic.predictNext(history);
     } else {
       prediction = null;
     }
@@ -178,7 +181,16 @@ class _MainScreenState extends State<MainScreen> {
                     _martingaleAdvisor.baseBet = currentBet;
                   }
                 });
-                Navigator.pop(context);
+              },
+            ),
+            SwitchListTile(
+              title: const Text('Predicción Licuado'),
+              subtitle: const Text('Prioriza números recientes'),
+              value: useLicuado,
+              onChanged: (value) {
+                setState(() {
+                  useLicuado = value;
+                });
               },
             ),
           ],
@@ -295,17 +307,19 @@ class _MainScreenState extends State<MainScreen> {
                     children: [
                       const Icon(Icons.lightbulb_outline, size: 32, color: Colors.amber),
                       const SizedBox(height: 8),
-                      const Text(
-                        'Predicción sugerida',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      Text(
+                        useLicuado ? 'Predicción Licuado' : 'Predicción sugerida',
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                       ),
                       Text(
                         prediction.toString(),
                         style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                       ),
-                      const Text(
-                        '(basada en historial reciente)',
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                      Text(
+                        useLicuado 
+                            ? '(ponderado por recencia)'
+                            : '(basada en historial reciente)',
+                        style: const TextStyle(fontSize: 12, color: Colors.grey),
                       ),
                     ],
                   ),
@@ -390,6 +404,35 @@ class _MainScreenState extends State<MainScreen> {
                       const SizedBox(height: 8),
                       const Text(
                         'La apuesta se duplicará automáticamente después de cada pérdida.',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            
+            // Info sobre Licuado
+            if (useLicuado)
+              Card(
+                color: Colors.purple.shade50,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(Icons.auto_graph, color: Colors.purple),
+                          SizedBox(width: 8),
+                          Text(
+                            'Predicción Licuado Activa',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Las predicciones dan mayor peso a los números más recientes en el historial.',
                         style: TextStyle(fontSize: 12),
                       ),
                     ],

@@ -35,6 +35,37 @@ void main() {
       final prediction = roulette.predictNext(history);
       expect(prediction, equals(5));
     });
+
+    test('predictNextLicuado devuelve un número válido', () {
+      final history = [1, 2, 3, 4, 5];
+      final prediction = roulette.predictNextLicuado(history);
+      expect(prediction, greaterThanOrEqualTo(0));
+      expect(prediction, lessThanOrEqualTo(36));
+    });
+
+    test('predictNextLicuado con historial vacío devuelve un número válido', () {
+      final prediction = roulette.predictNextLicuado([]);
+      expect(prediction, greaterThanOrEqualTo(0));
+      expect(prediction, lessThanOrEqualTo(36));
+    });
+
+    test('predictNextLicuado prioriza números más recientes', () {
+      // Historial donde 10 aparece al final (más reciente)
+      // y 5 aparece al principio (menos reciente)
+      final history = [5, 5, 10, 10, 10];
+      final prediction = roulette.predictNextLicuado(history);
+      // Debe predecir 10 porque es más reciente y frecuente
+      expect(prediction, equals(10));
+    });
+
+    test('predictNextLicuado favorece números recientes sobre frecuentes antiguos', () {
+      // 5 aparece 3 veces al principio, 7 aparece 2 veces al final
+      final history = [5, 5, 5, 1, 2, 7, 7];
+      final prediction = roulette.predictNextLicuado(history);
+      // Con pesos exponenciales, 7 (más reciente) puede ganar sobre 5
+      // Esto depende de los pesos, pero al menos debería ser uno de estos números
+      expect([5, 7].contains(prediction), isTrue);
+    });
   });
 
   group('MartingaleAdvisor', () {

@@ -23,6 +23,26 @@ class RouletteLogic {
     }
     return freq.entries.reduce((a, b) => a.value > b.value ? a : b).key;
   }
+
+  /// Predicción "licuado" (suavizado) basado en tendencias recientes
+  /// Usa pesos exponenciales dando más importancia a números recientes
+  /// Nota: Esta es una simulación educativa para demostrar diferentes
+  /// enfoques de análisis de patrones.
+  int predictNextLicuado(List<int> history) {
+    if (history.isEmpty) return rng.nextInt(37);
+    
+    // Usa pesos exponenciales: más reciente = más peso
+    final weights = <int, double>{};
+    for (var i = 0; i < history.length; i++) {
+      final num = history[i];
+      // Peso exponencial: números más recientes tienen más peso
+      final weight = pow(1.5, i.toDouble()).toDouble();
+      weights[num] = (weights[num] ?? 0.0) + weight;
+    }
+    
+    // Retorna el número con mayor peso acumulado
+    return weights.entries.reduce((a, b) => a.value > b.value ? a : b).key;
+  }
 }
 
 /// Asesor de estrategia Martingale
