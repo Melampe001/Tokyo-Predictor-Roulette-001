@@ -44,6 +44,10 @@ class RouletteLogic {
     for (final num in history) {
       freq[num] = (freq[num] ?? 0) + 1;
     }
+    
+    // Protección: verificar que freq no esté vacío antes de reduce
+    if (freq.isEmpty) return rng.nextInt(37);
+    
     return freq.entries.reduce((a, b) => a.value > b.value ? a : b).key;
   }
 

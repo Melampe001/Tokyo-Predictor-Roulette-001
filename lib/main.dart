@@ -108,8 +108,7 @@ class _MainScreenState extends State<MainScreen> {
     // Simular apuesta en rojo (ejemplo)
     // NOTA: En esta versión educativa, siempre se apuesta a rojo para simplificar
     // En una versión futura, se podría permitir elegir el tipo de apuesta
-    final betOnRed = spin.color == RouletteColor.red;
-    final won = betOnRed;
+    final won = spin.color == RouletteColor.red;
     
     setState(() {
       lastSpin = spin;
@@ -283,6 +282,20 @@ class _MainScreenState extends State<MainScreen> {
                 padding: const EdgeInsets.all(20),
               ),
             ),
+            
+            // Mensaje si no hay fondos suficientes
+            if (balance < currentBet)
+              const Padding(
+                padding: EdgeInsets.only(top: 8.0),
+                child: Text(
+                  '⚠️ Balance insuficiente para la apuesta actual',
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
             
             const SizedBox(height: 16),
             
