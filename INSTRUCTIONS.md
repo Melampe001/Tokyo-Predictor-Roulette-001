@@ -144,7 +144,7 @@ flutter pub cache repair           # Reparar cache de paquetes
 
 ---
 
-**Última actualización**: Diciembre 2024  
+**Última actualización**: Diciembre 13, 2024  
 **Versión del documento**: 1.0.0
 
 > 💡 **Tip**: Marca este documento con una estrella en GitHub para encontrarlo fácilmente.

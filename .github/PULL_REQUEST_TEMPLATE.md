@@ -18,7 +18,7 @@ Incluye enlaces o observaciones relevantes.
 
 ## ✅ Checklist
 
-> **Nota**: Ver [Checklist Principal](.github/checklist.md) y [Checklist de Agentes](docs/checklist_agents.md) para referencia detallada de cada punto y tipos de agentes requeridos.
+> **Nota**: Ver [Checklist Principal](/.github/checklist.md) y [Checklist de Agentes](/docs/checklist_agents.md) para referencia detallada de cada punto y tipos de agentes requeridos.
 
 - [ ] He seguido las guías de estilo del repositorio.
 - [ ] La descripción explica claramente la motivación y el alcance del cambio.
@@ -50,7 +50,7 @@ Incluye enlaces o observaciones relevantes.
 
 ### Verificación de Agentes (según tipo de cambio)
 
-> **Referencia**: [Checklist de Agentes completo](docs/checklist_agents.md)
+> **Referencia**: [Checklist de Agentes completo](/docs/checklist_agents.md)
 
 Marca los que apliquen a tu PR e indica qué agentes/jobs se usaron:
 
