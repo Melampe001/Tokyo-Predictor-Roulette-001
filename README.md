@@ -16,6 +16,7 @@ Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y mod
 
 ✅ **Simulador de Ruleta Europea** (0-36) con RNG seguro  
 ✅ **Sistema de Predicciones** basado en historial de giros  
+✅ **Predicción Licuado** con ponderación exponencial de números recientes  
 ✅ **Estrategia Martingale** configurable y automatizada  
 ✅ **Sistema de Balance Virtual** para simulación de apuestas  
 ✅ **Historial Visual** de últimos 20 giros con colores (rojo/negro/verde)  
@@ -96,6 +97,7 @@ flutter test --coverage
 ### Opciones Disponibles
 
 - **Estrategia Martingale**: Duplica apuesta tras pérdidas
+- **Predicción Licuado**: Método de predicción que da más peso a números recientes
 - **Balance Inicial**: $1000 (configurable en código)
 - **Apuesta Base**: $10 (ajustable)
 
