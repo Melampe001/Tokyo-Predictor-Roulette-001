@@ -9,6 +9,8 @@ on:
 
 env:
   BUILD_OUTPUT: 'build/app/outputs/flutter-apk'
+  FLUTTER_VERSION: '3.16.0'
+  FLUTTER_CHANNEL: 'stable'
 
 jobs:
   format:
@@ -20,8 +22,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.16.0'
-          channel: 'stable'
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
 
       - name: Cache Flutter packages
         uses: actions/cache@v3
@@ -49,8 +51,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.16.0'
-          channel: 'stable'
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
 
       - name: Cache Flutter packages
         uses: actions/cache@v3
@@ -78,8 +80,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.16.0'
-          channel: 'stable'
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
 
       - name: Cache Flutter packages
         uses: actions/cache@v3
@@ -107,8 +109,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.16.0'
-          channel: 'stable'
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
 
       - name: Setup Java
         uses: actions/setup-java@v3
