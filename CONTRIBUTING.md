@@ -401,13 +401,13 @@ Si encuentras una vulnerabilidad de seguridad:
 
 ### Documentación del Proyecto
 
-- [INSTRUCTIONS.md](INSTRUCTIONS.md) - Instrucciones fijas y workflows
+- [INSTRUCTIONS.md](../INSTRUCTIONS.md) - Instrucciones fijas y workflows
 - [README.md](../README.md) - Inicio rápido
-- [.github/checklist.md](.github/checklist.md) - Checklist de calidad para PRs
-- [docs/checklist_agents.md](docs/checklist_agents.md) - Detalles de agentes requeridos
-- [docs/USER_GUIDE.md](docs/USER_GUIDE.md) - Guía de usuario
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - Arquitectura técnica
-- [docs/FIREBASE_SETUP.md](docs/FIREBASE_SETUP.md) - Configuración de Firebase
+- [.github/checklist.md](../.github/checklist.md) - Checklist de calidad para PRs
+- [docs/checklist_agents.md](../docs/checklist_agents.md) - Detalles de agentes requeridos
+- [docs/USER_GUIDE.md](../docs/USER_GUIDE.md) - Guía de usuario
+- [docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md) - Arquitectura técnica
+- [docs/FIREBASE_SETUP.md](../docs/FIREBASE_SETUP.md) - Configuración de Firebase
 
 ### Flutter/Dart
 
