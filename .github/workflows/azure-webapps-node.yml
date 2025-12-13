@@ -1,3 +1,7 @@
+# IMPORTANTE: Este workflow NO es necesario para la aplicación Flutter actual.
+# Se mantiene aquí por si en el futuro se agrega un backend Node.js complementario.
+# Si no planeas usar Node.js, puedes eliminar este archivo de forma segura.
+#
 # NOTA: Este workflow es para una posible aplicación web Node.js complementaria.
 # El proyecto principal es una aplicación Flutter. Si no necesitas un backend Node.js,
 # considera eliminar este archivo.
