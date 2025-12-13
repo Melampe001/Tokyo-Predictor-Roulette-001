@@ -48,12 +48,4 @@ jobs:
         cache: true
     
     - name: Verificar formato del código
-      run: |
-        echo "Verificando formato del código..."
-        dart format --set-exit-if-changed --output none .
-        if [ $? -eq 0 ]; then
-          echo "✓ Formato correcto"
-        else
-          echo "✗ El código necesita formato. Ejecuta: dart format ."
-          exit 1
-        fi
+      run: dart format --set-exit-if-changed --output none .
