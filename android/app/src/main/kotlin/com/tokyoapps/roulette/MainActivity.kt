@@ -1,4 +1,4 @@
-package com.example.tokyo_roulette_predicciones
+package com.tokyoapps.roulette
 
 import io.flutter.embedding.android.FlutterActivity
 
