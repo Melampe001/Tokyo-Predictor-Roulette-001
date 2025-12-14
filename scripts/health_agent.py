@@ -314,8 +314,8 @@ class HealthAgent:
                         # Buscar patrones de secretos hardcodeados, excluyendo variables y secrets
                         secret_pattern = r'(?:password|token|api[_-]?key|secret)\s*:\s*["\'](?![\$\{])[^"\']{8,}["\']'
                         if re.search(secret_pattern, content, re.IGNORECASE):
-                            # Verificar que no sea una referencia a secrets o variables
-                            if not re.search(r'\$\{\{\s*secrets\.|env\.', content):
+                            # Verificar que no sea una referencia a secrets, env o vars de GitHub Actions
+                            if not re.search(r'\$\{\{\s*(?:secrets|env|vars)\.[^}]+\}\}', content):
                                 self.issues['critical'].append(
                                     f"❌ {workflow.name}: Posible secreto hardcodeado detectado"
                                 )
@@ -754,24 +754,24 @@ def main():
     # Ejecutar scan
     results = agent.run_full_scan()
 
-    # Generar reporte
+    # Generar reportes (solo si no es dry-run)
     if not args.dry_run:
         report_path = agent.generate_report(args.output)
-
-    # Salida JSON si se solicitó
-    if args.json:
-        # Use consistent timestamp for both content and filename
-        now = datetime.now()
-        json_output = {
-            'score': results['score'],
-            'timestamp': now.isoformat(),
-            'issues': results['issues'],
-            'metrics': results['metrics']
-        }
-        json_path = Path(args.output) / f"health-report-{now.strftime('%Y-%m-%d')}.json"
-        with open(json_path, 'w', encoding='utf-8') as f:
-            json.dump(json_output, f, indent=2, ensure_ascii=False)
-        print(f"📊 Reporte JSON generado: {json_path}")
+        
+        # Salida JSON si se solicitó
+        if args.json:
+            # Use consistent timestamp for both content and filename
+            now = datetime.now()
+            json_output = {
+                'score': results['score'],
+                'timestamp': now.isoformat(),
+                'issues': results['issues'],
+                'metrics': results['metrics']
+            }
+            json_path = Path(args.output) / f"health-report-{now.strftime('%Y-%m-%d')}.json"
+            with open(json_path, 'w', encoding='utf-8') as f:
+                json.dump(json_output, f, indent=2, ensure_ascii=False)
+            print(f"📊 Reporte JSON generado: {json_path}")
 
     # Resumen final
     print("\n" + "=" * 60)
