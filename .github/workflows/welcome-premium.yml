@@ -51,8 +51,8 @@ jobs:
               const userPRs = prs.filter(pr => pr.user.login === sender);
               
               // First contribution if this is their first issue/PR
-              const isFirstTime = (issues.length <= 1 && userPRs.length === 0) || 
-                                  (issues.length === 0 && userPRs.length <= 1);
+              const isFirstTime = (issues.length === 1 && userPRs.length === 0) || 
+                                  (issues.length === 0 && userPRs.length === 1);
               
               return isFirstTime.toString();
             } catch (error) {

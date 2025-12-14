@@ -268,46 +268,6 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const { owner, repo } = context.repo;
-            const pr_number = context.issue.number;
-            
-            // Get PR files to determine appropriate reviewers
-            const { data: files } = await github.rest.pulls.listFiles({
-              owner,
-              repo,
-              pull_number: pr_number,
-            });
-            
-            const reviewers = new Set();
-            
-            // Assign based on file types
-            for (const file of files) {
-              if (file.filename.endsWith('.dart')) {
-                // Flutter expert reviewers
-                // reviewers.add('flutter-expert-username');
-              }
-              if (file.filename.endsWith('.py')) {
-                // Python/ML expert reviewers
-                // reviewers.add('python-expert-username');
-              }
-              if (file.filename.includes('.github/workflows')) {
-                // DevOps expert reviewers
-                // reviewers.add('devops-expert-username');
-              }
-            }
-            
-            // Note: Uncomment when you have specific reviewers configured
-            /*
-            if (reviewers.size > 0) {
-              await github.rest.pulls.requestReviewers({
-                owner,
-                repo,
-                pull_number: pr_number,
-                reviewers: Array.from(reviewers),
-              });
-              
-              console.log(`Assigned reviewers: ${Array.from(reviewers).join(', ')}`);
-            }
-            */
-            
-            console.log('Auto-assign reviewers: Configure usernames in workflow to enable');
+            // Note: To enable auto-assignment, configure reviewers in repository settings
+            // or use the CODEOWNERS file for automatic review requests
+            console.log('Auto-assign reviewers: Use CODEOWNERS file for automatic assignments');

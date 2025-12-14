@@ -166,8 +166,10 @@ jobs:
           name: app-release-apk
       
       - name: Create deployment
+        id: create_deployment
         uses: actions/github-script@v7
         with:
+          result-encoding: string
           script: |
             const deployment = await github.rest.repos.createDeployment({
               owner: context.repo.owner,
@@ -180,6 +182,7 @@ jobs:
             });
             
             console.log('Deployment created:', deployment.data.id);
+            return deployment.data.id;
       
       - name: Deploy to staging server
         run: |
@@ -208,10 +211,12 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
+            const deploymentId = '${{ steps.create_deployment.outputs.result }}';
+            
             await github.rest.repos.createDeploymentStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              deployment_id: context.payload.deployment.id,
+              deployment_id: deploymentId,
               state: 'success',
               environment_url: 'https://staging.tokyo-roulette.app',
               description: 'Deployment to staging successful',

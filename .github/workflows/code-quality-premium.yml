@@ -106,11 +106,11 @@ jobs:
       - name: Run Pylint
         run: |
           echo "Running Pylint..."
-          pylint **/*.py \
+          find . -name "*.py" -type f ! -path "./.*" -exec pylint {} + \
             --max-line-length=100 \
             --output-format=text \
             --reports=y \
-            --exit-zero > pylint_report.txt
+            --exit-zero > pylint_report.txt || true
           cat pylint_report.txt
       
       - name: Run MyPy type checking
