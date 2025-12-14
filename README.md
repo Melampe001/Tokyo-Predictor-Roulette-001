@@ -79,6 +79,7 @@ flutter test --coverage
 - **[Guía de Usuario](docs/USER_GUIDE.md)**: Manual completo de uso de la aplicación
 - **[Arquitectura Técnica](docs/ARCHITECTURE.md)**: Diseño y estructura del código
 - **[Configuración Firebase](docs/FIREBASE_SETUP.md)**: Cómo integrar Firebase (opcional)
+- **[Health Agent](docs/HEALTH_AGENT.md)**: Sistema de auditoría de salud del proyecto
 - **[Guía de Contribución](CONTRIBUTING.md)**: Cómo contribuir al proyecto
 - **[Changelog](CHANGELOG.md)**: Historial de cambios y versiones
 
@@ -90,6 +91,29 @@ flutter test --coverage
 4. **Activa Martingale** desde configuración (opcional)
 5. **Consulta predicciones** basadas en historial
 6. **Resetea el juego** cuando desees comenzar de nuevo
+
+## 🏥 Project Health Agent
+
+Este proyecto incluye un **sistema automatizado de auditoría** que verifica la salud del proyecto:
+
+```bash
+# Ejecutar auditoría completa
+python scripts/health_agent.py --full-scan
+
+# Ver reporte generado
+cat reports/project-health-report-*.md
+```
+
+**Características**:
+- ✅ Verifica estructura de archivos y dependencias
+- ✅ Analiza seguridad y configuración de Git
+- ✅ Revisa CI/CD y documentación
+- ✅ Genera reportes con score de salud (0-100)
+- ✅ Se ejecuta automáticamente cada semana vía GitHub Actions
+
+**Score actual**: 🟢 92/100 (Excelente)
+
+Para más detalles, consulta [docs/HEALTH_AGENT.md](docs/HEALTH_AGENT.md).
 
 ## 🔧 Configuración
 

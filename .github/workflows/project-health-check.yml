@@ -1,0 +1,136 @@
+name: Project Health Check
+
+# Workflow para ejecutar auditorías automáticas de salud del proyecto
+# Ejecuta verificaciones de estructura, dependencias, seguridad, documentación, etc.
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Semanal: Domingos a medianoche UTC
+  workflow_dispatch:  # Permitir ejecución manual
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: read
+  issues: write  # Para crear issues automáticamente
+  pull-requests: write  # Para comentar en PRs
+
+jobs:
+  health-audit:
+    name: Project Structure Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history para análisis de branches
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Setup Flutter (if Flutter project)
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+      
+      - name: Install Health Agent Dependencies
+        run: |
+          pip install pyyaml requests gitpython
+      
+      - name: Run Health Check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python scripts/health_agent.py --full-scan --output reports/ --json
+        continue-on-error: true
+      
+      - name: Upload Health Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: health-report
+          path: |
+            reports/project-health-report-*.md
+            reports/health-report-*.json
+          retention-days: 90
+      
+      - name: Display Report Summary
+        if: always()
+        run: |
+          echo "=========================================="
+          echo "Project Health Check Completed"
+          echo "=========================================="
+          REPORT_FILE=$(find reports -name "project-health-report-*.md" -type f | head -n 1)
+          if [ -n "$REPORT_FILE" ] && [ -f "$REPORT_FILE" ]; then
+            echo "Report generated successfully!"
+            echo ""
+            echo "Summary:"
+            head -30 "$REPORT_FILE" || true
+          else
+            echo "No report file found"
+          fi
+      
+      - name: Comment PR (if PR context)
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            // Buscar el archivo de reporte
+            const reportsDir = 'reports';
+            let reportContent = '## 🏥 Project Health Check\n\n';
+            
+            try {
+              const files = fs.readdirSync(reportsDir);
+              const reportFile = files.find(f => f.startsWith('project-health-report-'));
+              
+              if (reportFile) {
+                const fullPath = path.join(reportsDir, reportFile);
+                const content = fs.readFileSync(fullPath, 'utf8');
+                
+                // Extraer solo las primeras secciones importantes para el comentario
+                const lines = content.split('\n');
+                const summaryLines = lines.slice(0, 50); // Primeras 50 líneas
+                reportContent += summaryLines.join('\n');
+                reportContent += '\n\n---\n📊 Ver el reporte completo en los artifacts de este workflow.';
+              } else {
+                reportContent += '⚠️ No se pudo generar el reporte de salud.';
+              }
+            } catch (error) {
+              reportContent += `❌ Error al leer el reporte: ${error.message}`;
+            }
+            
+            // Comentar en el PR
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: reportContent
+            });
+      
+      - name: Check Health Score
+        if: always()
+        run: |
+          # Verificar si el score es muy bajo y fallar el workflow si es crítico
+          JSON_FILE=$(find reports -name "health-report-*.json" -type f | head -n 1)
+          if [ -n "$JSON_FILE" ] && [ -f "$JSON_FILE" ]; then
+            SCORE=$(python3 -c "import json; print(json.load(open('$JSON_FILE'))['score'])" 2>/dev/null || echo "0")
+            echo "Health Score: $SCORE/100"
+            
+            if [ "$SCORE" -lt 50 ]; then
+              echo "::error::Health score is critical (<50). Please address the issues."
+              exit 1
+            elif [ "$SCORE" -lt 70 ]; then
+              echo "::warning::Health score is below recommended threshold (70)"
+            else
+              echo "::notice::Health score is good!"
+            fi
+          else
+            echo "::warning::Could not read health score from JSON report"
+          fi
