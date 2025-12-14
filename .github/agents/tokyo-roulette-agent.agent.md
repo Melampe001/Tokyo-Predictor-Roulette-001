@@ -788,8 +788,10 @@ final dio = Dio(BaseOptions(
 **Certificate Pinning** (for production):
 ```dart
 // Prevent man-in-the-middle attacks
+// Note: Replace with actual SHA256 certificate hashes from your server
+// Generate with: openssl s_client -connect api.tokyoroulette.com:443 | openssl x509 -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | openssl enc -base64
 final dio = Dio()..httpClientAdapter = DefaultHttpClientAdapter()
-  ..certificatePinning = ['sha256/AAAAAAA...'];
+  ..certificatePinning = ['sha256/AAAAAAA...']; // Replace with real hash
 ```
 
 ### Authentication & Authorization
@@ -1367,7 +1369,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.11.9'  # Pin to specific version for consistent builds
       - run: pip install -r requirements.txt
       - run: pytest tests/ --cov=src
       - run: flake8 src/
@@ -1465,7 +1467,8 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 Future<void> main() async {
   await SentryFlutter.init(
     (options) {
-      options.dsn = 'YOUR_DSN';
+      // Use environment variable, never hardcode DSN
+      options.dsn = const String.fromEnvironment('SENTRY_DSN');
       options.tracesSampleRate = 1.0;
     },
     appRunner: () => runApp(const MyApp()),
