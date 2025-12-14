@@ -75,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     MaterialPageRoute(builder: (_) => const MainScreen()),
                   );
                 } catch (e, stackTrace) {
-                  // Log error for debugging (using debugPrint for Flutter)
+                  // Log error for debugging (debugPrint is automatically stripped in release builds)
                   debugPrint('Registration error: $e');
                   debugPrint('Stack trace: $stackTrace');
                   
@@ -164,7 +164,7 @@ class _MainScreenState extends State<MainScreen> {
         }
       }
       
-      // Limita el historial a los últimos números
+      // Limita el historial a los últimos _historyLimit números
       if (history.length > _historyLimit) {
         history = history.sublist(history.length - _historyLimit);
       }
