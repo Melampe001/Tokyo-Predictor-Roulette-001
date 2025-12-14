@@ -18,7 +18,11 @@ class FlutterBuildBot:
     def clean(self):
         """Limpia build anterior"""
         print("🧹 Limpiando build anterior...")
-        subprocess.run(["flutter", "clean"], cwd=self.project_root)
+        result = subprocess.run(["flutter", "clean"], cwd=self.project_root, capture_output=True)
+        if result.returncode != 0:
+            print("⚠️  Advertencia: flutter clean falló, continuando...")
+        else:
+            print("✅ Build limpiado")
         
     def pub_get(self):
         """Obtiene dependencias"""
@@ -45,15 +49,16 @@ class FlutterBuildBot:
         
         if result.returncode == 0:
             print(f"✅ APK generada en {duration:.1f}s")
-            self.verify_apk()
+            self.verify_apk(mode)
             return True
         else:
             print(f"❌ Build falló después de {duration:.1f}s")
             return False
     
-    def verify_apk(self):
+    def verify_apk(self, mode: str = "release"):
         """Verifica que APK existe y muestra info"""
-        apk_path = self.build_dir / "app" / "outputs" / "flutter-apk" / "app-release.apk"
+        apk_filename = f"app-{mode}.apk"
+        apk_path = self.build_dir / "app" / "outputs" / "flutter-apk" / apk_filename
         
         if apk_path.exists():
             size_mb = apk_path.stat().st_size / (1024 * 1024)

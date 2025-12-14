@@ -178,6 +178,7 @@ def main():
         result = subprocess.run(
             ["flutter", "--version"],
             capture_output=True,
+            text=True,
             timeout=10
         )
         if result.returncode != 0:
