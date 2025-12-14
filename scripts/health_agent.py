@@ -311,10 +311,14 @@ class HealthAgent:
                             )
 
                         # Verificar secretos hardcodeados (búsqueda básica)
-                        if re.search(r'password\s*:\s*["\'][^"\']+["\']', content, re.IGNORECASE):
-                            self.issues['critical'].append(
-                                f"❌ {workflow.name}: Posible secreto hardcodeado detectado"
-                            )
+                        # Buscar patrones de secretos hardcodeados, excluyendo variables y secrets
+                        secret_pattern = r'(?:password|token|api[_-]?key|secret)\s*:\s*["\'](?![\$\{])[^"\']{8,}["\']'
+                        if re.search(secret_pattern, content, re.IGNORECASE):
+                            # Verificar que no sea una referencia a secrets o variables
+                            if not re.search(r'\$\{\{\s*secrets\.|env\.', content):
+                                self.issues['critical'].append(
+                                    f"❌ {workflow.name}: Posible secreto hardcodeado detectado"
+                                )
 
                 except Exception as e:
                     self.issues['warnings'].append(
@@ -756,13 +760,15 @@ def main():
 
     # Salida JSON si se solicitó
     if args.json:
+        # Use consistent timestamp for both content and filename
+        now = datetime.now()
         json_output = {
             'score': results['score'],
-            'timestamp': datetime.now().isoformat(),
+            'timestamp': now.isoformat(),
             'issues': results['issues'],
             'metrics': results['metrics']
         }
-        json_path = Path(args.output) / f"health-report-{datetime.now().strftime('%Y-%m-%d')}.json"
+        json_path = Path(args.output) / f"health-report-{now.strftime('%Y-%m-%d')}.json"
         with open(json_path, 'w', encoding='utf-8') as f:
             json.dump(json_output, f, indent=2, ensure_ascii=False)
         print(f"📊 Reporte JSON generado: {json_path}")

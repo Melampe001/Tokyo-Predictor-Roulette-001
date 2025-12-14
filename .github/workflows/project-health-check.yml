@@ -64,11 +64,12 @@ jobs:
           echo "=========================================="
           echo "Project Health Check Completed"
           echo "=========================================="
-          if [ -f reports/project-health-report-*.md ]; then
+          REPORT_FILE=$(find reports -name "project-health-report-*.md" -type f | head -n 1)
+          if [ -n "$REPORT_FILE" ] && [ -f "$REPORT_FILE" ]; then
             echo "Report generated successfully!"
             echo ""
             echo "Summary:"
-            head -30 reports/project-health-report-*.md || true
+            head -30 "$REPORT_FILE" || true
           else
             echo "No report file found"
           fi
@@ -117,8 +118,9 @@ jobs:
         if: always()
         run: |
           # Verificar si el score es muy bajo y fallar el workflow si es crítico
-          if [ -f reports/health-report-*.json ]; then
-            SCORE=$(python -c "import json; f=open([f for f in __import__('os').listdir('reports') if f.startswith('health-report-') and f.endswith('.json')][0], 'r'); data=json.load(f); print(data['score'])" 2>/dev/null || echo "0")
+          JSON_FILE=$(find reports -name "health-report-*.json" -type f | head -n 1)
+          if [ -n "$JSON_FILE" ] && [ -f "$JSON_FILE" ]; then
+            SCORE=$(python3 -c "import json; print(json.load(open('$JSON_FILE'))['score'])" 2>/dev/null || echo "0")
             echo "Health Score: $SCORE/100"
             
             if [ "$SCORE" -lt 50 ]; then
