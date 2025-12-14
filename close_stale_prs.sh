@@ -33,7 +33,7 @@ Si consideras que debe reabrirse, por favor:
 *Cerrado automáticamente por Bot de Limpieza - $DATE*"
 
   echo -e "${YELLOW}Cerrando PR #$pr_number: $reason${NC}"
-  if gh pr close $pr_number --repo $REPO --comment "$comment"; then
+  if gh pr close "$pr_number" --repo "$REPO" --comment "$comment"; then
     echo -e "${GREEN}✓ PR #$pr_number cerrado exitosamente${NC}"
   else
     echo -e "${RED}✗ Error cerrando PR #$pr_number${NC}"
@@ -54,7 +54,7 @@ Si consideras que debe reabrirse, por favor actualiza el contenido y menciona @M
 *Cerrado automáticamente por Bot de Limpieza - $DATE*"
 
   echo -e "${YELLOW}Cerrando Issue #$issue_number: $reason${NC}"
-  if gh issue close $issue_number --repo $REPO --comment "$comment"; then
+  if gh issue close "$issue_number" --repo "$REPO" --comment "$comment"; then
     echo -e "${GREEN}✓ Issue #$issue_number cerrado exitosamente${NC}"
   else
     echo -e "${RED}✗ Error cerrando Issue #$issue_number${NC}"
