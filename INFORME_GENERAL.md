@@ -1,5 +1,4 @@
-# 📊 Informe General del Proyecto
-# Tokyo Roulette Predicciones - Análisis Completo
+# 📊 Informe General del Proyecto - Tokyo Roulette Predicciones
 
 **Fecha del Informe**: 14 de Diciembre, 2024  
 **Versión del Proyecto**: 1.0.0  
@@ -288,7 +287,7 @@ TOTAL:              95/100 puntos 🟢
 
 ### Estadísticas de Git
 
-**Repositorio**: github.com/Melampe001/Tokyo-Predictor-Roulette-001
+**Repositorio**: https://github.com/Melampe001/Tokyo-Predictor-Roulette-001
 
 **Estadísticas Generales:**
 - **Commits totales**: ~36 commits
@@ -521,9 +520,11 @@ Este proyecto sirve como:
 
 ### Canales de Comunicación
 
-**GitHub Issues**: Para reportar bugs o solicitar features  
+**Repositorio**: https://github.com/Melampe001/Tokyo-Predictor-Roulette-001  
+**GitHub Issues**: https://github.com/Melampe001/Tokyo-Predictor-Roulette-001/issues  
 **Email**: A través de url_launcher en la app  
-**Documentación**: Consultar carpeta `/docs` para guías detalladas
+**Licencia**: MIT (ver LICENSE file)  
+**Autor Principal**: Artur Orozco (@Melampe001)
 
 ### Recursos Disponibles
 
@@ -619,13 +620,6 @@ Tokyo-Predictor-Roulette-001/
 ├── README.md                # Documentación principal
 └── INFORME_GENERAL.md       # Este documento
 ```
-
-### C. Contactos y Enlaces
-
-**Repositorio**: https://github.com/Melampe001/Tokyo-Predictor-Roulette-001  
-**Issues**: https://github.com/Melampe001/Tokyo-Predictor-Roulette-001/issues  
-**Licencia**: MIT (ver LICENSE file)  
-**Autor Principal**: Artur Orozco (@Melampe001)
 
 ---
 
