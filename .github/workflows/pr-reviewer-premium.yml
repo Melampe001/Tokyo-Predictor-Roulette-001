@@ -325,20 +325,16 @@ jobs:
             
             // If significant code changes but no doc updates, warn
             if (codeFiles > 5 && docFiles === 0) {
-              const comment = `## 📚 Documentation Notice
-
-This PR contains significant code changes (${codeFiles} files) but no documentation updates.
-
-Please consider:
-- Updating relevant documentation
-- Adding code comments for complex logic
-- Updating API documentation if interfaces changed
-- Adding usage examples if applicable
-
-If documentation is not needed, you can ignore this message.
-
----
-*Automated check by PR Reviewer Premium Bot*`;
+              const comment = "## 📚 Documentation Notice\n\n" +
+                "This PR contains significant code changes (" + codeFiles + " files) but no documentation updates.\n\n" +
+                "Please consider:\n" +
+                "- Updating relevant documentation\n" +
+                "- Adding code comments for complex logic\n" +
+                "- Updating API documentation if interfaces changed\n" +
+                "- Adding usage examples if applicable\n\n" +
+                "If documentation is not needed, you can ignore this message.\n\n" +
+                "---\n" +
+                "*Automated check by PR Reviewer Premium Bot*";
               
               await github.rest.issues.createComment({
                 owner,
@@ -390,23 +386,17 @@ If documentation is not needed, you can ignore this message.
             }
             
             if (issues.length > 0) {
-              const comment = `## 📝 Commit Message Suggestions
-
-${issues.join('\n')}
-
-### Recommended Format
-\`\`\`
-<type>(<scope>): <subject>
-
-<body>
-
-<footer>
-\`\`\`
-
-**Types:** feat, fix, docs, style, refactor, test, chore, perf, ci, build
-
----
-*Automated check by PR Reviewer Premium Bot*`;
+              const comment = "## 📝 Commit Message Suggestions\n\n" +
+                issues.join('\n') + "\n\n" +
+                "### Recommended Format\n" +
+                "```\n" +
+                "<type>(<scope>): <subject>\n\n" +
+                "<body>\n\n" +
+                "<footer>\n" +
+                "```\n\n" +
+                "**Types:** feat, fix, docs, style, refactor, test, chore, perf, ci, build\n\n" +
+                "---\n" +
+                "*Automated check by PR Reviewer Premium Bot*";
               
               await github.rest.issues.createComment({
                 owner,

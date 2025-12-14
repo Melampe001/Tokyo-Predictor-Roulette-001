@@ -243,22 +243,18 @@ jobs:
             const { owner, repo } = context.repo;
             const pr_number = context.issue.number;
             
-            const comment = `## 🤖 Auto-Labeler Bot
-
-Thanks for your pull request! I've automatically added labels based on your changes.
-
-### 📋 Checklist
-Before merging, please ensure:
-- [ ] Tests pass locally
-- [ ] Code follows style guidelines
-- [ ] Documentation is updated (if needed)
-- [ ] No security vulnerabilities introduced
-
-### 🔍 Need Review?
-Your PR will be automatically reviewed by our code quality bot. Address any feedback before requesting human review.
-
----
-*This is an automated message from the Auto-Labeler Premium Bot*`;
+            const comment = "## 🤖 Auto-Labeler Bot\n\n" +
+              "Thanks for your pull request! I've automatically added labels based on your changes.\n\n" +
+              "### 📋 Checklist\n" +
+              "Before merging, please ensure:\n" +
+              "- [ ] Tests pass locally\n" +
+              "- [ ] Code follows style guidelines\n" +
+              "- [ ] Documentation is updated (if needed)\n" +
+              "- [ ] No security vulnerabilities introduced\n\n" +
+              "### 🔍 Need Review?\n" +
+              "Your PR will be automatically reviewed by our code quality bot. Address any feedback before requesting human review.\n\n" +
+              "---\n" +
+              "*This is an automated message from the Auto-Labeler Premium Bot*";
             
             await github.rest.issues.createComment({
               owner,

@@ -221,22 +221,18 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const message = `## 🎉 Staging Deployment Successful
-            
-**Environment:** Staging
-**Branch:** ${context.ref.replace('refs/heads/', '')}
-**Commit:** ${context.sha.slice(0, 7)}
-**Deployed by:** ${context.actor}
-
-### 📱 Test the App
-- Staging URL: https://staging.tokyo-roulette.app
-- APK available in workflow artifacts
-
-### ✅ Next Steps
-1. Test the deployed version
-2. Verify all features work correctly
-3. If everything looks good, merge to main for production deployment
-`;
+            const message = "## 🎉 Staging Deployment Successful\n\n" +
+              "**Environment:** Staging\n" +
+              "**Branch:** " + context.ref.replace('refs/heads/', '') + "\n" +
+              "**Commit:** " + context.sha.slice(0, 7) + "\n" +
+              "**Deployed by:** " + context.actor + "\n\n" +
+              "### 📱 Test the App\n" +
+              "- Staging URL: https://staging.tokyo-roulette.app\n" +
+              "- APK available in workflow artifacts\n\n" +
+              "### ✅ Next Steps\n" +
+              "1. Test the deployed version\n" +
+              "2. Verify all features work correctly\n" +
+              "3. If everything looks good, merge to main for production deployment\n";
             
             // Post to PR if this is a PR
             if (context.payload.pull_request) {
@@ -333,26 +329,22 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const message = `## 🎉 Production Deployment Successful
-            
-**Environment:** Production
-**Version:** v${{ steps.version.outputs.version }}
-**Commit:** ${context.sha.slice(0, 7)}
-**Deployed by:** ${context.actor}
-**Deployment time:** ${new Date().toISOString()}
-
-### 🌟 Release Details
-- Release: [v${{ steps.version.outputs.version }}](https://github.com/${context.repo.owner}/${context.repo.repo}/releases/tag/v${{ steps.version.outputs.version }})
-- Production URL: https://tokyo-roulette.app
-
-### 📱 What's Live
-All features from this release are now live in production!
-
-### 📊 Post-Deployment
-- Monitor application performance
-- Watch for error rates
-- Check user feedback
-`;
+            const version = "${{ steps.version.outputs.version }}";
+            const message = "## 🎉 Production Deployment Successful\n\n" +
+              "**Environment:** Production\n" +
+              "**Version:** v" + version + "\n" +
+              "**Commit:** " + context.sha.slice(0, 7) + "\n" +
+              "**Deployed by:** " + context.actor + "\n" +
+              "**Deployment time:** " + new Date().toISOString() + "\n\n" +
+              "### 🌟 Release Details\n" +
+              "- Release: [v" + version + "](https://github.com/" + context.repo.owner + "/" + context.repo.repo + "/releases/tag/v" + version + ")\n" +
+              "- Production URL: https://tokyo-roulette.app\n\n" +
+              "### 📱 What's Live\n" +
+              "All features from this release are now live in production!\n\n" +
+              "### 📊 Post-Deployment\n" +
+              "- Monitor application performance\n" +
+              "- Watch for error rates\n" +
+              "- Check user feedback\n";
             
             // Create a discussion or issue for the release
             console.log(message);
@@ -375,30 +367,29 @@ All features from this release are now live in production!
         uses: actions/github-script@v7
         with:
           script: |
+            const environment = "${{ needs.determine-environment.outputs.environment }}";
+            const body = "## Deployment Failure Alert\n\n" +
+              "**Environment:** " + environment + "\n" +
+              "**Commit:** " + context.sha + "\n" +
+              "**Workflow Run:** " + context.serverUrl + "/" + context.repo.owner + "/" + context.repo.repo + "/actions/runs/" + context.runId + "\n\n" +
+              "### Action Required\n" +
+              "The deployment has failed. Please:\n" +
+              "1. Review the deployment logs\n" +
+              "2. Identify the failure cause\n" +
+              "3. Perform rollback if necessary\n" +
+              "4. Fix the issue before redeploying\n\n" +
+              "### Rollback Procedure\n" +
+              "```bash\n" +
+              "# Revert to previous version\n" +
+              "git revert " + context.sha + "\n" +
+              "git push origin main\n" +
+              "```\n";
+            
             const issue = await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `🔴 Deployment Failed - Rollback Required`,
-              body: `## Deployment Failure Alert
-              
-**Environment:** ${{ needs.determine-environment.outputs.environment }}
-**Commit:** ${context.sha}
-**Workflow Run:** ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}
-
-### Action Required
-The deployment has failed. Please:
-1. Review the deployment logs
-2. Identify the failure cause
-3. Perform rollback if necessary
-4. Fix the issue before redeploying
-
-### Rollback Procedure
-\`\`\`bash
-# Revert to previous version
-git revert ${context.sha}
-git push origin main
-\`\`\`
-              `,
+              title: "🔴 Deployment Failed - Rollback Required",
+              body: body,
               labels: ['deployment', 'critical', 'needs-attention'],
             });
             
