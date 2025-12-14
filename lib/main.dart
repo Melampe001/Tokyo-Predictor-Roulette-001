@@ -75,9 +75,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     MaterialPageRoute(builder: (_) => const MainScreen()),
                   );
                 } catch (e, stackTrace) {
-                  // Log error for debugging
-                  print('Registration error: $e');
-                  print('Stack trace: $stackTrace');
+                  // Log error for debugging (using debugPrint for Flutter)
+                  debugPrint('Registration error: $e');
+                  debugPrint('Stack trace: $stackTrace');
                   
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
