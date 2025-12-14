@@ -154,6 +154,40 @@ Para preguntas, sugerencias o reportar problemas:
 **Estado**: ✅ Proyecto Completado  
 **Última Actualización**: Diciembre 2024
 
+## 🧹 Mantenimiento del Repositorio
+
+**Última limpieza:** 2024-12-14
+
+### Estado de PRs
+- ✅ Abiertas activas: ~14-16
+- ⏸️ Drafts en desarrollo: ~8-10
+- ❌ Cerradas en limpieza: 16
+
+### Política de PRs
+- PRs inactivas >30 días serán marcadas como `stale`
+- Drafts sin actividad >60 días serán cerrados automáticamente
+- Duplicados se cierran automáticamente con comentario explicativo
+- PRs sin respuesta a comentarios en 14 días se marcan para cierre
+
+### Cómo Evitar Cierres Automáticos
+1. Mantén PRs actualizados con commits regulares
+2. Responde a comentarios en <7 días
+3. Sincroniza con `main` regularmente
+4. Marca PRs activos con label `priority` si son críticos
+5. Actualiza la descripción del PR con el estado actual
+
+### Proceso de Reapertura
+Si un PR/issue fue cerrado por error:
+1. Actualiza el contenido del PR/issue
+2. Responde a todos los comentarios pendientes
+3. Menciona @Melampe001 en un comentario solicitando revisión
+4. Explica por qué debería reabrirse
+
+### Documentación de Limpieza
+- [Script de Limpieza](docs/CLEANUP_SCRIPT.md) - Documentación completa del proceso
+- [Estado Post-Limpieza](docs/POST_CLEANUP_TRACKING.md) - Tracking de PRs cerrados y priorizados
+- [Script Ejecutable](close_stale_prs.sh) - Script bash para ejecutar limpieza
+
 ## Configuración de Keystore para Android
 
 Para firmar la APK en modo release, necesitas configurar un keystore:
