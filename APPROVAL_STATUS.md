@@ -196,7 +196,8 @@ Este repositorio cumple y excede todos los estándares de calidad requeridos par
 1. **Configurar Keystore de Android**
    ```bash
    keytool -genkey -v -keystore ~/upload-keystore.jks \
-     -keyalg RSA -keysize 2048 -validity 10000 \
+     -keyalg RSA -keysize 4096 -validity 10000 \
+     -sigalg SHA256withRSA \
      -alias upload
    ```
    Ver README.md líneas 157-177 para detalles.
