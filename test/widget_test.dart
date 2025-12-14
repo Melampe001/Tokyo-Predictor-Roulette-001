@@ -96,14 +96,18 @@ void main() {
     // Simula múltiples pérdidas hasta que el balance se agote
     // Nota: En una ruleta real, esto requeriría muchos giros
     // pero el balance está protegido contra valores negativos
-    final buttonFinder = find.text('Girar Ruleta');
+    final buttonFinder = find.widgetWithText(ElevatedButton, 'Girar Ruleta');
     for (int i = 0; i < maxSpinsToDepleteFunds; i++) {
-      final elevatedButton = tester.widget<ElevatedButton>(buttonFinder);
-      if (elevatedButton.onPressed != null) {
-        await tester.tap(buttonFinder);
-        await tester.pump();
+      if (buttonFinder.evaluate().isNotEmpty) {
+        final elevatedButton = tester.widget<ElevatedButton>(buttonFinder);
+        if (elevatedButton.onPressed != null) {
+          await tester.tap(buttonFinder);
+          await tester.pump();
+        } else {
+          // El botón está deshabilitado cuando balance < currentBet
+          break;
+        }
       } else {
-        // El botón está deshabilitado cuando balance < currentBet
         break;
       }
     }
