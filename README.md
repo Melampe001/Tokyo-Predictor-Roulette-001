@@ -33,6 +33,8 @@ Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y mod
 - Android Studio / VS Code
 - JDK 11+ (para builds de Android)
 
+> 📖 **Nota**: Para detalles completos sobre la configuración del proyecto, consulta [BASE_CONFIGURATION.md](BASE_CONFIGURATION.md)
+
 ### Instalación
 
 1. Clona el repositorio:
@@ -76,9 +78,11 @@ flutter test --coverage
 
 ## 📚 Documentación
 
+- **[Configuración Base](BASE_CONFIGURATION.md)**: Configuración base del proyecto para desarrollo
 - **[Guía de Usuario](docs/USER_GUIDE.md)**: Manual completo de uso de la aplicación
 - **[Arquitectura Técnica](docs/ARCHITECTURE.md)**: Diseño y estructura del código
 - **[Configuración Firebase](docs/FIREBASE_SETUP.md)**: Cómo integrar Firebase (opcional)
+- **[Configuración Local Android](android/LOCAL_PROPERTIES_SETUP.md)**: Setup de local.properties
 - **[Guía de Contribución](CONTRIBUTING.md)**: Cómo contribuir al proyecto
 - **[Changelog](CHANGELOG.md)**: Historial de cambios y versiones
 
