@@ -500,5 +500,5 @@ Esta configuración es parte del proyecto Tokyo Roulette Predicciones, licenciad
 ---
 
 **Última actualización**: Diciembre 2024  
-**Versión del proyecto**: 1.0.0  
+**Versión del proyecto**: 1.1.0  
 **Mantenido por**: Melampe001
