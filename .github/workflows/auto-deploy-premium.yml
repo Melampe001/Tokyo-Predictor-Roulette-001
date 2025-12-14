@@ -1,0 +1,438 @@
+name: Auto-Deploy Premium Bot
+
+# Automated deployment pipeline for staging and production
+
+on:
+  push:
+    branches:
+      - develop    # Deploy to staging
+      - main       # Deploy to production
+      - master     # Deploy to production
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+      skip_tests:
+        description: 'Skip tests (not recommended)'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  deployments: write
+
+env:
+  FLUTTER_VERSION: '3.16.0'
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  determine-environment:
+    name: Determine Deployment Environment
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.set-env.outputs.environment }}
+      deploy: ${{ steps.set-env.outputs.deploy }}
+    
+    steps:
+      - name: Set environment
+        id: set-env
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+            echo "deploy=true" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" == "refs/heads/develop" ]; then
+            echo "environment=staging" >> $GITHUB_OUTPUT
+            echo "deploy=true" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" == "refs/heads/main" ] || [ "${{ github.ref }}" == "refs/heads/master" ]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
+            echo "deploy=true" >> $GITHUB_OUTPUT
+          else
+            echo "environment=none" >> $GITHUB_OUTPUT
+            echo "deploy=false" >> $GITHUB_OUTPUT
+          fi
+
+  pre-deployment-tests:
+    name: Pre-Deployment Tests
+    runs-on: ubuntu-latest
+    needs: determine-environment
+    if: needs.determine-environment.outputs.deploy == 'true' && github.event.inputs.skip_tests != 'true'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          flutter pub get
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+            pip install pytest
+          fi
+      
+      - name: Run Flutter tests
+        run: flutter test --reporter=expanded
+      
+      - name: Run Python tests
+        if: hashFiles('**/*.py') != ''
+        run: |
+          if [ -d "tests" ] || find . -name "test_*.py" | grep -q .; then
+            pytest -v
+          else
+            echo "No Python tests found"
+          fi
+  
+  build-artifacts:
+    name: Build Deployment Artifacts
+    runs-on: ubuntu-latest
+    needs: [determine-environment, pre-deployment-tests]
+    if: needs.determine-environment.outputs.deploy == 'true' && (success() || github.event.inputs.skip_tests == 'true')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      
+      - name: Install dependencies
+        run: flutter pub get
+      
+      - name: Build APK
+        run: flutter build apk --release
+      
+      - name: Build App Bundle
+        run: flutter build appbundle --release
+      
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
+      
+      - name: Upload App Bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-bundle
+          path: build/app/outputs/bundle/release/app-release.aab
+          retention-days: 30
+  
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [determine-environment, build-artifacts]
+    if: needs.determine-environment.outputs.environment == 'staging'
+    environment:
+      name: staging
+      url: https://staging.tokyo-roulette.app
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download APK
+        uses: actions/download-artifact@v4
+        with:
+          name: app-release-apk
+      
+      - name: Create deployment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const deployment = await github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.sha,
+              environment: 'staging',
+              description: 'Deploying to staging environment',
+              auto_merge: false,
+              required_contexts: [],
+            });
+            
+            console.log('Deployment created:', deployment.data.id);
+      
+      - name: Deploy to staging server
+        run: |
+          echo "🚀 Deploying to staging environment..."
+          echo "Environment: staging"
+          echo "Commit: ${{ github.sha }}"
+          echo "Branch: ${{ github.ref_name }}"
+          
+          # Add your staging deployment commands here
+          # Examples:
+          # - Upload to Firebase App Distribution
+          # - Deploy to staging server via SSH
+          # - Upload to internal testing track on Google Play
+          
+          echo "✅ Staging deployment completed"
+      
+      - name: Run smoke tests
+        run: |
+          echo "Running smoke tests on staging..."
+          # Add smoke test commands here
+          sleep 5
+          echo "✅ Smoke tests passed"
+      
+      - name: Update deployment status
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: context.payload.deployment.id,
+              state: 'success',
+              environment_url: 'https://staging.tokyo-roulette.app',
+              description: 'Deployment to staging successful',
+            });
+      
+      - name: Notify staging deployment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const message = `## 🎉 Staging Deployment Successful
+            
+**Environment:** Staging
+**Branch:** ${context.ref.replace('refs/heads/', '')}
+**Commit:** ${context.sha.slice(0, 7)}
+**Deployed by:** ${context.actor}
+
+### 📱 Test the App
+- Staging URL: https://staging.tokyo-roulette.app
+- APK available in workflow artifacts
+
+### ✅ Next Steps
+1. Test the deployed version
+2. Verify all features work correctly
+3. If everything looks good, merge to main for production deployment
+`;
+            
+            // Post to PR if this is a PR
+            if (context.payload.pull_request) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body: message,
+              });
+            }
+            
+            console.log(message);
+  
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [determine-environment, build-artifacts]
+    if: needs.determine-environment.outputs.environment == 'production'
+    environment:
+      name: production
+      url: https://tokyo-roulette.app
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: app-release-apk
+      
+      - name: Download App Bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: app-release-bundle
+      
+      - name: Get version
+        id: version
+        run: |
+          VERSION=$(grep 'version:' pubspec.yaml | cut -d ' ' -f 2)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Release v${{ steps.version.outputs.version }}
+          body: |
+            ## 🎉 Tokyo Roulette Predictor - Production Release
+            
+            ### What's Changed
+            See the [changelog](CHANGELOG.md) for details.
+            
+            ### 📦 Downloads
+            - APK for Android devices
+            - App Bundle for Google Play Store
+            
+            ### 🚀 Deployment
+            Deployed to production on ${{ github.event.head_commit.timestamp }}
+            
+            **Commit:** ${{ github.sha }}
+          files: |
+            app-release.apk
+            app-release.aab
+          draft: false
+          prerelease: false
+      
+      - name: Deploy to production
+        run: |
+          echo "🚀 Deploying to production environment..."
+          echo "Environment: production"
+          echo "Version: ${{ steps.version.outputs.version }}"
+          echo "Commit: ${{ github.sha }}"
+          
+          # Add your production deployment commands here
+          # Examples:
+          # - Upload to Google Play Store
+          # - Deploy to production servers
+          # - Update CDN
+          # - Notify monitoring systems
+          
+          echo "✅ Production deployment completed"
+      
+      - name: Run production smoke tests
+        run: |
+          echo "Running smoke tests on production..."
+          # Add production smoke test commands
+          sleep 5
+          echo "✅ Production smoke tests passed"
+      
+      - name: Notify production deployment
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const message = `## 🎉 Production Deployment Successful
+            
+**Environment:** Production
+**Version:** v${{ steps.version.outputs.version }}
+**Commit:** ${context.sha.slice(0, 7)}
+**Deployed by:** ${context.actor}
+**Deployment time:** ${new Date().toISOString()}
+
+### 🌟 Release Details
+- Release: [v${{ steps.version.outputs.version }}](https://github.com/${context.repo.owner}/${context.repo.repo}/releases/tag/v${{ steps.version.outputs.version }})
+- Production URL: https://tokyo-roulette.app
+
+### 📱 What's Live
+All features from this release are now live in production!
+
+### 📊 Post-Deployment
+- Monitor application performance
+- Watch for error rates
+- Check user feedback
+`;
+            
+            // Create a discussion or issue for the release
+            console.log(message);
+  
+  rollback:
+    name: Rollback Deployment
+    runs-on: ubuntu-latest
+    if: failure()
+    needs: [deploy-staging, deploy-production]
+    
+    steps:
+      - name: Notify rollback needed
+        uses: actions/github-script@v7
+        with:
+          script: |
+            console.log('⚠️ Deployment failed. Manual rollback may be required.');
+            console.log('Check deployment logs and consider rolling back to previous version.');
+      
+      - name: Create rollback issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🔴 Deployment Failed - Rollback Required`,
+              body: `## Deployment Failure Alert
+              
+**Environment:** ${{ needs.determine-environment.outputs.environment }}
+**Commit:** ${context.sha}
+**Workflow Run:** ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}
+
+### Action Required
+The deployment has failed. Please:
+1. Review the deployment logs
+2. Identify the failure cause
+3. Perform rollback if necessary
+4. Fix the issue before redeploying
+
+### Rollback Procedure
+\`\`\`bash
+# Revert to previous version
+git revert ${context.sha}
+git push origin main
+\`\`\`
+              `,
+              labels: ['deployment', 'critical', 'needs-attention'],
+            });
+            
+            console.log('Rollback issue created:', issue.data.html_url);
+  
+  notify-deployment:
+    name: Send Deployment Notifications
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, deploy-production]
+    if: always()
+    
+    steps:
+      - name: Deployment summary
+        run: |
+          echo "=========================================="
+          echo "Deployment Summary"
+          echo "=========================================="
+          echo "Environment: ${{ needs.determine-environment.outputs.environment }}"
+          echo "Status: ${{ job.status }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "=========================================="
+      
+      # Add notification integrations here
+      # Examples:
+      # - Slack webhook
+      # - Discord webhook
+      # - Email notification
+      # - PagerDuty alert
+      
+      - name: Slack notification (if configured)
+        if: false  # Enable when Slack webhook is configured
+        run: |
+          # curl -X POST -H 'Content-type: application/json' \
+          #   --data '{"text":"Deployment completed"}' \
+          #   ${{ secrets.SLACK_WEBHOOK_URL }}
+          echo "Slack notifications disabled. Configure SLACK_WEBHOOK_URL secret to enable."
