@@ -59,6 +59,7 @@ key.properties
 
 # Environment variables and secrets
 .env
+*.env
 .env.local
 .env.*.local
 *.pem
@@ -103,3 +104,6 @@ lib/generated_plugin_registrant.dart
 # Exceptions to above rules.
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 !/dev/ci/**/Gemfile.lock
+
+# Project Health Agent - Generated reports
+reports/

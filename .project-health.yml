@@ -1,0 +1,50 @@
+# Project Health Agent Configuration
+agent:
+  name: "Project Structure Health Agent"
+  version: "1.0.0"
+  
+checks:
+  enabled:
+    - file_structure
+    - dependencies
+    - git_health
+    - ci_cd
+    - security
+    - documentation
+  
+thresholds:
+  max_open_prs: 10
+  max_pr_age_days: 30
+  max_stale_branches: 5
+  min_test_coverage: 70
+  max_outdated_dependencies: 5
+  
+project_type: "flutter"  # auto-detect si está en blanco
+
+critical_files:
+  flutter:
+    - pubspec.yaml
+    - lib/main.dart
+    - android/app/src/main/AndroidManifest.xml
+  nodejs:
+    - package.json
+    - package-lock.json
+  python:
+    - requirements.txt
+    - setup.py
+  go:
+    - go.mod
+    - go.sum
+    
+ignore_patterns:
+  - "build/"
+  - ".dart_tool/"
+  - "*.g.dart"  # Generated files
+  - "node_modules/"
+  - "**/.git/"
+  
+notifications:
+  create_issues: true  # Crear issues automáticamente para problemas críticos
+  labels:
+    - "project-health"
+    - "automated"

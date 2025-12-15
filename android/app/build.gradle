@@ -23,8 +23,9 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "com.example.tokyo_roulette_predicciones"
+    namespace "com.tokyoapps.roulette"
     compileSdk 34
+    ndkVersion "25.1.8937393"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -119,13 +120,13 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     
     // Firebase dependencies (uncomment when configured)
+    // Firebase (descomentar cuando se configure)
     // implementation platform('com.google.firebase:firebase-bom:32.7.0')
     // implementation 'com.google.firebase:firebase-analytics'
     // implementation 'com.google.firebase:firebase-auth'
     // implementation 'com.google.firebase:firebase-firestore'
     // implementation 'com.google.firebase:firebase-messaging'
-    // implementation 'com.google.firebase:firebase-config'
 }
 
-// Apply Google services plugin (uncomment when google-services.json is added)
+// Firebase (descomentar cuando se configure google-services.json)
 // apply plugin: 'com.google.gms.google-services'
