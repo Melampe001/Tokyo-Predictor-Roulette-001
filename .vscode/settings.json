@@ -1,5 +1,39 @@
 {
-    "files.readonlyInclude": {
-        "{**/.c4z/.extsrcs/*.PROTSYM.cbl,**/.c4z/.extsrcs/*.PROTSYM.listing}": true
-    }
+  "files.readonlyInclude": {
+    "{**/.c4z/.extsrcs/*.PROTSYM.cbl,**/.c4z/.extsrcs/*.PROTSYM.listing}": true
+  },
+  "dart.flutterSdkPath": "auto",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "dart.lineLength": 120,
+  "[dart]": {
+    "editor.defaultFormatter": "Dart-Code.dart-code",
+    "editor.rulers": [120],
+    "editor.selectionHighlight": true,
+    "editor.suggest.snippetsPreventQuickSuggestions": false,
+    "editor.suggestSelection": "first",
+    "editor.tabCompletion": "onlySnippets",
+    "editor.wordBasedSuggestions": "off"
+  },
+  "dart.debugExternalPackageLibraries": false,
+  "dart.debugSdkLibraries": false,
+  "dart.previewFlutterUiGuides": true,
+  "dart.previewFlutterUiGuidesCustomTracking": true,
+  "files.associations": {
+    "*.dart": "dart"
+  },
+  "files.exclude": {
+    "**/.dart_tool": true,
+    "**/.packages": true,
+    "**/build": true
+  },
+  "search.exclude": {
+    "**/.dart_tool": true,
+    "**/build": true,
+    "**/.git": true,
+    "**/node_modules": true
+  }
 }
