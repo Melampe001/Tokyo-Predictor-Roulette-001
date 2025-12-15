@@ -56,17 +56,17 @@ class CodeStyleValidator {
         final line = lines[i];
         final lineNum = i + 1;
 
-        // Check class names (should be PascalCase)
-        final classMatch = RegExp(r'class\s+([a-z_][a-zA-Z0-9_]*)').firstMatch(line);
+        // Check class names (should be PascalCase - starts with uppercase)
+        final classMatch = RegExp(r'class\s+([A-Za-z_][a-zA-Z0-9_]*)').firstMatch(line);
         if (classMatch != null) {
           final className = classMatch.group(1)!;
           if (!_isPascalCase(className)) {
-            _reportError(file, lineNum, 'Class name should be PascalCase: $className');
+            _reportError(file, lineNum, 'Class name should be PascalCase (start with uppercase): $className');
           }
         }
 
         // Check for snake_case in variable/method names (should be camelCase)
-        final methodMatch = RegExp(r'^\s*(void|int|double|String|bool|Future|dynamic)\s+([a-z]+_[a-z_]+)\s*\(').firstMatch(line);
+        final methodMatch = RegExp(r'^\s*(void|int|double|String|bool|Future|dynamic)\s+([a-z][a-zA-Z0-9]*_[a-zA-Z0-9_]*)\s*\(').firstMatch(line);
         if (methodMatch != null) {
           final methodName = methodMatch.group(2)!;
           if (!methodName.startsWith('_')) { // Allow private methods with underscores
@@ -104,13 +104,18 @@ class CodeStyleValidator {
           }
         }
 
-        // Check for public methods without documentation
-        if (RegExp(r'^\s*(int|double|String|bool|void|Future|dynamic)\s+[a-z][a-zA-Z0-9]*\s*\(').hasMatch(line) &&
-            !line.contains('_')) {
-          // Look back for documentation
-          if (i == 0 || !lines[i - 1].trim().startsWith('///')) {
-            _reportWarning(file, lineNum, 'Public method should have documentation comment (///)');
-            undocumentedApis++;
+        // Check for public methods without documentation (more accurate check)
+        final methodPattern = RegExp(r'^\s*(int|double|String|bool|void|Future|dynamic)\s+([a-z][a-zA-Z0-9]*)\s*\(');
+        final methodMatch = methodPattern.firstMatch(line);
+        if (methodMatch != null) {
+          final methodName = methodMatch.group(2)!;
+          // Only check public methods (not starting with _)
+          if (!methodName.startsWith('_')) {
+            // Look back for documentation
+            if (i == 0 || !lines[i - 1].trim().startsWith('///')) {
+              _reportWarning(file, lineNum, 'Public method should have documentation comment (///)');
+              undocumentedApis++;
+            }
           }
         }
       }

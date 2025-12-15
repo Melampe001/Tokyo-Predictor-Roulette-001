@@ -36,9 +36,21 @@ calculate_file_coverage() {
     local file=$1
     local lcov_file=$2
     
-    # Extract lines for this file from lcov
-    local lines_found=$(grep -A 1 "SF:$file" "$lcov_file" | grep "^LF:" | cut -d: -f2)
-    local lines_hit=$(grep -A 1 "SF:$file" "$lcov_file" | grep "^LH:" | cut -d: -f2)
+    # Extract lines for this file from lcov using more robust parsing
+    # Use awk to find the SF block and extract LF and LH
+    local lines_found=$(awk -v target="$file" '
+        /^SF:/ { 
+            if (index($0, target) > 0) found=1; else found=0
+        }
+        found && /^LF:/ { print substr($0, 4); exit }
+    ' "$lcov_file")
+    
+    local lines_hit=$(awk -v target="$file" '
+        /^SF:/ { 
+            if (index($0, target) > 0) found=1; else found=0
+        }
+        found && /^LH:/ { print substr($0, 4); exit }
+    ' "$lcov_file")
     
     if [ -z "$lines_found" ] || [ "$lines_found" -eq 0 ]; then
         echo "0"

@@ -151,7 +151,7 @@ else
 fi
 
 # Check for secrets in code (quick check)
-if grep -r "sk_live_\|pk_live_\|api_key.*=.*['\"]" lib/ test/ 2>/dev/null | grep -v "example\|TODO\|test"; then
+if grep -r "sk_live_\|pk_live_\|api_key.*=.*['\"]" lib/ 2>/dev/null | grep -v "example\|TODO" | head -5; then
     echo -e "${RED}⚠️  Possible secrets found in code!${NC}"
     echo -e "${YELLOW}   Review and move to environment variables${NC}"
 fi

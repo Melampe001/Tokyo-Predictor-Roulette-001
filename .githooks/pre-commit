@@ -126,11 +126,14 @@ echo ""
 echo -e "${BLUE}🎲 Checking for secure RNG...${NC}"
 INSECURE_RANDOM=0
 for file in $STAGED_DART_FILES; do
-    if [ -f "$file" ] && [[ "$file" == *"roulette"* ]] || [[ "$file" == *"random"* ]]; then
-        if grep -qE "Random\(\)" "$file" 2>/dev/null && ! grep -q "Random.secure()" "$file" 2>/dev/null; then
-            echo -e "${YELLOW}⚠️  Found Random() in: $file${NC}"
-            echo -e "${YELLOW}   Consider using Random.secure() for gambling/gaming${NC}"
-            # This is a warning, not an error
+    if [ -f "$file" ]; then
+        # Check if file relates to randomness or roulette
+        if [[ "$file" == *"roulette"* ]] || [[ "$file" == *"random"* ]]; then
+            if grep -qE "Random\(\)" "$file" 2>/dev/null && ! grep -q "Random.secure()" "$file" 2>/dev/null; then
+                echo -e "${YELLOW}⚠️  Found Random() in: $file${NC}"
+                echo -e "${YELLOW}   Consider using Random.secure() for gambling/gaming${NC}"
+                # This is a warning, not an error
+            fi
         fi
     fi
 done

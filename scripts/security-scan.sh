@@ -40,7 +40,7 @@ if grep -rE "(api_key|apiKey|API_KEY)\s*=\s*['\"][a-zA-Z0-9]{20,}['\"]" lib/ 2>/
 fi
 
 # Firebase keys in code (should be in config files only)
-if grep -rE "(firebase|FIREBASE).*['\"][a-zA-Z0-9]{30,}['\"]" lib/*.dart 2>/dev/null | grep -v "TODO\|example"; then
+if find lib -name '*.dart' -exec grep -lE "(firebase|FIREBASE).*['\"][a-zA-Z0-9]{30,}['\"]" {} \; 2>/dev/null | grep -v "TODO\|example"; then
     report_warning "Firebase configuration found in Dart code - should be in config files"
 fi
 
