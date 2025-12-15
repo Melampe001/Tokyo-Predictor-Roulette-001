@@ -11,5 +11,9 @@ void main() {
     expect(find.text('Girar Ruleta'), findsOneWidget);
     await tester.tap(find.text('Girar Ruleta'));
     await tester.pump();
+    
+    // Verify that the spin actually changed the result
+    expect(find.textContaining('Presiona Girar'), findsNothing);
+    expect(find.textContaining('Resultado:'), findsOneWidget);
   });
 }
