@@ -5,8 +5,11 @@
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS-lightgrey)
 ![Status](https://img.shields.io/badge/Status-Completed-success)
+![Approval](https://img.shields.io/badge/Approval-✅_APPROVED-brightgreen)
 
 Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y modelo freemium. Incluye integraciones con Stripe para pagos y Firebase para configuraciones remotas.
+
+> **✅ REPOSITORIO OFICIALMENTE APROBADO** - Ver [APPROVAL_STATUS.md](APPROVAL_STATUS.md) para detalles completos de aprobación.
 
 ## 📱 Capturas de Pantalla
 
@@ -76,6 +79,7 @@ flutter test --coverage
 
 ## 📚 Documentación
 
+- **[Estado de Aprobación](APPROVAL_STATUS.md)**: Documento oficial de aprobación del repositorio
 - **[Guía de Usuario](docs/USER_GUIDE.md)**: Manual completo de uso de la aplicación
 - **[Arquitectura Técnica](docs/ARCHITECTURE.md)**: Diseño y estructura del código
 - **[Configuración Firebase](docs/FIREBASE_SETUP.md)**: Cómo integrar Firebase (opcional)
