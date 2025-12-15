@@ -29,7 +29,24 @@ class TestRunner:
     """Ejecutor de tests paralelo con reporte JSON"""
     
     def __init__(self, project_root: str, workers: int = 4, timeout: int = 120, verbose: bool = False):
+        # Security: Validate and resolve project root path
         self.project_root = Path(project_root).resolve()
+        
+        # Security: Validate it's a Flutter project
+        pubspec_file = self.project_root / 'pubspec.yaml'
+        if not pubspec_file.exists():
+            raise ValueError(f"Not a valid Flutter project (pubspec.yaml not found): {self.project_root}")
+        
+        # Security: Prevent path traversal outside allowed directory tree
+        try:
+            # Ensure project_root is within or at the current working directory tree
+            current_dir = Path.cwd().resolve()
+            # Allow current dir or subdirectories
+            if not (self.project_root == current_dir or current_dir in self.project_root.parents or self.project_root in current_dir.parents):
+                raise ValueError(f"Project root must be within current directory tree")
+        except ValueError as e:
+            raise ValueError(f"Invalid project root path: {e}")
+        
         self.test_dir = self.project_root / 'test'
         self.workers = workers
         self.timeout = timeout

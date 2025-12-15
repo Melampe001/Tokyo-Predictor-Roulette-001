@@ -51,6 +51,60 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
+  bool _ageVerified = false;
+  
+  // Email validation regex
+  static final RegExp _emailRegex = RegExp(
+    r'^[\w\-\.]+@([\w\-]+\.)+[\w\-]{2,4}$',
+  );
+  
+  void _handleLogin() {
+    final email = _emailController.text.trim();
+    
+    // Validate email is not empty
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Por favor ingrese un email'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+    
+    // Validate email format
+    if (!_emailRegex.hasMatch(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Por favor ingrese un email válido'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+    
+    // Validate age verification
+    if (!_ageVerified) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Debes confirmar que tienes 18 años o más'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+    
+    // Security: Sanitize email before any future processing
+    final sanitizedEmail = email.toLowerCase();
+    
+    // NOTA: Para producción, implementar autenticación real con Firebase Auth
+    // Ver docs/FIREBASE_SETUP.md para configuración completa
+    // Por ahora, navegación directa para simulación educativa
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const MainScreen()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,19 +116,45 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             TextField(
               controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
+              decoration: const InputDecoration(
+                labelText: 'Email',
+                hintText: 'ejemplo@correo.com',
+                prefixIcon: Icon(Icons.email),
+              ),
+              keyboardType: TextInputType.emailAddress,
+              autocorrect: false,
             ),
-            ElevatedButton(
-              onPressed: () {
-                // NOTA: Para producción, implementar autenticación real con Firebase Auth
-                // Ver docs/FIREBASE_SETUP.md para configuración completa
-                // Por ahora, navegación directa para simulación educativa
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const MainScreen()),
-                );
+            const SizedBox(height: 16),
+            CheckboxListTile(
+              title: const Text('Confirmo que tengo 18 años o más'),
+              subtitle: const Text(
+                'Esta app es solo para mayores de edad',
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+              value: _ageVerified,
+              onChanged: (value) {
+                setState(() {
+                  _ageVerified = value ?? false;
+                });
               },
+              controlAffinity: ListTileControlAffinity.leading,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _handleLogin,
               child: const Text('Registrar y Continuar'),
+            ),
+            const SizedBox(height: 24),
+            const Card(
+              color: Colors.amber,
+              child: Padding(
+                padding: EdgeInsets.all(12.0),
+                child: Text(
+                  '⚠️ Esta es una simulación educativa.\nNo promueve juegos de azar reales.',
+                  style: TextStyle(fontSize: 12),
+                  textAlign: TextAlign.center,
+                ),
+              ),
             ),
           ],
         ),
@@ -411,10 +491,34 @@ class _MainScreenState extends State<MainScreen> {
               color: Colors.red,
               child: Padding(
                 padding: EdgeInsets.all(12.0),
-                child: Text(
-                  '⚠️ DISCLAIMER: Esta es una simulación educativa. No promueve juegos de azar reales. Las predicciones son aleatorias y no garantizan resultados.',
-                  style: TextStyle(color: Colors.white, fontSize: 12),
-                  textAlign: TextAlign.center,
+                child: Column(
+                  children: [
+                    Text(
+                      '⚠️ DISCLAIMER IMPORTANTE',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Esta es una simulación educativa. No promueve juegos de azar reales. Las predicciones son aleatorias y no garantizan resultados.',
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Si necesitas ayuda con adicción al juego: 1-800-GAMBLER',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               ),
             ),

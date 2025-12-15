@@ -3,6 +3,9 @@ import 'dart:math';
 /// Lógica de ruleta europea (0-36)
 class RouletteLogic {
   final List<int> wheel = List.generate(37, (i) => i);  // Ruleta europea
+  
+  // Security: Using cryptographically secure RNG for unpredictable results
+  // This prevents manipulation and ensures fair random number generation
   final Random rng = Random.secure();
 
   /// Genera un número aleatorio de la ruleta usando RNG seguro
