@@ -86,7 +86,6 @@ class _MainScreenState extends State<MainScreen> {
   final RouletteLogic _rouletteLogic = RouletteLogic();
   String result = 'Presiona Girar';
   List<int> history = [];
-  double bet = 10.0;
 
   void spinRoulette() {
     // Usa RouletteLogic con RNG seguro
