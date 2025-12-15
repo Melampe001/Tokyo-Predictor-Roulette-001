@@ -5,6 +5,8 @@
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS-lightgrey)
 ![Status](https://img.shields.io/badge/Status-Completed-success)
+![Build](https://img.shields.io/github/actions/workflow/status/Melampe001/Tokyo-Predictor-Roulette-001/quality-checks.yml?branch=main&label=Quality%20Checks)
+![Code Style](https://img.shields.io/badge/Code%20Style-Conventional%20Commits-blue)
 
 Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y modelo freemium. Incluye integraciones con Stripe para pagos y Firebase para configuraciones remotas.
 
@@ -35,6 +37,17 @@ Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y mod
 
 ### Instalación
 
+#### Opción 1: Setup Automático (Recomendado)
+```bash
+# Clona el repositorio
+git clone https://github.com/Melampe001/Tokyo-Predictor-Roulette-001.git
+cd Tokyo-Predictor-Roulette-001
+
+# Setup completo con un comando
+bash scripts/dev-setup.sh
+```
+
+#### Opción 2: Setup Manual
 1. Clona el repositorio:
 ```bash
 git clone https://github.com/Melampe001/Tokyo-Predictor-Roulette-001.git
@@ -44,6 +57,8 @@ cd Tokyo-Predictor-Roulette-001
 2. Instala las dependencias:
 ```bash
 flutter pub get
+# o usando Makefile
+make setup
 ```
 
 3. Ejecuta la aplicación:
@@ -114,6 +129,75 @@ cat reports/project-health-report-*.md
 **Score actual**: 🟢 92/100 (Excelente)
 
 Para más detalles, consulta [docs/HEALTH_AGENT.md](docs/HEALTH_AGENT.md).
+
+## 🔐 Code Quality & Standards
+
+Este proyecto implementa estándares de código estrictos con herramientas automatizadas:
+
+### Herramientas de Calidad
+
+```bash
+# Setup inicial (instala hooks, dependencias)
+make setup
+
+# Verificar todo antes de commit
+make check
+
+# Formatear código
+make format
+
+# Análisis estático
+make lint
+
+# Ejecutar tests con cobertura
+make test
+
+# Escaneo de seguridad
+make check-security
+```
+
+### Pre-commit Hooks
+
+Los Git hooks se ejecutan automáticamente antes de cada commit:
+- ✅ Formateo de código (dart format)
+- ✅ Análisis estático (flutter analyze)
+- ✅ Detección de secretos
+- ✅ Validación de RNG seguro
+
+**Instalación:**
+```bash
+bash scripts/dev-setup.sh  # Instala hooks automáticamente
+# o manualmente
+bash scripts/install-hooks.sh
+```
+
+### CI/CD Pipeline
+
+Cada PR pasa por verificaciones automáticas:
+- ✅ Formateo de código
+- ✅ Análisis estático (zero warnings)
+- ✅ Tests con cobertura (≥80%)
+- ✅ Escaneo de seguridad
+- ✅ Build validation
+
+Ver: [`.github/workflows/quality-checks.yml`](.github/workflows/quality-checks.yml)
+
+### Cobertura de Tests
+
+- **Mínimo general**: 80%
+- **Lógica core**: 90%
+
+```bash
+flutter test --coverage
+bash scripts/check-coverage.sh
+```
+
+### Recursos
+
+- 📖 [Guía de Contribución](CONTRIBUTING.md) - Estándares completos
+- 📋 [Quick Reference](docs/CODE_STANDARDS_QUICK_REF.md) - Referencia rápida
+- 🔧 [Scripts README](scripts/README.md) - Documentación de scripts
+- 🪝 [Hooks README](.githooks/README.md) - Documentación de hooks
 
 ## 🔧 Configuración
 
