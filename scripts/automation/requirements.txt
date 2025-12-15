@@ -1,0 +1,23 @@
+# Tokyo Roulette - Automation Scripts Requirements
+
+# Python Version Required: 3.7+
+# This file documents the dependencies, but no external packages are needed!
+
+# All scripts use only Python standard library:
+# - subprocess (command execution)
+# - pathlib (file path handling)
+# - concurrent.futures (parallel execution)
+# - json (report generation)
+# - time (timing and metrics)
+# - argparse (CLI argument parsing)
+# - sys, os (system operations)
+
+# Installation:
+# No installation needed! Just run the scripts with Python 3.7+
+
+# To verify Python version:
+# python3 --version
+
+# Usage:
+# python3 test_runner.py
+# python3 build_bot.py
