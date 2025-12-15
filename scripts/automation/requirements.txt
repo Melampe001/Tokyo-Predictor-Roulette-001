@@ -1,0 +1,5 @@
+# Tokyo Roulette - Automation Dependencies
+# Python 3.8+
+
+# No se requieren dependencias externas
+# Todos los scripts usan solo la biblioteca estándar de Python
