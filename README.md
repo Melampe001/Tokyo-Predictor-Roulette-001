@@ -5,6 +5,8 @@
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS-lightgrey)
 ![Status](https://img.shields.io/badge/Status-Completed-success)
+[![CI](https://github.com/Melampe001/Tokyo-Predictor-Roulette-001/actions/workflows/ci.yml/badge.svg)](https://github.com/Melampe001/Tokyo-Predictor-Roulette-001/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/Melampe001/Tokyo-Predictor-Roulette-001/actions/workflows/codeql.yml/badge.svg)](https://github.com/Melampe001/Tokyo-Predictor-Roulette-001/actions/workflows/codeql.yml)
 
 Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y modelo freemium. Incluye integraciones con Stripe para pagos y Firebase para configuraciones remotas.
 
