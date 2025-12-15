@@ -48,7 +48,9 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _emailError;
 
   bool _isValidEmail(String email) {
-    // Basic email validation regex
+    // Basic email validation regex for educational app
+    // Note: This is intentionally simple. Full auth will be implemented
+    // when Firebase Auth is configured (see TODO below).
     final emailRegex = RegExp(
       r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
     );
@@ -77,7 +79,8 @@ class _LoginScreenState extends State<LoginScreen> {
       _emailError = null;
     });
     
-    // TODO: Implementar lógica de registro/Auth aquí
+    // TODO: Implementar lógica de registro/Auth aquí con Firebase Auth
+    // Por ahora, esto es solo una simulación educativa sin backend
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const MainScreen()),
