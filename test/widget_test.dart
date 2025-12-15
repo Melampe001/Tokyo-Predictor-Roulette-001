@@ -11,7 +11,10 @@ void main() {
     
     // Verify initial state before spinning
     expect(find.text('Girar Ruleta'), findsOneWidget);
+    
+    // Verify initial state
     expect(find.text('Resultado: Presiona Girar'), findsOneWidget);
+    expect(find.textContaining('Historia:'), findsOneWidget);
     
     // Tap the spin button
     await tester.tap(find.text('Girar Ruleta'));
