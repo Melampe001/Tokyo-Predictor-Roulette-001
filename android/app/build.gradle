@@ -75,8 +75,13 @@ android {
 
     buildTypes {
         release {
-            // Usar signing config de release si existe, de lo contrario debug
-            signingConfig keystorePropertiesFile.exists() ? signingConfigs.release : signingConfigs.debug
+            // Usar signing config de release si key.properties existe
+            if (keystorePropertiesFile.exists()) {
+                signingConfig signingConfigs.release
+            } else {
+                // Fallback a debug si no hay keystore configurado
+                signingConfig signingConfigs.debug
+            }
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'

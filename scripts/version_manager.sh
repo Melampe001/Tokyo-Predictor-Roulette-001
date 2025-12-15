@@ -13,6 +13,9 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+# Constantes
+VERSION_REGEX='^[0-9]+\.[0-9]+\.[0-9]+\+[0-9]+$'
+
 # Variables globales
 DRY_RUN=false
 INCREMENT_TYPE=""
@@ -97,7 +100,7 @@ EOF
 # Función para validar formato de versión
 validate_version_format() {
     local version=$1
-    if [[ ! $version =~ ^[0-9]+\.[0-9]+\.[0-9]+\+[0-9]+$ ]]; then
+    if [[ ! $version =~ $VERSION_REGEX ]]; then
         log_error "Formato de versión inválido: $version"
         log_error "Formato esperado: X.Y.Z+BUILD (ej: 1.0.0+1)"
         exit 1

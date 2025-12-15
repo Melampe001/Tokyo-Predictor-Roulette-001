@@ -105,6 +105,11 @@ check_dependencies() {
         HTML_REPORT=false
     fi
     
+    # Verificar bc para cálculos si no está lcov
+    if ! command -v lcov &> /dev/null && ! command -v bc &> /dev/null; then
+        log_warning "bc no encontrado. Instala bc: apt-get install bc"
+    fi
+    
     if [ ${#missing_deps[@]} -ne 0 ]; then
         log_error "Dependencias faltantes: ${missing_deps[*]}"
         exit 1
@@ -172,8 +177,12 @@ calculate_coverage_percentage() {
         
         if [ "$total_lines" -eq 0 ]; then
             echo "0"
-        else
+        elif command -v bc &> /dev/null; then
             echo "scale=2; ($covered * 100) / $total_lines" | bc
+        else
+            # Usar aritmética shell como fallback
+            local percentage_int=$((covered * 100 / total_lines))
+            echo "$percentage_int"
         fi
     fi
 }

@@ -370,18 +370,30 @@ scan_hardcoded_passwords() {
 generate_summary() {
     log "Generando resumen final..."
     
-    add_to_report "=================================================================
-                        RESUMEN
-=================================================================
+    local separator="================================================================="
+    local title="                        RESUMEN"
+    local status_text
+    
+    if [ "$ISSUES_FOUND" -eq 0 ]; then
+        status_text="PASS ✓"
+    else
+        status_text="ISSUES FOUND ⚠️"
+    fi
+    
+    local summary_content="$separator
+$title
+$separator
 
 Total de issues encontrados: $ISSUES_FOUND
 
-Estado: $(if [ "$ISSUES_FOUND" -eq 0 ]; then echo "PASS ✓"; else echo "ISSUES FOUND ⚠️"; fi)
+Estado: $status_text
 
-Fecha: $(date +"%Y-%m-%d %H:%M:%S")
+Fecha: $(date +'%Y-%m-%d %H:%M:%S')
 
-=================================================================
+$separator
 "
+    
+    add_to_report "$summary_content"
     
     echo ""
     echo -e "${GREEN}═══════════════════════════════════════════════════════════${NC}"

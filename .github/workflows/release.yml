@@ -44,12 +44,12 @@ jobs:
           echo "Configurando keystore..."
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/keystore.jks
           
-          cat > android/key.properties << EOF
+          cat > android/key.properties << 'KEYPROPS'
         storePassword=${{ secrets.KEYSTORE_PASSWORD }}
         keyPassword=${{ secrets.KEY_PASSWORD }}
         keyAlias=${{ secrets.KEY_ALIAS }}
         storeFile=keystore.jks
-        EOF
+        KEYPROPS
           
           echo "signing_configured=true" >> $GITHUB_OUTPUT
         else
