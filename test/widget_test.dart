@@ -9,7 +9,34 @@ void main() {
     await tester.tap(find.text('Registrar y Continuar'));
     await tester.pumpAndSettle();
     expect(find.text('Girar Ruleta'), findsOneWidget);
+    
+    // Verify initial state
+    expect(find.text('Resultado: Presiona Girar'), findsOneWidget);
+    expect(find.text('Historia: '), findsOneWidget);
+    
+    // Tap the spin button
     await tester.tap(find.text('Girar Ruleta'));
-    await tester.pump();
+    await tester.pumpAndSettle();
+    
+    // Verify that the result changed from 'Presiona Girar'
+    expect(find.text('Resultado: Presiona Girar'), findsNothing);
+    
+    // Verify that a number (0-36) appears in the result
+    final resultText = tester.widget<Text>(
+      find.byWidgetPredicate(
+        (widget) => widget is Text && widget.data!.startsWith('Resultado: '),
+      ),
+    ).data!;
+    final resultNumber = int.parse(resultText.replaceFirst('Resultado: ', ''));
+    expect(resultNumber, inInclusiveRange(0, 36));
+    
+    // Verify that the history now contains one number
+    final historyText = tester.widget<Text>(
+      find.byWidgetPredicate(
+        (widget) => widget is Text && widget.data!.startsWith('Historia: '),
+      ),
+    ).data!;
+    expect(historyText, isNot('Historia: '));
+    expect(historyText, contains(resultNumber.toString()));
   });
 }
