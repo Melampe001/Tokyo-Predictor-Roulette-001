@@ -1,20 +1,26 @@
 import 'package:flutter/material.dart';
-// Removed unused imports: firebase_core and flutter_stripe.
-// Uncomment and initialize when configured:
+// NOTA: Firebase y Stripe son OPCIONALES. La app funciona sin ellos.
+// Para habilitar Firebase, ver docs/FIREBASE_SETUP.md
+// Luego, descomentar los siguientes imports:
 // import 'package:firebase_core/firebase_core.dart';
 // import 'package:flutter_stripe/flutter_stripe.dart';
 import 'roulette_logic.dart';
-// TODO: Genera firebase_options.dart con: flutterfire configure
+// CONFIGURACIÓN FIREBASE (Opcional): 
+// 1. Genera firebase_options.dart con: flutterfire configure
+// 2. Luego, descomenta el siguiente import:
 // import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // TODO: Descomentar cuando firebase_options.dart esté configurado
+  // CONFIGURACIÓN FIREBASE (Opcional):
+  // Después de configurar Firebase (ver docs/FIREBASE_SETUP.md), descomentar:
   // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   
-  // SEGURIDAD: NO hardcodear claves. Usar variables de entorno o configuración segura
-  // TODO: Configurar Stripe key desde variables de entorno
+  // CONFIGURACIÓN STRIPE (Opcional):
+  // Para habilitar pagos, configurar la key desde variables de entorno:
+  // Ejecutar: flutter run --dart-define=STRIPE_PUBLISHABLE_KEY=pk_test_xxx
+  // Luego, descomentar:
   // const stripeKey = String.fromEnvironment('STRIPE_PUBLISHABLE_KEY');
   // if (stripeKey.isNotEmpty) {
   //   Stripe.publishableKey = stripeKey;
@@ -60,7 +66,9 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                // TODO: Implementar lógica de registro/Auth aquí
+                // NOTA: Para producción, implementar autenticación real con Firebase Auth
+                // Ver docs/FIREBASE_SETUP.md para configuración completa
+                // Por ahora, navegación directa para simulación educativa
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const MainScreen()),
