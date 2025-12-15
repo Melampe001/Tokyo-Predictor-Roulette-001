@@ -49,10 +49,12 @@ app.*.map.json
 key.properties
 
 # Firebase configuration - may contain sensitive data
-# Uncomment if you don't want to commit firebase config
-# google-services.json
-# firebase_options.dart
-# GoogleService-Info.plist
+# SECURITY: These files MUST NOT be committed
+google-services.json
+firebase_options.dart
+GoogleService-Info.plist
+firebase-debug.log
+.firebase/
 
 # Environment variables and secrets
 .env
@@ -60,10 +62,13 @@ key.properties
 .env.local
 .env.*.local
 *.pem
+.envrc
 
 # API Keys and secrets - IMPORTANT: Never commit these!
 secrets.yaml
 api_keys.dart
+stripe_keys.dart
+config/secrets/
 
 # iOS related
 **/ios/**/*.mode1v3
