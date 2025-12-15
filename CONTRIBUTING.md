@@ -64,8 +64,12 @@ Las sugerencias son bienvenidas. Abre un issue con:
 
 2. **Configura tu entorno**:
    ```bash
+   # Opción recomendada: Usar el script de setup automático
+   bash scripts/dev-setup.sh
+   
+   # O manualmente:
    flutter pub get
-   flutter pub run build_runner build  # Si usas generadores de código
+   make setup  # Instala hooks y dependencias
    ```
 
 3. **Realiza tus cambios**:
@@ -75,21 +79,36 @@ Las sugerencias son bienvenidas. Abre un issue con:
 
 4. **Escribe tests**:
    ```bash
-   # Tests unitarios
-   flutter test test/roulette_logic_test.dart
+   # Todos los tests
+   make test
    
-   # Tests de widgets
-   flutter test test/widget_test.dart
+   # Solo tests unitarios
+   make test-unit
+   
+   # Solo tests de widgets
+   make test-widget
+   
+   # Con cobertura
+   flutter test --coverage
    ```
 
-5. **Ejecuta el linter**:
+5. **Verifica calidad del código**:
    ```bash
-   flutter analyze
+   # Ejecutar todas las verificaciones (recomendado)
+   make check
+   
+   # O individualmente:
+   make format      # Formatear código
+   make lint        # Análisis estático
+   make test        # Tests con cobertura
+   make check-security  # Escaneo de seguridad
    ```
 
-6. **Formatea el código**:
+6. **Formatea el código** (si no usaste `make check`):
    ```bash
    dart format lib/ test/
+   # o
+   make format
    ```
 
 7. **Commit tus cambios**:
@@ -151,6 +170,274 @@ Los maintainers revisarán tu PR y pueden:
    git pull upstream main
    git push origin main
    ```
+
+## Estándares de Calidad y Herramientas
+
+Este proyecto utiliza un conjunto integral de herramientas para mantener la calidad del código. Los estándares se aplican automáticamente mediante pre-commit hooks y CI/CD.
+
+### Configuración Inicial
+
+Para configurar tu entorno de desarrollo con todas las herramientas:
+
+```bash
+# Setup completo (recomendado)
+bash scripts/dev-setup.sh
+
+# O manualmente:
+make setup
+```
+
+Esto instalará:
+- Dependencias de Flutter
+- Git hooks pre-commit
+- Herramientas de validación
+
+### Pre-commit Hooks
+
+Los hooks Git se ejecutan automáticamente antes de cada commit:
+
+**Verificaciones automáticas:**
+- ✅ Formateo de código (dart format)
+- ✅ Análisis estático (flutter analyze)
+- ✅ Escaneo de secretos
+- ✅ Validación de RNG seguro
+
+**Si falla un hook:**
+```bash
+# Corrige los problemas indicados, luego:
+git add .
+git commit -m "tu mensaje"
+
+# Solo si es absolutamente necesario, puedes saltar los hooks:
+git commit --no-verify -m "tu mensaje"
+```
+
+### Comandos Make Disponibles
+
+El proyecto incluye un `Makefile` para tareas comunes:
+
+```bash
+make help              # Ver todos los comandos disponibles
+make setup             # Configurar entorno de desarrollo
+make format            # Formatear código Dart
+make lint              # Análisis estático
+make test              # Ejecutar tests con cobertura
+make test-unit         # Solo tests unitarios
+make test-widget       # Solo tests de widgets
+make build-debug       # Compilar APK debug
+make build-release     # Compilar APK/AAB release
+make check             # Ejecutar TODAS las verificaciones
+make clean             # Limpiar artefactos de build
+make validate-structure # Validar estructura del proyecto
+make check-security    # Escaneo de seguridad
+```
+
+### Verificación de Calidad Local
+
+Antes de hacer push, ejecuta todas las verificaciones:
+
+```bash
+make check
+```
+
+Esto ejecuta:
+1. **Formato** - Verifica que el código esté formateado
+2. **Lint** - Análisis estático sin warnings
+3. **Tests** - Todos los tests con cobertura
+4. **Seguridad** - Escaneo de secretos y vulnerabilidades
+5. **Estructura** - Validación de archivos requeridos
+
+### Requisitos de Cobertura de Tests
+
+- **Cobertura general**: ≥ 80%
+- **Lógica core** (roulette_logic.dart): ≥ 90%
+- Todos los archivos nuevos deben tener tests correspondientes
+
+Para ver el reporte de cobertura:
+
+```bash
+flutter test --coverage
+bash scripts/check-coverage.sh
+
+# Generar reporte HTML
+sudo apt-get install lcov  # Si es necesario
+genhtml coverage/lcov.info -o coverage/html
+open coverage/html/index.html  # Ver en navegador
+```
+
+### Validación de Estilo de Código
+
+El proyecto incluye un validador de estilo personalizado:
+
+```bash
+dart run scripts/validate-code-style.dart
+```
+
+Verifica:
+- Convenciones de nomenclatura (PascalCase, camelCase)
+- Documentación de APIs públicas
+- Comentarios TODO/FIXME
+- Cobertura de tests para archivos nuevos
+
+### Escaneo de Seguridad
+
+Antes de commitear código sensible:
+
+```bash
+bash scripts/security-scan.sh
+```
+
+Detecta:
+- API keys hardcodeadas (Stripe, Firebase, etc.)
+- Secretos y contraseñas en código
+- Uso inseguro de Random() en lugar de Random.secure()
+- Archivos sensibles trackeados en git
+- Patrones inseguros
+
+**Importante:** Nunca commitees:
+- `*.keystore`, `key.properties`
+- `google-services.json` con keys reales
+- `.env` con secretos
+- API keys en código
+
+### CI/CD Pipeline
+
+Todos los PRs pasan por verificación automática en GitHub Actions:
+
+**Checks ejecutados:**
+1. ✅ Formateo de código
+2. ✅ Análisis estático (zero warnings)
+3. ✅ Tests con cobertura
+4. ✅ Escaneo de seguridad
+5. ✅ Validación de estructura
+6. ✅ Build debug y release
+7. ✅ Validación de estilo
+
+**Archivos de workflow:**
+- `.github/workflows/quality-checks.yml` - Verificaciones de calidad
+- `.github/workflows/build-apk.yml` - Build de APK
+
+### Badges de Calidad
+
+El proyecto incluye badges para:
+- [![Build Status](badge-url)]() - Estado de build
+- [![Coverage](badge-url)]() - Cobertura de tests
+- [![Quality Gate](badge-url)]() - Calidad del código
+
+### Mensajes de Commit
+
+Los mensajes de commit deben seguir [Conventional Commits](https://www.conventionalcommits.org/):
+
+**Formato:**
+```
+<tipo>[ámbito opcional]: <descripción>
+
+[cuerpo opcional]
+
+[nota de pie opcional]
+```
+
+**Tipos válidos:**
+- `feat:` Nueva característica
+- `fix:` Corrección de bug
+- `docs:` Cambios en documentación
+- `style:` Cambios de formato (no afectan lógica)
+- `refactor:` Refactorización
+- `test:` Añadir o actualizar tests
+- `chore:` Tareas de mantenimiento
+- `perf:` Mejoras de rendimiento
+- `ci:` Cambios en CI/CD
+- `build:` Cambios en sistema de build
+
+**Ejemplos válidos:**
+```bash
+feat: añade cálculo de probabilidades para Martingale
+fix: corrige desbordamiento en balance con apuestas grandes
+docs: actualiza README con instrucciones de instalación
+test: añade tests para predictNext con historial vacío
+refactor(ui): extrae componente de ruleta a widget separado
+chore: actualiza dependencias de Firebase
+```
+
+**Validación automática:**
+El hook `commit-msg` valida automáticamente el formato. Si falla:
+
+```bash
+# Mensaje rechazado
+git commit -m "actualizar código"
+
+# ✅ Mensaje válido
+git commit -m "feat: añade validación de apuesta mínima"
+```
+
+### Resolución de Problemas
+
+#### "Formato de código incorrecto"
+```bash
+make format
+git add .
+git commit -m "style: formatea código"
+```
+
+#### "Analyzer encontró warnings"
+```bash
+flutter analyze
+# Corrige los issues reportados
+```
+
+#### "Tests fallando"
+```bash
+flutter test
+# Corrige los tests que fallan
+```
+
+#### "Secretos detectados"
+```bash
+# Remueve los secretos del código
+# Usa environment variables o Firebase Remote Config
+git rm --cached archivo_con_secreto
+# Actualiza .gitignore si es necesario
+```
+
+#### "Coverage por debajo del mínimo"
+```bash
+# Añade más tests
+flutter test --coverage
+bash scripts/check-coverage.sh
+```
+
+### Bypass de Hooks (Emergencias)
+
+Solo en casos de emergencia puedes saltar los hooks:
+
+```bash
+# Saltar pre-commit hooks
+git commit --no-verify -m "mensaje"
+
+# Saltar validación de mensaje
+git commit --no-verify -m "mensaje sin formato"
+```
+
+⚠️ **Advertencia:** Usar `--no-verify` es desaconsejado. El CI aún validará tu código y puede fallar.
+
+### Recursos y Documentación
+
+**Scripts disponibles:**
+- `scripts/dev-setup.sh` - Setup completo de desarrollo
+- `scripts/install-hooks.sh` - Instalar Git hooks
+- `scripts/validate-code-style.dart` - Validador de estilo
+- `scripts/security-scan.sh` - Escáner de seguridad
+- `scripts/check-coverage.sh` - Verificador de cobertura
+
+**Archivos de configuración:**
+- `analysis_options.yaml` - Reglas de análisis estático
+- `Makefile` - Comandos de automatización
+- `.githooks/` - Git hooks del proyecto
+
+**Para más información:**
+- Ver `make help` para todos los comandos
+- Ejecutar `bash scripts/dev-setup.sh` para guía interactiva
+- Revisar `.github/workflows/quality-checks.yml` para ver qué verifica el CI
 
 ## Convenciones de Código
 

@@ -1,0 +1,283 @@
+name: Code Quality Checks
+
+# Comprehensive CI/CD workflow for code quality enforcement
+# Runs on all pull requests and pushes to main/master branches
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+permissions:
+  contents: read
+  pull-requests: write # For PR comments
+
+jobs:
+  # Job 1: Format Check
+  format-check:
+    name: Code Formatting
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+        cache: true
+    
+    - name: Check Dart formatting
+      run: |
+        echo "🔍 Checking code formatting..."
+        dart format --set-exit-if-changed lib/ test/ || {
+          echo "❌ Code is not formatted correctly"
+          echo "Run: dart format lib/ test/"
+          echo "Or: make format"
+          exit 1
+        }
+        echo "✅ Code is properly formatted"
+
+  # Job 2: Static Analysis
+  analyze:
+    name: Static Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+        cache: true
+    
+    - name: Get dependencies
+      run: flutter pub get
+    
+    - name: Run analyzer
+      run: |
+        echo "🔍 Running static analysis..."
+        flutter analyze --fatal-infos || {
+          echo "❌ Static analysis found issues"
+          exit 1
+        }
+        echo "✅ Static analysis passed"
+
+  # Job 3: Security Scan
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Run security scan
+      run: |
+        chmod +x scripts/security-scan.sh
+        bash scripts/security-scan.sh
+    
+    - name: Check for secrets
+      uses: trufflesecurity/trufflehog@main
+      continue-on-error: true
+      with:
+        path: ./
+        base: ${{ github.event.repository.default_branch }}
+        head: HEAD
+
+  # Job 4: Test with Coverage
+  test:
+    name: Tests & Coverage
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+        cache: true
+    
+    - name: Get dependencies
+      run: flutter pub get
+    
+    - name: Run tests with coverage
+      run: |
+        echo "🧪 Running tests..."
+        flutter test --coverage
+    
+    - name: Check coverage thresholds
+      run: |
+        chmod +x scripts/check-coverage.sh
+        bash scripts/check-coverage.sh || true
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      continue-on-error: true
+      with:
+        file: coverage/lcov.info
+        fail_ci_if_error: false
+    
+    - name: Generate coverage report
+      if: always()
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y lcov
+        genhtml coverage/lcov.info -o coverage/html --quiet || true
+    
+    - name: Upload coverage HTML report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: coverage/html
+        retention-days: 30
+
+  # Job 5: Code Style Validation
+  code-style:
+    name: Code Style Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+        cache: true
+    
+    - name: Validate code style
+      run: |
+        chmod +x scripts/validate-code-style.dart
+        dart run scripts/validate-code-style.dart || true
+
+  # Job 6: Build Validation
+  build:
+    name: Build Validation
+    runs-on: ubuntu-latest
+    needs: [format-check, analyze, test]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+    
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+        cache: true
+    
+    - name: Get dependencies
+      run: flutter pub get
+    
+    - name: Build debug APK
+      run: |
+        echo "🔨 Building debug APK..."
+        flutter build apk --debug
+        ls -lh build/app/outputs/flutter-apk/app-debug.apk
+    
+    - name: Build release APK
+      run: |
+        echo "🔨 Building release APK..."
+        flutter build apk --release
+        ls -lh build/app/outputs/flutter-apk/app-release.apk
+    
+    - name: Upload debug APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: debug-apk
+        path: build/app/outputs/flutter-apk/app-debug.apk
+        retention-days: 7
+    
+    - name: Upload release APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-apk
+        path: build/app/outputs/flutter-apk/app-release.apk
+        retention-days: 30
+
+  # Job 7: Project Structure Validation
+  structure:
+    name: Project Structure
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Validate structure
+      run: |
+        echo "🔍 Validating project structure..."
+        
+        # Check required files
+        required_files=("pubspec.yaml" "analysis_options.yaml" "README.md" "lib/main.dart" "lib/roulette_logic.dart" ".gitignore")
+        
+        for file in "${required_files[@]}"; do
+          if [ -f "$file" ]; then
+            echo "✅ $file"
+          else
+            echo "❌ Missing: $file"
+            exit 1
+          fi
+        done
+        
+        # Check required directories
+        required_dirs=("lib" "test" "android" "scripts")
+        
+        for dir in "${required_dirs[@]}"; do
+          if [ -d "$dir" ]; then
+            echo "✅ $dir/"
+          else
+            echo "❌ Missing: $dir/"
+            exit 1
+          fi
+        done
+        
+        echo "✅ Project structure validated"
+
+  # Job 8: Summary
+  quality-gate:
+    name: Quality Gate
+    runs-on: ubuntu-latest
+    needs: [format-check, analyze, security, test, code-style, build, structure]
+    if: always()
+    
+    steps:
+    - name: Check quality gate
+      run: |
+        echo "======================================"
+        echo "Quality Checks Summary"
+        echo "======================================"
+        echo "Format Check: ${{ needs.format-check.result }}"
+        echo "Static Analysis: ${{ needs.analyze.result }}"
+        echo "Security Scan: ${{ needs.security.result }}"
+        echo "Tests: ${{ needs.test.result }}"
+        echo "Code Style: ${{ needs.code-style.result }}"
+        echo "Build: ${{ needs.build.result }}"
+        echo "Structure: ${{ needs.structure.result }}"
+        echo "======================================"
+        
+        if [ "${{ needs.format-check.result }}" != "success" ] || \
+           [ "${{ needs.analyze.result }}" != "success" ] || \
+           [ "${{ needs.test.result }}" != "success" ] || \
+           [ "${{ needs.build.result }}" != "success" ] || \
+           [ "${{ needs.structure.result }}" != "success" ]; then
+          echo "❌ Quality gate FAILED"
+          exit 1
+        else
+          echo "✅ Quality gate PASSED"
+        fi
