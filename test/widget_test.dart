@@ -10,6 +10,11 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Girar Ruleta'), findsOneWidget);
     await tester.tap(find.text('Girar Ruleta'));
-    await tester.pump();
+    await tester.pumpAndSettle();
+    
+    // Verify the spin changed the result
+    expect(find.text('Resultado: Presiona Girar'), findsNothing);
+    // Verify a number (0-36) appears in the result
+    expect(find.textContaining(RegExp(r'Resultado: \d+')), findsOneWidget);
   });
 }
