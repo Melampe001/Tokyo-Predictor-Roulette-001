@@ -30,7 +30,11 @@ android {
 
     signingConfigs {
         release {
-            // Usar debug keystore para testing
+            // ⚠️ ADVERTENCIA DE SEGURIDAD ⚠️
+            // Esta configuración usa debug keystore SOLO PARA TESTING
+            // NUNCA uses esto para producción o distribución a usuarios
+            // Las credenciales del debug keystore son públicas
+            // Para producción, crea un keystore seguro (ver docs/ANDROID_BUILD_SETUP.md)
             storeFile file("${System.getProperty('user.home')}/.android/debug.keystore")
             storePassword "android"
             keyAlias "androiddebugkey"

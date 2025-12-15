@@ -116,6 +116,23 @@ adb install build/app/outputs/flutter-apk/app-release.apk
 2. Habilitar "Instalación desde fuentes desconocidas" en el dispositivo
 3. Abrir el archivo APK en el dispositivo para instalarlo
 
+## ⚠️ ADVERTENCIA IMPORTANTE DE SEGURIDAD
+
+### ⚠️ Debug Keystore - SOLO PARA TESTING
+
+La configuración actual usa el **debug keystore** del sistema para firmar la release APK.
+
+**🚨 ESTO ES EXTREMADAMENTE INSEGURO PARA PRODUCCIÓN 🚨**
+
+- Las credenciales del debug keystore son públicas y conocidas
+- Cualquiera puede crear una APK que reemplace tu app
+- **NUNCA distribuyas esta APK a usuarios finales**
+- **NUNCA la subas a Google Play Store**
+
+**Esta configuración es SOLO para desarrollo y testing rápido.**
+
+---
+
 ## ⚠️ Notas Importantes
 
 ### Firma de la APK
