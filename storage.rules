@@ -1,0 +1,55 @@
+rules_version = '2';
+
+// Firebase Storage Security Rules para Tokyo Roulette Predictor
+// Reglas para almacenamiento de archivos (avatares, etc.)
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isValidImageSize() {
+      // Limita tamaño de imagen a 5MB
+      return request.resource.size < 5 * 1024 * 1024;
+    }
+    
+    function isValidImageType() {
+      // Solo permite imágenes
+      return request.resource.contentType.matches('image/.*');
+    }
+    
+    // Avatares de usuario
+    match /avatars/{userId}/{fileName} {
+      allow read: if true;  // Avatares son públicos
+      
+      allow write: if isOwner(userId)
+        && isValidImageSize()
+        && isValidImageType()
+        && fileName.matches('^[a-zA-Z0-9._-]+\\.(jpg|jpeg|png|gif)$');
+      
+      allow delete: if isOwner(userId);
+    }
+    
+    // Archivos temporales (se limpian automáticamente)
+    match /temp/{userId}/{fileName} {
+      allow read: if isOwner(userId);
+      
+      allow write: if isOwner(userId)
+        && request.resource.size < 2 * 1024 * 1024;  // 2MB máximo
+      
+      allow delete: if isOwner(userId);
+    }
+    
+    // Denegar todo lo demás
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,106 @@
+rules_version = '2';
+
+// Firestore Security Rules para Tokyo Roulette Predictor
+// Aplicación educativa de simulación de ruleta
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions para validación
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isValidEmail(email) {
+      return email is string 
+        && email.size() > 3 
+        && email.size() < 255
+        && email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$');
+    }
+    
+    // Colección de usuarios
+    match /users/{userId} {
+      // Solo lectura/escritura del propio usuario autenticado
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId)
+        && request.resource.data.keys().hasOnly(['email', 'displayName', 'createdAt', 'ageVerified'])
+        && isValidEmail(request.resource.data.email)
+        && request.resource.data.ageVerified == true
+        && request.resource.data.createdAt is timestamp;
+      
+      allow update: if isOwner(userId)
+        && request.resource.data.keys().hasOnly(['email', 'displayName', 'createdAt', 'ageVerified', 'updatedAt'])
+        && isValidEmail(request.resource.data.email)
+        && request.resource.data.ageVerified == true
+        && request.resource.data.updatedAt is timestamp;
+      
+      // No se permite eliminar usuarios (soft delete si es necesario)
+      allow delete: if false;
+      
+      // Sub-colección de historial de juegos (solo para datos educativos)
+      match /gameHistory/{historyId} {
+        allow read: if isOwner(userId);
+        allow write: if isOwner(userId)
+          && request.resource.data.keys().hasOnly([
+            'timestamp', 
+            'spins', 
+            'startBalance', 
+            'endBalance',
+            'strategyUsed'
+          ])
+          && request.resource.data.timestamp is timestamp
+          && request.resource.data.spins is number
+          && request.resource.data.spins >= 0
+          && request.resource.data.spins <= 10000  // Límite razonable
+          && request.resource.data.startBalance is number
+          && request.resource.data.endBalance is number;
+      }
+    }
+    
+    // Colección de configuración remota (solo lectura para usuarios)
+    match /config/{configId} {
+      allow read: if isAuthenticated();
+      allow write: if false;  // Solo administradores pueden escribir (via Admin SDK)
+    }
+    
+    // Colección de invitaciones (sistema de referidos)
+    match /invitations/{invitationId} {
+      allow read: if isAuthenticated() 
+        && (resource.data.fromUserId == request.auth.uid 
+            || resource.data.toEmail == request.auth.token.email);
+      
+      allow create: if isAuthenticated()
+        && request.resource.data.fromUserId == request.auth.uid
+        && isValidEmail(request.resource.data.toEmail)
+        && request.resource.data.keys().hasOnly([
+          'fromUserId', 
+          'toEmail', 
+          'createdAt', 
+          'status'
+        ])
+        && request.resource.data.status == 'pending'
+        && request.resource.data.createdAt is timestamp;
+      
+      allow update: if isAuthenticated()
+        && resource.data.toEmail == request.auth.token.email
+        && request.resource.data.status in ['accepted', 'declined'];
+      
+      allow delete: if false;
+    }
+    
+    // Colección de suscripciones premium (solo lectura para usuarios)
+    match /subscriptions/{userId} {
+      allow read: if isOwner(userId);
+      allow write: if false;  // Solo backend puede escribir después de validar pago
+    }
+    
+    // Denegar acceso a todo lo demás por defecto
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

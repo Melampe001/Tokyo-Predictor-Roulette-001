@@ -45,30 +45,203 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  String? _errorMessage;
+  bool _ageVerified = false;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  /// Valida el formato del email
+  /// Previene inyecciones y asegura formato válido
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Por favor ingresa un email';
+    }
+    
+    // Sanitiza el input: trim y lowercase
+    final sanitized = value.trim().toLowerCase();
+    
+    // Validación de formato de email
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
+    
+    if (!emailRegex.hasMatch(sanitized)) {
+      return 'Ingresa un email válido';
+    }
+    
+    // Verifica longitud máxima para prevenir ataques de buffer
+    if (sanitized.length > 254) {
+      return 'Email demasiado largo';
+    }
+    
+    return null;
+  }
+
+  void _showAgeVerificationDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('⚠️ Verificación de Edad'),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Esta aplicación es SOLO para mayores de 18 años.',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 16),
+            Text(
+              '¿Confirmas que tienes 18 años o más?',
+            ),
+            SizedBox(height: 16),
+            Text(
+              'AVISO: Esta es una simulación educativa que NO involucra dinero real.',
+              style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              // No permite continuar si no verifica edad
+            },
+            child: const Text('No, soy menor de 18'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _ageVerified = true;
+              });
+              Navigator.pop(context);
+            },
+            child: const Text('Sí, soy mayor de 18'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _handleSubmit() {
+    if (!_ageVerified) {
+      _showAgeVerificationDialog();
+      return;
+    }
+
+    if (_formKey.currentState!.validate()) {
+      // Sanitiza el email antes de usarlo
+      final sanitizedEmail = _emailController.text.trim().toLowerCase();
+      
+      // TODO: Implementar lógica de registro/Auth aquí
+      // Ejemplo seguro de uso con Firebase:
+      // await FirebaseAuth.instance.signInWithEmailAndPassword(
+      //   email: sanitizedEmail,
+      //   password: password,
+      // );
+      
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const MainScreen()),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Login')),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                // TODO: Implementar lógica de registro/Auth aquí
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const MainScreen()),
-                );
-              },
-              child: const Text('Registrar y Continuar'),
-            ),
-          ],
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 20),
+              const Text(
+                '🎰 Tokyo Roulette Predicciones',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Simulador Educativo',
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              TextFormField(
+                controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
+                autocorrect: false,
+                enableSuggestions: false,
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                  hintText: 'tu@email.com',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.email),
+                ),
+                validator: _validateEmail,
+              ),
+              if (_errorMessage != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(
+                    _errorMessage!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                ),
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                onPressed: _handleSubmit,
+                icon: const Icon(Icons.login),
+                label: const Text('Registrar y Continuar'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Card(
+                color: Colors.orange.shade50,
+                child: const Padding(
+                  padding: EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.info_outline, color: Colors.orange),
+                          SizedBox(width: 8),
+                          Text(
+                            'Importante',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.orange,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        '• Solo para mayores de 18 años\n'
+                        '• Simulación educativa únicamente\n'
+                        '• No involucra dinero real\n'
+                        '• No promueve apuestas',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -397,16 +570,53 @@ class _MainScreenState extends State<MainScreen> {
                 ),
               ),
             
-            // Disclaimer
+            // Disclaimer mejorado con información de ayuda
             const SizedBox(height: 16),
-            const Card(
-              color: Colors.red,
-              child: Padding(
-                padding: EdgeInsets.all(12.0),
-                child: Text(
-                  '⚠️ DISCLAIMER: Esta es una simulación educativa. No promueve juegos de azar reales. Las predicciones son aleatorias y no garantizan resultados.',
-                  style: TextStyle(color: Colors.white, fontSize: 12),
-                  textAlign: TextAlign.center,
+            Card(
+              color: Colors.red.shade700,
+              child: const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    Text(
+                      '⚠️ AVISO IMPORTANTE',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 12),
+                    Text(
+                      'Esta aplicación es SOLO para fines educativos y de entretenimiento.\n\n'
+                      '• NO involucra dinero real\n'
+                      '• NO promueve apuestas\n'
+                      '• NO es un juego de azar regulado\n'
+                      '• Las predicciones son simulaciones aleatorias',
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                      textAlign: TextAlign.left,
+                    ),
+                    SizedBox(height: 12),
+                    Divider(color: Colors.white70),
+                    SizedBox(height: 8),
+                    Text(
+                      '🆘 El juego puede ser adictivo',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Si necesitas ayuda: 1-800-GAMBLER\n'
+                      'España: 900 200 225 (Juego Responsable)',
+                      style: TextStyle(color: Colors.white, fontSize: 11),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               ),
             ),
