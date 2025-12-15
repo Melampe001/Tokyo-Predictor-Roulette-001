@@ -13,6 +13,11 @@
 -keep class io.flutter.** { *; }
 -keep class io.flutter.plugins.** { *; }
 
+# Keep native methods
+-keepclassmembers class * {
+    native <methods>;
+}
+
 # Kotlin
 -keep class kotlin.** { *; }
 -keep class kotlin.Metadata { *; }

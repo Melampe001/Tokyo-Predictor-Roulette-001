@@ -56,21 +56,53 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
-        // Para release, crear keystore con:
-        // keytool -genkey -v -keystore upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
-        // y configurar key.properties
+        release {
+            // Release keystore configuration
+            // To create a release keystore:
+            // 1. Run: keytool -genkey -v -keystore upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+            // 2. Create android/key.properties with:
+            //    storePassword=<password>
+            //    keyPassword=<password>
+            //    keyAlias=upload
+            //    storeFile=<path-to-keystore>/upload-keystore.jks
+            def keystorePropertiesFile = rootProject.file('key.properties')
+            if (keystorePropertiesFile.exists()) {
+                def keystoreProperties = new Properties()
+                keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
     }
 
     buildTypes {
-        release {
+        debug {
+            // Debug build configuration
             signingConfig signingConfigs.debug
-            // TODO: Cambiar a signingConfig signingConfigs.release cuando tengas keystore
+            minifyEnabled false
+            shrinkResources false
+            debuggable true
+        }
+        release {
+            // Use release signing if configured, otherwise fall back to debug signing
+            def keystorePropertiesFile = rootProject.file('key.properties')
+            if (keystorePropertiesFile.exists()) {
+                signingConfig signingConfigs.release
+                println "✓ Using release keystore configuration from key.properties"
+            } else {
+                signingConfig signingConfigs.debug
+                println "⚠ WARNING: Release keystore not configured!"
+                println "⚠ Using debug signing for release build."
+                println "⚠ To configure release signing:"
+                println "⚠   1. Generate keystore: keytool -genkey -v -keystore upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload"
+                println "⚠   2. Create android/key.properties with keystore details"
+                println "⚠   See android/app/build.gradle signingConfigs section for details"
+            }
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-        debug {
-            signingConfig signingConfigs.debug
         }
     }
 }
@@ -81,7 +113,14 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    // Firebase (descomentar cuando se configure)
+    
+    // Firebase dependencies (uncomment when configured)
+    // To set up Firebase:
+    // 1. Create a Firebase project at https://console.firebase.google.com/
+    // 2. Download google-services.json and place it in android/app/
+    // 3. Uncomment the dependencies below
+    // 4. Uncomment the google-services plugin at the bottom of this file
+    // 
     // implementation platform('com.google.firebase:firebase-bom:32.7.0')
     // implementation 'com.google.firebase:firebase-analytics'
     // implementation 'com.google.firebase:firebase-auth'
@@ -89,5 +128,5 @@ dependencies {
     // implementation 'com.google.firebase:firebase-messaging'
 }
 
-// Firebase (descomentar cuando se configure google-services.json)
+// Firebase plugin (uncomment when google-services.json is configured)
 // apply plugin: 'com.google.gms.google-services'
