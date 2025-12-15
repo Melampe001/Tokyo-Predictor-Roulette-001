@@ -1,3 +1,5 @@
+import 'dart:math';
+
 /// Funciones helper de utilidad
 class Helpers {
   /// Determina si un número es rojo en la ruleta
@@ -70,13 +72,22 @@ class Helpers {
   
   /// Valida que una apuesta esté en el rango permitido
   static bool isValidBet(double bet, double balance) {
+    // Validar edge cases
+    if (bet.isNaN || bet.isInfinite) return false;
+    if (balance.isNaN || balance.isInfinite) return false;
+    
     return bet > 0 && bet <= balance;
   }
   
-  /// Genera un ID único simple
+  /// Genera un ID único seguro con timestamp y componente aleatorio
   static String generateSimpleId() {
-    return DateTime.now().millisecondsSinceEpoch.toString();
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final random = _secureRandom.nextInt(999999).toString().padLeft(6, '0');
+    return '$timestamp-$random';
   }
+  
+  // Instancia de Random seguro para generación de IDs
+  static final _secureRandom = Random.secure();
   
   /// Calcula la racha más larga de victorias/derrotas
   static int calculateLongestStreak(List<bool> results, bool targetValue) {

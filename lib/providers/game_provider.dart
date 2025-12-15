@@ -140,9 +140,28 @@ class GameProvider with ChangeNotifier {
     notifyListeners();
   }
   
-  /// Cambia la apuesta actual
+  /// Cambia la apuesta actual con validación completa
   void setCurrentBet(double bet) {
+    // Validar edge cases primero
+    if (bet.isNaN || bet.isInfinite) {
+      if (kDebugMode) {
+        debugPrint('⚠️ Invalid bet amount (NaN or Infinite)');
+      }
+      return;
+    }
+    
+    // Validar rangos
     if (bet <= 0 || bet > _user.balance) return;
+    
+    // Validar contra el máximo permitido
+    const maxBet = 1000.0;  // From AppConstants
+    if (bet > maxBet) {
+      if (kDebugMode) {
+        debugPrint('⚠️ Bet exceeds maximum allowed');
+      }
+      return;
+    }
+    
     _user = _user.copyWith(currentBet: bet);
     if (_useMartingale) {
       _martingaleService.baseBet = bet;
