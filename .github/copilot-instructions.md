@@ -39,10 +39,25 @@ This is a Flutter/Dart educational roulette simulator with predictions, RNG (Ran
 - **Release APK**: `flutter build apk --release`
 - **Testing**: `flutter test`
 
+### Linting and Code Quality
+- **Analyze code**: `flutter analyze --no-fatal-infos`
+  - The project uses `package:flutter_lints/flutter.yaml`
+  - Configuration is in `analysis_options.yaml`
+- **Format code**: `dart format .`
+- **Check formatting**: `dart format --set-exit-if-changed .`
+
 ### Testing
 - Unit tests are located in the `test/` directory
 - Run all tests with: `flutter test`
+- Run specific test: `flutter test test/roulette_logic_test.dart`
+- Run with coverage: `flutter test --coverage`
 - Integration tests use the `integration_test` package
+
+### CI/CD Workflows
+The repository has automated workflows in `.github/workflows/`:
+- **build-apk.yml**: Builds Android APK on push/PR to main
+- **project-health-check.yml**: Weekly project health audits
+- All workflows run `flutter analyze` and tests automatically
 
 ## Code Style and Conventions
 - Follow Dart's official style guide
@@ -104,3 +119,18 @@ Ensure Firebase configuration files are properly set up before running.
 - Ensure Firebase and Stripe integrations remain secure
 - Test payment flows thoroughly in test mode before production
 - Keep the disclaimer visible that this is a simulator, not real gambling
+
+## Custom Agents
+This repository has specialized custom agents available in `.github/agents/`:
+- **repository-setup-agent**: Expert in complete repository setup with 110% perfection standards
+- **security-agent**: Specialist in security reviews for educational Flutter apps
+
+When working on tasks related to these domains, consider leveraging these specialized agents for better results.
+
+## Project Health System
+The repository includes an automated health check system:
+- **Script**: `scripts/health_agent.py`
+- **Run manually**: `python scripts/health_agent.py --full-scan`
+- **Automated**: Runs weekly via GitHub Actions
+- **Reports**: Generated in `reports/` directory
+- The health score is monitored and should be kept above 70/100
