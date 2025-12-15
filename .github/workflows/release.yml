@@ -1,0 +1,192 @@
+name: Release - Automated Release Build
+
+# Ejecutar en tags que sigan el patrón v*.*.* (ej: v1.0.0, v1.2.3)
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+# Permisos necesarios para crear releases
+permissions:
+  contents: write
+
+jobs:
+  # Job: Build y Release
+  release:
+    name: Build y Publicar Release
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout del repositorio
+      uses: actions/checkout@v4
+    
+    - name: Configurar Java 11
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+    
+    - name: Configurar Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+        cache: true
+    
+    - name: Obtener dependencias
+      run: flutter pub get
+    
+    # Decodificar keystore desde GitHub Secrets (si está configurado)
+    - name: Configurar signing (si está disponible)
+      id: setup_signing
+      continue-on-error: true
+      run: |
+        if [ -n "${{ secrets.KEYSTORE_BASE64 }}" ]; then
+          echo "Configurando keystore..."
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/keystore.jks
+          
+          cat > android/key.properties << EOF
+        storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+        keyPassword=${{ secrets.KEY_PASSWORD }}
+        keyAlias=${{ secrets.KEY_ALIAS }}
+        storeFile=keystore.jks
+        EOF
+          
+          echo "signing_configured=true" >> $GITHUB_OUTPUT
+        else
+          echo "signing_configured=false" >> $GITHUB_OUTPUT
+          echo "⚠️  Secretos de keystore no configurados"
+        fi
+    
+    # Build APK Release
+    - name: Build APK Release
+      run: flutter build apk --release
+    
+    # Build AAB Release (Android App Bundle)
+    - name: Build AAB Release
+      run: flutter build appbundle --release
+    
+    # Verificar builds
+    - name: Verificar builds generados
+      run: |
+        echo "Verificando APK release..."
+        if [ -f "build/app/outputs/flutter-apk/app-release.apk" ]; then
+          echo "✓ APK release generado"
+          ls -lh build/app/outputs/flutter-apk/app-release.apk
+        else
+          echo "✗ APK release no encontrado"
+          exit 1
+        fi
+        
+        echo "Verificando AAB release..."
+        if [ -f "build/app/outputs/bundle/release/app-release.aab" ]; then
+          echo "✓ AAB release generado"
+          ls -lh build/app/outputs/bundle/release/app-release.aab
+        else
+          echo "✗ AAB release no encontrado"
+          exit 1
+        fi
+    
+    # Generar checksums
+    - name: Generar checksums
+      run: |
+        cd build/app/outputs/flutter-apk
+        sha256sum app-release.apk > app-release.apk.sha256
+        cd ../../../../
+        
+        cd build/app/outputs/bundle/release
+        sha256sum app-release.aab > app-release.aab.sha256
+        cd ../../../../../
+    
+    # Renombrar archivos con versión
+    - name: Renombrar archivos con versión
+      run: |
+        VERSION=${GITHUB_REF#refs/tags/v}
+        
+        mv build/app/outputs/flutter-apk/app-release.apk \
+           build/app/outputs/flutter-apk/tokyo-roulette-v${VERSION}.apk
+        
+        mv build/app/outputs/flutter-apk/app-release.apk.sha256 \
+           build/app/outputs/flutter-apk/tokyo-roulette-v${VERSION}.apk.sha256
+        
+        mv build/app/outputs/bundle/release/app-release.aab \
+           build/app/outputs/bundle/release/tokyo-roulette-v${VERSION}.aab
+        
+        mv build/app/outputs/bundle/release/app-release.aab.sha256 \
+           build/app/outputs/bundle/release/tokyo-roulette-v${VERSION}.aab.sha256
+    
+    # Generar release notes
+    - name: Generar release notes
+      id: generate_notes
+      run: |
+        VERSION=${GITHUB_REF#refs/tags/v}
+        
+        cat > release-notes.md << 'EOF'
+        # 🎉 Tokyo Roulette Predictor $VERSION
+        
+        ## 📱 Instalación
+        
+        Descarga el archivo APK para instalar en dispositivos Android.
+        
+        ## 📦 Archivos Disponibles
+        
+        - **APK**: Para instalación directa en Android
+        - **AAB**: Para distribución en Google Play Store
+        - **SHA256**: Checksums para verificar integridad
+        
+        ## 🔒 Verificación de Integridad
+        
+        Verifica el checksum SHA-256 antes de instalar:
+        
+        ```bash
+        sha256sum -c tokyo-roulette-v$VERSION.apk.sha256
+        ```
+        
+        ## 📝 Cambios
+        
+        Ver [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) para detalles completos.
+        
+        ## ⚠️  Nota Importante
+        
+        Esta es una aplicación educativa de simulación. No promueve ni facilita apuestas reales.
+        
+        ---
+        
+        **Versión**: $VERSION  
+        **Fecha**: $(date +"%Y-%m-%d")  
+        **Commit**: ${{ github.sha }}
+        EOF
+        
+        sed -i "s/\$VERSION/$VERSION/g" release-notes.md
+    
+    # Crear GitHub Release
+    - name: Crear GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          build/app/outputs/flutter-apk/tokyo-roulette-*.apk
+          build/app/outputs/flutter-apk/tokyo-roulette-*.apk.sha256
+          build/app/outputs/bundle/release/tokyo-roulette-*.aab
+          build/app/outputs/bundle/release/tokyo-roulette-*.aab.sha256
+        body_path: release-notes.md
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    # Notificación de éxito
+    - name: Resumen de release
+      run: |
+        VERSION=${GITHUB_REF#refs/tags/v}
+        
+        echo "# 🎉 Release Completado" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## Versión: $VERSION" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Archivos generados:" >> $GITHUB_STEP_SUMMARY
+        echo "- ✓ APK Release" >> $GITHUB_STEP_SUMMARY
+        echo "- ✓ AAB Release" >> $GITHUB_STEP_SUMMARY
+        echo "- ✓ Checksums SHA-256" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Release publicado en:" >> $GITHUB_STEP_SUMMARY
+        echo "https://github.com/${{ github.repository }}/releases/tag/v$VERSION" >> $GITHUB_STEP_SUMMARY
