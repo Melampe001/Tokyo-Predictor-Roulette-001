@@ -60,6 +60,9 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             ElevatedButton(
               onPressed: () async {
+                // NOTE: Try-catch block is prepared for future Firebase Auth implementation.
+                // Currently no exceptions are thrown, but this structure ensures proper
+                // error handling when authentication is added (see TODO below).
                 try {
                   // TODO: Implementar lógica de registro/Auth aquí
                   // Ejemplo con Firebase Auth:
