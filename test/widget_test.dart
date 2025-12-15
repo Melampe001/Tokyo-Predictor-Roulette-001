@@ -21,15 +21,12 @@ void main() {
     expect(find.text('Resultado: Presiona Girar'), findsNothing);
     
     // Verify that a number result is displayed (0-36 for roulette)
-    final resultText = tester.widget<Text>(
-      find.byWidgetPredicate((widget) => 
-        widget is Text && 
-        widget.data != null && 
-        widget.data!.startsWith('Resultado: ') &&
-        widget.data != 'Resultado: Presiona Girar'
-      )
-    );
-    expect(resultText, isNotNull);
+    expect(find.byWidgetPredicate((widget) => 
+      widget is Text && 
+      widget.data != null && 
+      widget.data!.startsWith('Resultado: ') &&
+      widget.data != 'Resultado: Presiona Girar'
+    ), findsOneWidget);
     
     // Verify that the history contains at least one number
     expect(find.byWidgetPredicate((widget) => 
