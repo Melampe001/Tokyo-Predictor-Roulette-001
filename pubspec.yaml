@@ -21,12 +21,19 @@ dependencies:
   # charts_flutter: ^0.12.0  # Gráficos (DEPRECADO)
   fl_chart: ^0.65.0  # Gráficos modernos (reemplazo de charts_flutter)
   firebase_messaging: ^14.7.10  # Notificaciones para invitaciones
+  # Nuevas dependencias para Elite ∞
+  provider: ^6.1.1  # State management
+  equatable: ^2.0.5  # Value equality para modelos
+  cached_network_image: ^3.3.1  # Image caching
+  flutter_secure_storage: ^9.0.0  # Secure storage
 dev_dependencies:
   flutter_test:
     sdk: flutter
   integration_test:
     sdk: flutter
   flutter_lints: ^3.0.0  # Linter oficial de Flutter
+  mockito: ^5.4.4  # Mocking para tests
+  build_runner: ^2.4.7  # Code generation
 flutter:
   uses-material-design: true
   assets:

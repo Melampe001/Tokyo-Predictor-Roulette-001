@@ -81,11 +81,17 @@ linter:
     use_rethrow_when_possible: true
 
 analyzer:
+  strong-mode:
+    implicit-casts: false
+    implicit-dynamic: false
   exclude:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
   errors:
-    # Treat certain warnings as informational
+    # Errores críticos
+    missing_required_param: error
+    missing_return: error
+    # Warnings importantes
     todo: info
     deprecated_member_use: warning
     deprecated_member_use_from_same_package: ignore

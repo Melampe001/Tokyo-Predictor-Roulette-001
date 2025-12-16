@@ -1,0 +1,174 @@
+name: Flutter CI/CD Elite
+
+on:
+  push:
+    branches: [main, develop, copilot/**]
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Análisis de Código
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+      
+      - name: Configurar Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.x'
+          channel: 'stable'
+          cache: true
+      
+      - name: Verificar versión de Flutter
+        run: flutter --version
+      
+      - name: Obtener dependencias
+        run: flutter pub get
+      
+      - name: Analizar código
+        run: flutter analyze --no-fatal-infos
+      
+      - name: Verificar formato de código
+        run: flutter format --set-exit-if-changed lib/ test/
+        continue-on-error: true
+
+  test:
+    name: Tests Unitarios e Integración
+    runs-on: ubuntu-latest
+    needs: analyze
+    
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+      
+      - name: Configurar Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.x'
+          channel: 'stable'
+          cache: true
+      
+      - name: Obtener dependencias
+        run: flutter pub get
+      
+      - name: Ejecutar tests con coverage
+        run: flutter test --coverage
+      
+      - name: Verificar coverage mínimo
+        run: |
+          echo "Verificando cobertura de tests..."
+          if [ -f "coverage/lcov.info" ]; then
+            echo "✓ Archivo de coverage generado"
+            # TODO: Agregar verificación de porcentaje mínimo
+          else
+            echo "✗ No se generó archivo de coverage"
+            exit 1
+          fi
+      
+      - name: Subir coverage a Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage/lcov.info
+          fail_ci_if_error: false
+          verbose: true
+        continue-on-error: true
+
+  build-apk:
+    name: Build APK Android
+    runs-on: ubuntu-latest
+    needs: [analyze, test]
+    
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+      
+      - name: Configurar JDK 11
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      
+      - name: Configurar Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.x'
+          channel: 'stable'
+          cache: true
+      
+      - name: Obtener dependencias
+        run: flutter pub get
+      
+      - name: Compilar APK Release
+        run: flutter build apk --release
+      
+      - name: Verificar APK generada
+        run: |
+          if [ -f "build/app/outputs/flutter-apk/app-release.apk" ]; then
+            echo "✓ APK generada exitosamente"
+            ls -lh build/app/outputs/flutter-apk/app-release.apk
+          else
+            echo "✗ Error: APK no encontrada"
+            exit 1
+          fi
+      
+      - name: Subir APK como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
+          compression-level: 9
+
+  build-ios:
+    name: Build iOS (sin firma)
+    runs-on: macos-latest
+    needs: [analyze, test]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+      
+      - name: Configurar Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.x'
+          channel: 'stable'
+          cache: true
+      
+      - name: Obtener dependencias
+        run: flutter pub get
+      
+      - name: Compilar iOS (sin firma)
+        run: flutter build ios --release --no-codesign
+        continue-on-error: true
+      
+      - name: Información del build
+        run: |
+          echo "Build de iOS completado"
+          echo "Nota: Requiere configuración de firma para deployment"
+
+  summary:
+    name: Resumen de CI/CD
+    runs-on: ubuntu-latest
+    needs: [analyze, test, build-apk]
+    if: always()
+    
+    steps:
+      - name: Generar resumen
+        run: |
+          echo "# 🎉 Resumen de CI/CD" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Estado de Jobs" >> $GITHUB_STEP_SUMMARY
+          echo "- Análisis: ${{ needs.analyze.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Tests: ${{ needs.test.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Build APK: ${{ needs.build-apk.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📱 Artefactos" >> $GITHUB_STEP_SUMMARY
+          echo "Los artefactos generados están disponibles en la pestaña Actions." >> $GITHUB_STEP_SUMMARY

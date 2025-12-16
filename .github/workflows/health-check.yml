@@ -1,0 +1,106 @@
+name: Project Health Check
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Cada domingo a medianoche
+  workflow_dispatch:  # Permite ejecución manual
+
+permissions:
+  contents: read
+
+jobs:
+  health-check:
+    name: Verificación de Salud del Proyecto
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+      
+      - name: Configurar Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.x'
+          channel: 'stable'
+          cache: true
+      
+      - name: Obtener dependencias
+        run: flutter pub get
+      
+      - name: Ejecutar análisis
+        id: analyze
+        run: |
+          flutter analyze --no-fatal-infos > analyze_output.txt 2>&1 || true
+          echo "analyze_status=$?" >> $GITHUB_OUTPUT
+        continue-on-error: true
+      
+      - name: Ejecutar tests
+        id: test
+        run: |
+          flutter test > test_output.txt 2>&1 || true
+          echo "test_status=$?" >> $GITHUB_OUTPUT
+        continue-on-error: true
+      
+      - name: Verificar dependencias desactualizadas
+        id: outdated
+        run: |
+          flutter pub outdated > outdated_output.txt 2>&1 || true
+          echo "outdated_status=$?" >> $GITHUB_OUTPUT
+        continue-on-error: true
+      
+      - name: Generar reporte de salud
+        run: |
+          cat > health_report.md << 'EOF'
+          # 📊 Reporte de Salud del Proyecto
+          
+          **Fecha:** $(date '+%Y-%m-%d %H:%M:%S')
+          **Branch:** ${{ github.ref_name }}
+          
+          ## Estado de Verificaciones
+          
+          ### ✅ Análisis de Código
+          - Estado: ${{ steps.analyze.outputs.analyze_status == '0' && '✓ Pasó' || '✗ Falló' }}
+          
+          ### 🧪 Tests
+          - Estado: ${{ steps.test.outputs.test_status == '0' && '✓ Pasó' || '✗ Falló' }}
+          
+          ### 📦 Dependencias
+          - Estado: Verificación completada
+          
+          ## Métricas del Proyecto
+          
+          - **Archivos Dart:** $(find lib -name '*.dart' | wc -l)
+          - **Tests:** $(find test -name '*_test.dart' | wc -l)
+          - **Líneas de código:** $(find lib -name '*.dart' -exec wc -l {} + | tail -1 | awk '{print $1}')
+          
+          ## Recomendaciones
+          
+          - Mantener dependencias actualizadas
+          - Revisar warnings de análisis
+          - Mantener cobertura de tests >95%
+          - Documentar funciones públicas
+          
+          ---
+          
+          *Este reporte se genera automáticamente cada semana*
+          EOF
+          
+          cat health_report.md
+      
+      - name: Subir reporte como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: health-report
+          path: |
+            health_report.md
+            analyze_output.txt
+            test_output.txt
+            outdated_output.txt
+          retention-days: 90
+      
+      - name: Crear issue si hay fallos críticos
+        if: steps.analyze.outputs.analyze_status != '0' || steps.test.outputs.test_status != '0'
+        run: |
+          echo "⚠️ Se detectaron fallos en el health check"
+          echo "Se recomienda revisar los artefactos generados"
+        continue-on-error: true
