@@ -59,12 +59,37 @@ class _LoginScreenState extends State<LoginScreen> {
               decoration: const InputDecoration(labelText: 'Email'),
             ),
             ElevatedButton(
-              onPressed: () {
-                // TODO: Implementar lógica de registro/Auth aquí
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const MainScreen()),
-                );
+              onPressed: () async {
+                // NOTE: Try-catch block is prepared for future Firebase Auth implementation.
+                // Currently no exceptions are thrown, but this structure ensures proper
+                // error handling when authentication is added (see TODO below).
+                try {
+                  // TODO: Implementar lógica de registro/Auth aquí
+                  // Ejemplo con Firebase Auth:
+                  // await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                  //   email: _emailController.text,
+                  //   password: password,
+                  // );
+                  
+                  if (!mounted) return;
+                  
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const MainScreen()),
+                  );
+                } catch (e, stackTrace) {
+                  // Log error for debugging (debugPrint is automatically stripped in release builds)
+                  debugPrint('Registration error: $e');
+                  debugPrint('Stack trace: $stackTrace');
+                  
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Ocurrió un error inesperado. Por favor intenta nuevamente.'),
+                      ),
+                    );
+                  }
+                }
               },
               child: const Text('Registrar y Continuar'),
             ),
@@ -83,17 +108,26 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  // Constants for business logic
+  static const int _historyLimit = 20;
+  static const double _initialBalance = 1000.0;
+  static const double _initialBet = 10.0;
+  
   final RouletteLogic _rouletteLogic = RouletteLogic();
   final MartingaleAdvisor _martingaleAdvisor = MartingaleAdvisor();
   
   String result = 'Presiona Girar';
   List<int> history = [];
   int? prediction;
-  double balance = 1000.0;
-  double currentBet = 10.0;
+  double balance = _initialBalance;
+  double currentBet = _initialBet;
   bool useMartingale = false;
   String lastBetResult = '';
 
+  /// Spins the roulette wheel and updates the game state.
+  /// 
+  /// Generates a prediction before spinning, simulates the bet result,
+  /// updates the balance, and applies Martingale strategy if enabled.
   void spinRoulette() {
     // Genera predicción antes del giro
     if (history.isNotEmpty) {
@@ -133,9 +167,9 @@ class _MainScreenState extends State<MainScreen> {
         }
       }
       
-      // Limita el historial a los últimos 20 números
-      if (history.length > 20) {
-        history = history.sublist(history.length - 20);
+      // Limita el historial a los últimos _historyLimit números
+      if (history.length > _historyLimit) {
+        history = history.sublist(history.length - _historyLimit);
       }
     });
   }
@@ -150,8 +184,8 @@ class _MainScreenState extends State<MainScreen> {
     setState(() {
       history.clear();
       result = 'Presiona Girar';
-      balance = 1000.0;
-      currentBet = 10.0;
+      balance = _initialBalance;
+      currentBet = _initialBet;
       prediction = null;
       lastBetResult = '';
       _martingaleAdvisor.reset();
