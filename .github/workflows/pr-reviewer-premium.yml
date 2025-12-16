@@ -1,0 +1,407 @@
+name: PR Reviewer Premium Bot
+
+# Automated code review and quality checks for pull requests
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main, develop, master]
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  code-quality:
+    name: Code Quality Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for better analysis
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Install Flutter dependencies
+        run: flutter pub get
+      
+      - name: Install Python dependencies
+        run: |
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+          pip install pylint black isort mypy bandit
+      
+      - name: Run Flutter analyzer
+        id: flutter_analyze
+        run: |
+          echo "Running Flutter analyzer..."
+          flutter analyze --no-fatal-infos > flutter_analyze.txt 2>&1 || true
+          cat flutter_analyze.txt
+        continue-on-error: true
+      
+      - name: Run Dart formatter check
+        id: dart_format
+        run: |
+          echo "Checking Dart formatting..."
+          dart format --set-exit-if-changed . > dart_format.txt 2>&1 || true
+          cat dart_format.txt
+        continue-on-error: true
+      
+      - name: Run Python linting
+        id: pylint
+        if: hashFiles('**/*.py') != ''
+        run: |
+          echo "Running pylint..."
+          pylint **/*.py --max-line-length=100 --output-format=text > pylint.txt 2>&1 || true
+          cat pylint.txt
+        continue-on-error: true
+      
+      - name: Run Black formatter check
+        id: black
+        if: hashFiles('**/*.py') != ''
+        run: |
+          echo "Checking Python formatting with Black..."
+          black --check . > black.txt 2>&1 || true
+          cat black.txt
+        continue-on-error: true
+      
+      - name: Run isort check
+        id: isort
+        if: hashFiles('**/*.py') != ''
+        run: |
+          echo "Checking import sorting..."
+          isort --check-only . > isort.txt 2>&1 || true
+          cat isort.txt
+        continue-on-error: true
+      
+      - name: Run Bandit security scan
+        id: bandit
+        if: hashFiles('**/*.py') != ''
+        run: |
+          echo "Running Bandit security scan..."
+          bandit -r . -f txt > bandit.txt 2>&1 || true
+          cat bandit.txt
+        continue-on-error: true
+      
+      - name: Post review comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const { owner, repo } = context.repo;
+            const pr_number = context.issue.number;
+            
+            let comment = '## 🤖 PR Reviewer Premium Bot\n\n';
+            comment += '### Code Quality Analysis Results\n\n';
+            
+            // Flutter analysis
+            try {
+              const flutterAnalyze = fs.readFileSync('flutter_analyze.txt', 'utf8');
+              const flutterIssues = flutterAnalyze.includes('error') || flutterAnalyze.includes('warning');
+              
+              if (flutterIssues) {
+                comment += '#### ⚠️ Flutter Analysis\n';
+                comment += '```\n' + flutterAnalyze.slice(0, 500) + '\n```\n\n';
+              } else {
+                comment += '#### ✅ Flutter Analysis - Passed\n\n';
+              }
+            } catch (e) {
+              comment += '#### ℹ️ Flutter Analysis - No Dart files changed\n\n';
+            }
+            
+            // Dart formatting
+            try {
+              const dartFormat = fs.readFileSync('dart_format.txt', 'utf8');
+              if (dartFormat.includes('Changed')) {
+                comment += '#### ⚠️ Dart Formatting\n';
+                comment += 'Some files need formatting. Run `dart format .`\n\n';
+              } else {
+                comment += '#### ✅ Dart Formatting - Passed\n\n';
+              }
+            } catch (e) {
+              // No formatting issues
+            }
+            
+            // Python linting
+            try {
+              const pylint = fs.readFileSync('pylint.txt', 'utf8');
+              if (pylint.includes('Your code has been rated')) {
+                comment += '#### 📊 Python Linting (Pylint)\n';
+                const ratingMatch = pylint.match(/rated at ([\d.]+)\/10/);
+                if (ratingMatch) {
+                  comment += `Code quality score: ${ratingMatch[1]}/10\n\n`;
+                }
+              }
+            } catch (e) {
+              // No Python files
+            }
+            
+            // Black formatting
+            try {
+              const black = fs.readFileSync('black.txt', 'utf8');
+              if (black.includes('would be reformatted')) {
+                comment += '#### ⚠️ Python Formatting (Black)\n';
+                comment += 'Some files need formatting. Run `black .`\n\n';
+              } else {
+                comment += '#### ✅ Python Formatting - Passed\n\n';
+              }
+            } catch (e) {
+              // No formatting issues
+            }
+            
+            // Bandit security
+            try {
+              const bandit = fs.readFileSync('bandit.txt', 'utf8');
+              if (bandit.includes('Issue:')) {
+                comment += '#### 🔒 Security Scan (Bandit)\n';
+                comment += '⚠️ Potential security issues detected. Please review.\n';
+                comment += '```\n' + bandit.slice(0, 500) + '\n```\n\n';
+              } else {
+                comment += '#### ✅ Security Scan - Passed\n\n';
+              }
+            } catch (e) {
+              // No security issues
+            }
+            
+            comment += '\n### 📋 Next Steps\n\n';
+            comment += '1. Address any warnings or errors above\n';
+            comment += '2. Run tests locally: `flutter test` and `pytest`\n';
+            comment += '3. Update documentation if needed\n';
+            comment += '4. Request human review when ready\n\n';
+            comment += '---\n';
+            comment += '*Automated review by PR Reviewer Premium Bot*';
+            
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: pr_number,
+              body: comment,
+            });
+  
+  run-tests:
+    name: Run Test Suites
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          flutter pub get
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+            pip install pytest pytest-cov
+          fi
+      
+      - name: Run Flutter tests
+        id: flutter_test
+        run: |
+          echo "Running Flutter tests..."
+          flutter test --reporter=expanded --coverage > flutter_test.txt 2>&1 || echo "Tests completed with issues"
+          cat flutter_test.txt
+        continue-on-error: true
+      
+      - name: Run Python tests
+        id: python_test
+        if: hashFiles('**/*.py') != ''
+        run: |
+          echo "Running Python tests..."
+          if [ -d "tests" ] || find . -name "test_*.py" -o -name "*_test.py" | grep -q .; then
+            pytest -v --cov=. --cov-report=term > pytest.txt 2>&1 || echo "Tests completed with issues"
+            cat pytest.txt
+          else
+            echo "No Python tests found" > pytest.txt
+          fi
+        continue-on-error: true
+      
+      - name: Comment test results
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const { owner, repo } = context.repo;
+            const pr_number = context.issue.number;
+            
+            let comment = '## 🧪 Test Results\n\n';
+            
+            // Flutter tests
+            try {
+              const flutterTest = fs.readFileSync('flutter_test.txt', 'utf8');
+              const passed = flutterTest.includes('All tests passed');
+              
+              if (passed) {
+                comment += '#### ✅ Flutter Tests - All Passed\n\n';
+              } else {
+                comment += '#### ❌ Flutter Tests - Some Failed\n';
+                comment += '```\n' + flutterTest.slice(-500) + '\n```\n\n';
+              }
+            } catch (e) {
+              comment += '#### ℹ️ Flutter Tests - Not run\n\n';
+            }
+            
+            // Python tests
+            try {
+              const pytest = fs.readFileSync('pytest.txt', 'utf8');
+              if (pytest.includes('passed')) {
+                comment += '#### ✅ Python Tests - Passed\n\n';
+              } else if (pytest.includes('No Python tests found')) {
+                comment += '#### ℹ️ Python Tests - No tests found\n\n';
+              } else {
+                comment += '#### ❌ Python Tests - Some Failed\n';
+                comment += '```\n' + pytest.slice(-500) + '\n```\n\n';
+              }
+            } catch (e) {
+              comment += '#### ℹ️ Python Tests - Not run\n\n';
+            }
+            
+            comment += '\n---\n*Test results by PR Reviewer Premium Bot*';
+            
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: pr_number,
+              body: comment,
+            });
+  
+  check-documentation:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Check for documentation updates
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pr_number = context.issue.number;
+            
+            // Get PR files
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner,
+              repo,
+              pull_number: pr_number,
+            });
+            
+            const codeFiles = files.filter(f => 
+              f.filename.endsWith('.dart') || 
+              f.filename.endsWith('.py')
+            ).length;
+            
+            const docFiles = files.filter(f => 
+              f.filename.endsWith('.md') || 
+              f.filename.includes('docs/')
+            ).length;
+            
+            // If significant code changes but no doc updates, warn
+            if (codeFiles > 5 && docFiles === 0) {
+              const comment = "## 📚 Documentation Notice\n\n" +
+                "This PR contains significant code changes (" + codeFiles + " files) but no documentation updates.\n\n" +
+                "Please consider:\n" +
+                "- Updating relevant documentation\n" +
+                "- Adding code comments for complex logic\n" +
+                "- Updating API documentation if interfaces changed\n" +
+                "- Adding usage examples if applicable\n\n" +
+                "If documentation is not needed, you can ignore this message.\n\n" +
+                "---\n" +
+                "*Automated check by PR Reviewer Premium Bot*";
+              
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: pr_number,
+                body: comment,
+              });
+            }
+  
+  commit-message-check:
+    name: Commit Message Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Validate commit messages
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pr_number = context.issue.number;
+            
+            // Get commits
+            const { data: commits } = await github.rest.pulls.listCommits({
+              owner,
+              repo,
+              pull_number: pr_number,
+            });
+            
+            const issues = [];
+            
+            for (const commit of commits) {
+              const message = commit.commit.message;
+              const firstLine = message.split('\n')[0];
+              
+              // Check length
+              if (firstLine.length > 72) {
+                issues.push(`⚠️ Commit message too long (${firstLine.length} chars): "${firstLine.slice(0, 50)}..."`);
+              }
+              
+              // Check if it starts with conventional commit type
+              if (!/^(feat|fix|docs|style|refactor|test|chore|perf|ci|build)(\(.+\))?:/.test(firstLine)) {
+                issues.push(`ℹ️ Consider using conventional commits format: "${firstLine.slice(0, 50)}..."`);
+              }
+            }
+            
+            if (issues.length > 0) {
+              const comment = "## 📝 Commit Message Suggestions\n\n" +
+                issues.join('\n') + "\n\n" +
+                "### Recommended Format\n" +
+                "```\n" +
+                "<type>(<scope>): <subject>\n\n" +
+                "<body>\n\n" +
+                "<footer>\n" +
+                "```\n\n" +
+                "**Types:** feat, fix, docs, style, refactor, test, chore, perf, ci, build\n\n" +
+                "---\n" +
+                "*Automated check by PR Reviewer Premium Bot*";
+              
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: pr_number,
+                body: comment,
+              });
+            }

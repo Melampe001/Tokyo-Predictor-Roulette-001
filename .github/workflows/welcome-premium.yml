@@ -1,0 +1,415 @@
+name: Welcome & Onboarding Premium Bot
+
+# Welcome new contributors and celebrate milestones
+
+on:
+  issues:
+    types: [opened]
+  pull_request_target:
+    types: [opened, closed]
+  discussion:
+    types: [created]
+
+permissions:
+  issues: write
+  pull-requests: write
+  discussions: write
+
+jobs:
+  welcome-new-contributor:
+    name: Welcome First-Time Contributors
+    runs-on: ubuntu-latest
+    if: github.event.action == 'opened'
+    
+    steps:
+      - name: Check if first-time contributor
+        uses: actions/github-script@v7
+        id: check-first-time
+        with:
+          result-encoding: string
+          script: |
+            const { owner, repo } = context.repo;
+            const sender = context.payload.sender.login;
+            
+            try {
+              // Check if user has previous contributions
+              const { data: issues } = await github.rest.issues.listForRepo({
+                owner,
+                repo,
+                creator: sender,
+                state: 'all',
+                per_page: 100,
+              });
+              
+              const { data: prs } = await github.rest.pulls.list({
+                owner,
+                repo,
+                state: 'all',
+                per_page: 100,
+              });
+              
+              const userPRs = prs.filter(pr => pr.user.login === sender);
+              
+              // First contribution if this is their first issue/PR
+              const isFirstTime = (issues.length === 1 && userPRs.length === 0) || 
+                                  (issues.length === 0 && userPRs.length === 1);
+              
+              return isFirstTime.toString();
+            } catch (error) {
+              console.log('Error checking contribution history:', error);
+              return 'true';  // Assume first time on error
+            }
+      
+      - name: Welcome new issue creator
+        if: github.event_name == 'issues' && steps.check-first-time.outputs.result == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const author = context.payload.sender.login;
+            
+            const welcomeMessage = "## 👋 Welcome to Tokyo Roulette Predictor!\n"
+                          "\n" +
+                          "Hi @" + author + "! Thank you for opening your first issue in our project. We're excited to have you here! 🎉\n" +
+                          "\n" +
+                          "### 📚 Getting Started\n" +
+                          "- **Documentation**: Check out our [README](../README.md) and [Contributing Guide](../CONTRIBUTING.md)\n" +
+                          "- **Project Overview**: See [PROJECT_SUMMARY.md](../PROJECT_SUMMARY.md) for project details\n" +
+                          "- **Architecture**: Review [ARCHITECTURE.md](../docs/ARCHITECTURE.md) to understand the codebase\n" +
+                          "\n" +
+                          "### 🤝 What Happens Next?\n" +
+                          "1. A maintainer will review your issue\n" +
+                          "2. We may ask for clarification or additional details\n" +
+                          "3. If it's a bug, we'll investigate and work on a fix\n" +
+                          "4. If it's a feature request, we'll discuss feasibility and approach\n" +
+                          "\n" +
+                          "### 💡 Want to Contribute?\n" +
+                          "If you'd like to work on this issue yourself:\n" +
+                          "- Comment on this issue to express interest\n" +
+                          "- We'll provide guidance and answer questions\n" +
+                          "- Check out our [Contributing Guide](../CONTRIBUTING.md) for the process\n" +
+                          "\n" +
+                          "### 🔗 Helpful Resources\n" +
+                          "- [User Guide](../docs/USER_GUIDE.md)\n" +
+                          "- [Health Agent Guide](../docs/HEALTH_AGENT.md)\n" +
+                          "- [Changelog](../CHANGELOG.md)\n" +
+                          "\n" +
+                          "Thank you for helping improve Tokyo Roulette Predictor! 🎰✨\n" +
+                          "\n" +
+                          "---\n" +
+                          "*Automated welcome message by Welcome & Onboarding Premium Bot*";
+            
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: issue_number,
+              body: welcomeMessage,
+            });
+            
+            // Add welcome label
+            await github.rest.issues.addLabels({
+              owner,
+              repo,
+              issue_number: issue_number,
+              labels: ['first-time-contributor'],
+            });
+      
+      - name: Welcome new PR creator
+        if: github.event_name == 'pull_request_target' && steps.check-first-time.outputs.result == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pr_number = context.issue.number;
+            const author = context.payload.sender.login;
+            
+            const welcomeMessage = "## 🎉 Welcome to Tokyo Roulette Predictor!\n"
+                          "\n" +
+                          "Hi @" + author + "! Thank you for your first pull request! We're thrilled to have you contribute to our project! 🚀\n" +
+                          "\n" +
+                          "### 📋 PR Review Process\n" +
+                          "1. **Automated Checks**: Our bots will run automated tests and quality checks\n" +
+                          "2. **Code Review**: A maintainer will review your changes\n" +
+                          "3. **Feedback**: We may request changes or clarifications\n" +
+                          "4. **Merge**: Once approved, we'll merge your contribution!\n" +
+                          "\n" +
+                          "### ✅ Before Merge Checklist\n" +
+                          "Please ensure your PR:\n" +
+                          "- [ ] Passes all CI/CD checks\n" +
+                          "- [ ] Includes tests for new functionality\n" +
+                          "- [ ] Updates documentation if needed\n" +
+                          "- [ ] Follows our code style guidelines\n" +
+                          "- [ ] Has a clear description of changes\n" +
+                          "\n" +
+                          "### 🎯 Tips for Success\n" +
+                          "- **Respond to feedback**: Address review comments promptly\n" +
+                          "- **Keep it focused**: Smaller PRs are easier to review\n" +
+                          "- **Test locally**: Make sure tests pass before pushing\n" +
+                          "- **Ask questions**: Don't hesitate to ask for clarification\n" +
+                          "\n" +
+                          "### 📚 Resources\n" +
+                          "- [Contributing Guide](../CONTRIBUTING.md)\n" +
+                          "- [Code of Conduct](../CODE_OF_CONDUCT.md) (if available)\n" +
+                          "- [Architecture Guide](../docs/ARCHITECTURE.md)\n" +
+                          "\n" +
+                          "### 🤝 Need Help?\n" +
+                          "If you have questions or need assistance:\n" +
+                          "- Comment on this PR\n" +
+                          "- Mention @maintainers for help\n" +
+                          "- Check our documentation\n" +
+                          "\n" +
+                          "Thank you for your contribution! We appreciate your effort and look forward to working with you! 🙏\n" +
+                          "\n" +
+                          "---\n" +
+                          "*Automated welcome message by Welcome & Onboarding Premium Bot*";
+            
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: pr_number,
+              body: welcomeMessage,
+            });
+            
+            // Add first-time contributor label
+            await github.rest.issues.addLabels({
+              owner,
+              repo,
+              issue_number: pr_number,
+              labels: ['first-time-contributor'],
+            });
+  
+  thank-contributor:
+    name: Thank Contributors on PR Merge
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request_target' && github.event.action == 'closed' && github.event.pull_request.merged == true
+    
+    steps:
+      - name: Thank contributor
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pr_number = context.issue.number;
+            const author = context.payload.pull_request.user.login;
+            const pr_title = context.payload.pull_request.title;
+            
+            // Check if first-time contributor
+            const labels = context.payload.pull_request.labels || [];
+            const isFirstTime = labels.some(label => label.name === 'first-time-contributor');
+            
+            let thankYouMessage = '';
+            
+            if (isFirstTime) {
+              thankYouMessage = "## 🎊 Congratulations on Your First Merged PR!\n\n" +
+                "@" + author + ", your pull request has been merged! This is a significant milestone, and we're grateful for your contribution! 🎉\n\n" +
+                "### 🌟 What You've Accomplished\n" +
+                "✅ **Merged PR**: \"" + pr_title + "\"\n" +
+                "✅ **Became a contributor** to Tokyo Roulette Predictor\n" +
+                "✅ **Made open source better** with your work!\n\n" +
+                "### 🚀 What's Next?\n" +
+                "- Your changes are now part of the project!\n" +
+                "- Check out other [open issues](../../issues) you might be interested in\n" +
+                "- Join our community discussions\n" +
+                "- Help review other PRs\n" +
+                "- Share your experience with others\n\n" +
+                "### 🏆 Contributor Recognition\n" +
+                "You're now an official contributor! Your name will appear in:\n" +
+                "- Git history\n" +
+                "- Contributors list\n" +
+                "- Project acknowledgments\n\n" +
+                "Thank you for your valuable contribution! We hope this is the first of many! 🙌\n\n" +
+                "---\n" +
+                "*Automated message by Welcome & Onboarding Premium Bot*";
+            } else {
+              thankYouMessage = "## 🎉 Thank You for Your Contribution!\n\n" +
+                "@" + author + ", your pull request has been merged! Thank you for improving Tokyo Roulette Predictor! 🚀\n\n" +
+                "**Merged PR**: \"" + pr_title + "\"\n\n" +
+                "Your contribution helps make this project better for everyone. We appreciate your continued support! 🙏\n\n" +
+                "---\n" +
+                "*Automated message by Welcome & Onboarding Premium Bot*";
+            }
+            
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: pr_number,
+              body: thankYouMessage,
+            });
+  
+  celebrate-milestones:
+    name: Celebrate Contributor Milestones
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request_target' && github.event.action == 'closed' && github.event.pull_request.merged == true
+    
+    steps:
+      - name: Check milestones
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pr_number = context.issue.number;
+            const author = context.payload.pull_request.user.login;
+            
+            try {
+              // Get all merged PRs by this author
+              const { data: prs } = await github.rest.pulls.list({
+                owner,
+                repo,
+                state: 'closed',
+                per_page: 100,
+              });
+              
+              const authorMergedPRs = prs.filter(pr => 
+                pr.user.login === author && pr.merged_at !== null
+              );
+              
+              const prCount = authorMergedPRs.length;
+              const milestones = [5, 10, 25, 50, 100];
+              
+              if (milestones.includes(prCount)) {
+                let milestone_text = '';
+                if (prCount === 5) {
+                  milestone_text = "🌟 **5 PRs** - You're becoming a regular contributor!";
+                } else if (prCount === 10) {
+                  milestone_text = "⭐ **10 PRs** - Double digits! You're a valuable team member!";
+                } else if (prCount === 25) {
+                  milestone_text = "🌟 **25 PRs** - Quarter century! You're a core contributor!";
+                } else if (prCount === 50) {
+                  milestone_text = "💎 **50 PRs** - Half a hundred! You're a project champion!";
+                } else if (prCount === 100) {
+                  milestone_text = "🏆 **100 PRs** - Triple digits! You're a legendary contributor!";
+                }
+                
+                const celebrationMessage = "## 🎊 MILESTONE ACHIEVEMENT! 🎊\n\n" +
+                  "@" + author + " just reached an amazing milestone: **" + prCount + " merged pull requests!** 🎉\n\n" +
+                  "### 🏆 Outstanding Contribution\n" +
+                  milestone_text + "\n\n" +
+                  "Thank you for your continued dedication to Tokyo Roulette Predictor! Your contributions make a real difference! 🙌\n\n" +
+                  "Keep up the amazing work! 🚀\n\n" +
+                  "---\n" +
+                  "*Automated celebration by Welcome & Onboarding Premium Bot*";
+                
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: pr_number,
+                  body: celebrationMessage,
+                });
+              }
+            } catch (error) {
+              console.log('Error checking milestones:', error);
+            }
+  
+  provide-resources:
+    name: Provide Contextual Resources
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'opened'
+    
+    steps:
+      - name: Analyze issue and provide resources
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const title = context.payload.issue.title.toLowerCase();
+            const body = (context.payload.issue.body || '').toLowerCase();
+            const content = title + " " + body;
+            
+            const resources = [];
+            
+            // Provide relevant resources based on issue content
+            if (content.includes('flutter') || content.includes('mobile') || content.includes('dart')) {
+              resources.push('- [Flutter Documentation](https://flutter.dev/docs)');
+              resources.push('- [Project Architecture](../docs/ARCHITECTURE.md)');
+            }
+            
+            if (content.includes('python') || content.includes('ml') || content.includes('prediction')) {
+              resources.push('- [Health Agent Documentation](../docs/HEALTH_AGENT.md)');
+            }
+            
+            if (content.includes('install') || content.includes('setup') || content.includes('build')) {
+              resources.push('- [Installation Guide](../README.md#installation)');
+              resources.push('- [Build Instructions](../README.md#build-apk)');
+            }
+            
+            if (content.includes('test') || content.includes('testing')) {
+              resources.push('- [Testing Guide](../README.md#run-tests)');
+            }
+            
+            if (content.includes('firebase') || content.includes('config')) {
+              resources.push('- [Firebase Setup Guide](../docs/FIREBASE_SETUP.md)');
+            }
+            
+            if (content.includes('contribute') || content.includes('contribution')) {
+              resources.push('- [Contributing Guide](../CONTRIBUTING.md)');
+            }
+            
+            if (resources.length > 0) {
+              const resourceMessage = "### 📚 Helpful Resources\n"
+                            "\n" +
+                            "Based on your issue, these resources might be helpful:\n" +
+                            "\n" +
+                            "" + resources.join('\n') + "\n" +
+                            "\n" +
+                            "---\n" +
+                            "*Provided by Welcome & Onboarding Premium Bot*";
+              
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: issue_number,
+                body: resourceMessage,
+              });
+            }
+  
+  label-good-first-issues:
+    name: Suggest Issues for New Contributors
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'opened'
+    
+    steps:
+      - name: Check if suitable for beginners
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const title = context.payload.issue.title.toLowerCase();
+            const body = (context.payload.issue.body || '').toLowerCase();
+            const content = title + " " + body;
+            
+            // Check if issue is suitable for beginners
+            const beginner_keywords = [
+              'typo', 'documentation', 'docs', 'readme', 'comment',
+              'simple', 'minor', 'small', 'easy', 'trivial'
+            ];
+            
+            const isBeginner = beginner_keywords.some(keyword => content.includes(keyword));
+            
+            if (isBeginner && context.payload.issue.user.login !== context.repo.owner) {
+              // Add good-first-issue label
+              await github.rest.issues.addLabels({
+                owner,
+                repo,
+                issue_number: issue_number,
+                labels: ['good first issue'],
+              });
+              
+              const message = "### 🌟 Good First Issue\n"
+                            "\n" +
+                            "This looks like a great issue for first-time contributors! \n" +
+                            "\n" +
+                            "If you're new to the project and want to contribute, this might be a good starting point. Feel free to ask questions if you need guidance!\n" +
+                            "\n" +
+                            "---\n" +
+                            "*Automated suggestion by Welcome & Onboarding Premium Bot*";
+              
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: issue_number,
+                body: message,
+              });
+            }

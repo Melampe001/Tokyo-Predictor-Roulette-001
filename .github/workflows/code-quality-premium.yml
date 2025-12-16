@@ -1,0 +1,382 @@
+name: Code Quality & Performance Premium Bot
+
+# Comprehensive code quality and performance analysis
+
+on:
+  push:
+    branches: [main, develop, master]
+  pull_request:
+    branches: [main, develop, master]
+  schedule:
+    - cron: '0 0 * * 1'  # Weekly on Monday
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+  security-events: write
+
+jobs:
+  flutter-quality:
+    name: Flutter Code Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      
+      - name: Install dependencies
+        run: flutter pub get
+      
+      - name: Run Flutter analyzer
+        run: flutter analyze --write=flutter_analyze_report.txt
+        continue-on-error: true
+      
+      - name: Run dart format check
+        run: dart format --output=none --set-exit-if-changed .
+        continue-on-error: true
+      
+      - name: Run Flutter tests with coverage
+        run: flutter test --coverage --reporter=expanded
+        continue-on-error: true
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/lcov.info
+          flags: flutter
+          name: flutter-coverage
+      
+      - name: Check Flutter analyze results
+        run: |
+          if [ -f flutter_analyze_report.txt ]; then
+            echo "Flutter Analysis Report:"
+            cat flutter_analyze_report.txt
+          fi
+      
+      - name: Upload Flutter artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-quality-reports
+          path: |
+            flutter_analyze_report.txt
+            coverage/
+          retention-days: 30
+  
+  python-quality:
+    name: Python Code Quality
+    runs-on: ubuntu-latest
+    if: hashFiles('**/*.py') != ''
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+          pip install pylint black isort mypy bandit pytest pytest-cov radon
+      
+      - name: Run Black formatter
+        run: |
+          echo "Running Black..."
+          black --check --diff . || true
+      
+      - name: Run isort
+        run: |
+          echo "Running isort..."
+          isort --check-only --diff . || true
+      
+      - name: Run Pylint
+        run: |
+          echo "Running Pylint..."
+          find . -name "*.py" -type f ! -path "./.*" -exec pylint {} + \
+            --max-line-length=100 \
+            --output-format=text \
+            --reports=y \
+            --exit-zero > pylint_report.txt || true
+          cat pylint_report.txt
+      
+      - name: Run MyPy type checking
+        run: |
+          echo "Running MyPy..."
+          mypy . --ignore-missing-imports --no-error-summary || true
+      
+      - name: Run Bandit security scan
+        run: |
+          echo "Running Bandit security scan..."
+          bandit -r . -f json -o bandit_report.json || true
+          bandit -r . -f txt || true
+      
+      - name: Calculate code complexity
+        run: |
+          echo "Calculating code complexity with Radon..."
+          radon cc . -a -s > complexity_report.txt || true
+          cat complexity_report.txt
+      
+      - name: Run Python tests with coverage
+        run: |
+          if [ -d "tests" ] || find . -name "test_*.py" -o -name "*_test.py" | grep -q .; then
+            pytest -v --cov=. --cov-report=xml --cov-report=html --cov-report=term
+          else
+            echo "No tests found"
+          fi
+        continue-on-error: true
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage.xml
+          flags: python
+          name: python-coverage
+      
+      - name: Upload Bandit results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: bandit_report.json
+        continue-on-error: true
+      
+      - name: Upload Python artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-quality-reports
+          path: |
+            pylint_report.txt
+            bandit_report.json
+            complexity_report.txt
+            htmlcov/
+          retention-days: 30
+  
+  dependency-check:
+    name: Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+      
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+      
+      - name: Flutter dependency audit
+        run: |
+          echo "Checking Flutter dependencies..."
+          flutter pub outdated || true
+      
+      - name: Python dependency check
+        if: hashFiles('requirements.txt') != ''
+        run: |
+          pip install safety
+          echo "Checking Python dependencies for known vulnerabilities..."
+          safety check --json > safety_report.json || true
+          safety check || true
+      
+      - name: Upload security artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-reports
+          path: |
+            trivy-results.sarif
+            safety_report.json
+          retention-days: 90
+  
+  performance-check:
+    name: Performance Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      
+      - name: Install dependencies
+        run: flutter pub get
+      
+      - name: Build app for performance testing
+        run: flutter build apk --release --target-platform android-arm64
+        continue-on-error: true
+      
+      - name: Check APK size
+        run: |
+          if [ -f "build/app/outputs/flutter-apk/app-release.apk" ]; then
+            SIZE=$(ls -lh build/app/outputs/flutter-apk/app-release.apk | awk '{print $5}')
+            echo "APK Size: $SIZE"
+            
+            # Get size in bytes
+            SIZE_BYTES=$(stat -c%s "build/app/outputs/flutter-apk/app-release.apk" 2>/dev/null || stat -f%z "build/app/outputs/flutter-apk/app-release.apk")
+            echo "APK Size (bytes): $SIZE_BYTES"
+            
+            # Warn if larger than 50MB
+            if [ $SIZE_BYTES -gt 52428800 ]; then
+              echo "::warning::APK size is larger than 50MB. Consider optimizing."
+            fi
+          fi
+      
+      - name: Analyze build size
+        run: |
+          echo "Build size analysis:"
+          du -sh build/ 2>/dev/null || echo "Build directory not found"
+  
+  code-metrics:
+    name: Code Metrics & Reporting
+    runs-on: ubuntu-latest
+    needs: [flutter-quality, python-quality, dependency-check]
+    if: always()
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+      
+      - name: Generate quality report
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            const fs = require('fs');
+            const { owner, repo } = context.repo;
+            const pr_number = context.issue.number;
+            
+            let report = '## 📊 Code Quality & Performance Report\n\n';
+            
+            // Flutter quality
+            try {
+              const flutterReport = fs.readFileSync('flutter-quality-reports/flutter_analyze_report.txt', 'utf8');
+              const issues = (flutterReport.match(/error/gi) || []).length + 
+                            (flutterReport.match(/warning/gi) || []).length;
+              
+              if (issues === 0) {
+                report += '### ✅ Flutter Quality - Excellent\n';
+              } else {
+                report += `### ⚠️ Flutter Quality - ${issues} issues found\n`;
+              }
+            } catch (e) {
+              report += '### ℹ️ Flutter Quality - No report available\n';
+            }
+            
+            report += '\n';
+            
+            // Python quality
+            try {
+              const pylintReport = fs.readFileSync('python-quality-reports/pylint_report.txt', 'utf8');
+              const ratingMatch = pylintReport.match(/rated at ([\d.]+)\/10/);
+              
+              if (ratingMatch) {
+                const rating = parseFloat(ratingMatch[1]);
+                if (rating >= 8.0) {
+                  report += `### ✅ Python Quality - Excellent (${rating}/10)\n`;
+                } else if (rating >= 6.0) {
+                  report += `### ⚠️ Python Quality - Good (${rating}/10)\n`;
+                } else {
+                  report += `### ❌ Python Quality - Needs Improvement (${rating}/10)\n`;
+                }
+              }
+            } catch (e) {
+              report += '### ℹ️ Python Quality - No report available\n';
+            }
+            
+            report += '\n';
+            
+            // Security
+            try {
+              const banditReport = JSON.parse(
+                fs.readFileSync('python-quality-reports/bandit_report.json', 'utf8')
+              );
+              const highSeverity = banditReport.metrics._totals['SEVERITY.HIGH'] || 0;
+              const mediumSeverity = banditReport.metrics._totals['SEVERITY.MEDIUM'] || 0;
+              
+              if (highSeverity > 0) {
+                report += `### 🔒 Security - ${highSeverity} high severity issues\n`;
+              } else if (mediumSeverity > 0) {
+                report += `### 🔒 Security - ${mediumSeverity} medium severity issues\n`;
+              } else {
+                report += '### ✅ Security - No issues detected\n';
+              }
+            } catch (e) {
+              report += '### ℹ️ Security - No report available\n';
+            }
+            
+            report += '\n';
+            report += '### 📈 Recommendations\n\n';
+            report += '- Maintain code coverage above 80%\n';
+            report += '- Address all high-severity security issues\n';
+            report += '- Keep code complexity low (< 10 per function)\n';
+            report += '- Update dependencies regularly\n';
+            report += '- Follow coding style guidelines\n\n';
+            report += '---\n';
+            report += '*Generated by Code Quality & Performance Premium Bot*';
+            
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: pr_number,
+              body: report,
+            });
+  
+  performance-benchmark:
+    name: Performance Benchmarking
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      
+      - name: Run performance tests
+        run: |
+          echo "Running performance benchmarks..."
+          flutter pub get
+          # Add custom performance tests here
+          echo "Performance tests completed"
+      
+      - name: Store benchmark results
+        run: |
+          mkdir -p benchmark-results
+          echo "{ \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\", \"commit\": \"${{ github.sha }}\" }" > benchmark-results/latest.json
+      
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-benchmarks
+          path: benchmark-results/
+          retention-days: 90

@@ -1,0 +1,53 @@
+# Code Owners
+# This file defines who owns specific parts of the codebase
+# When a PR changes files in a specific area, the designated owners
+# will automatically be requested for review
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global fallback - repository owner reviews everything not covered below
+* @Melampe001
+
+# Flutter/Dart mobile code
+*.dart @Melampe001
+/lib/ @Melampe001
+/android/ @Melampe001
+/ios/ @Melampe001
+pubspec.yaml @Melampe001
+analysis_options.yaml @Melampe001
+
+# Python ML and backend code
+*.py @Melampe001
+/scripts/ @Melampe001
+requirements.txt @Melampe001
+
+# Tests
+/test/ @Melampe001
+*_test.dart @Melampe001
+test_*.py @Melampe001
+
+# CI/CD and GitHub configuration
+/.github/ @Melampe001
+/.github/workflows/ @Melampe001
+/.github/agents/ @Melampe001
+.github-ci.yml @Melampe001
+
+# Documentation
+*.md @Melampe001
+/docs/ @Melampe001
+README.md @Melampe001
+CONTRIBUTING.md @Melampe001
+CHANGELOG.md @Melampe001
+
+# Configuration files
+*.yaml @Melampe001
+*.yml @Melampe001
+*.json @Melampe001
+.gitignore @Melampe001
+
+# Assets and resources
+/assets/ @Melampe001
+
+# Security-related files (require extra careful review)
+SECURITY.md @Melampe001
+/android/app/build.gradle @Melampe001
+key.properties @Melampe001
