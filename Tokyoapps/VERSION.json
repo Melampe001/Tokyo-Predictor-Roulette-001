@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "build": "20241215-a9e38395",
+  "hash": "df1a9f77da46cf50",
+  "timestamp": "2025-12-15T20:36:16.770167",
+  "built_by": "El Taller de Los Cinco Mandamases",
+  "valid": true,
+  "serial": "TLL-1B8EA7A0E82C",
+  "components": {
+    "suri": "3.0.0",
+    "bochi": "3.0.0",
+    "analista": "3.0.0",
+    "equilibrador": "3.0.0"
+  }
+}
