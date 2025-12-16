@@ -1,0 +1,158 @@
+#!/bin/bash
+# Pre-commit hook for Tokyo Roulette Predictor
+# Enforces code quality standards before commits
+
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+echo -e "${BLUE}🔍 Running pre-commit checks...${NC}"
+echo "======================================"
+
+EXIT_CODE=0
+
+# Check if Flutter/Dart is available
+if ! command -v dart &> /dev/null; then
+    echo -e "${YELLOW}⚠️  Dart not found. Skipping format and analysis checks.${NC}"
+    echo -e "${YELLOW}   Install Flutter/Dart to enable full pre-commit checks.${NC}"
+    exit 0
+fi
+
+# Get list of staged Dart files
+STAGED_DART_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.dart$' || true)
+
+if [ -z "$STAGED_DART_FILES" ]; then
+    echo -e "${GREEN}✓ No Dart files to check${NC}"
+    exit 0
+fi
+
+echo -e "${BLUE}Checking ${#STAGED_DART_FILES[@]} Dart file(s)...${NC}"
+echo ""
+
+# 1. Format Check (fast - only staged files)
+echo -e "${BLUE}📝 Checking code formatting...${NC}"
+UNFORMATTED_FILES=""
+for file in $STAGED_DART_FILES; do
+    if [ -f "$file" ]; then
+        if ! dart format --set-exit-if-changed "$file" > /dev/null 2>&1; then
+            UNFORMATTED_FILES="$UNFORMATTED_FILES $file"
+        fi
+    fi
+done
+
+if [ -n "$UNFORMATTED_FILES" ]; then
+    echo -e "${RED}✗ The following files need formatting:${NC}"
+    for file in $UNFORMATTED_FILES; do
+        echo -e "  ${RED}- $file${NC}"
+    done
+    echo ""
+    echo -e "${YELLOW}Run: dart format lib/ test/${NC}"
+    echo -e "${YELLOW}Or: make format${NC}"
+    EXIT_CODE=1
+else
+    echo -e "${GREEN}✓ Code is properly formatted${NC}"
+fi
+echo ""
+
+# 2. Static Analysis (quick check on staged files)
+echo -e "${BLUE}🔍 Running static analysis...${NC}"
+# Run analyzer on the whole project (it's fast and catches more issues)
+if command -v flutter &> /dev/null; then
+    if ! flutter analyze --no-fatal-infos > /tmp/analyze_output.txt 2>&1; then
+        echo -e "${RED}✗ Static analysis found issues:${NC}"
+        cat /tmp/analyze_output.txt | grep -E "error|warning" || cat /tmp/analyze_output.txt
+        rm -f /tmp/analyze_output.txt
+        EXIT_CODE=1
+    else
+        echo -e "${GREEN}✓ Static analysis passed${NC}"
+        rm -f /tmp/analyze_output.txt
+    fi
+else
+    # Fallback to dart analyze if flutter is not available
+    if ! dart analyze --fatal-infos > /tmp/analyze_output.txt 2>&1; then
+        echo -e "${RED}✗ Static analysis found issues:${NC}"
+        cat /tmp/analyze_output.txt | grep -E "error|warning" || cat /tmp/analyze_output.txt
+        rm -f /tmp/analyze_output.txt
+        EXIT_CODE=1
+    else
+        echo -e "${GREEN}✓ Static analysis passed${NC}"
+        rm -f /tmp/analyze_output.txt
+    fi
+fi
+echo ""
+
+# 3. Quick security check on staged files
+echo -e "${BLUE}🔒 Checking for secrets...${NC}"
+SECRETS_FOUND=0
+
+# Patterns to detect secrets (excluding GitHub Actions variables)
+for file in $STAGED_DART_FILES; do
+    if [ -f "$file" ]; then
+        # Check for API keys
+        if grep -qE "(api_key|apiKey|API_KEY)\s*=\s*['\"][^'\"]{20,}['\"]" "$file" 2>/dev/null; then
+            echo -e "${RED}✗ Possible API key found in: $file${NC}"
+            SECRETS_FOUND=1
+        fi
+        
+        # Check for hardcoded secrets
+        if grep -qE "(secret|SECRET|password|PASSWORD)\s*=\s*['\"][^'\"]{8,}['\"]" "$file" 2>/dev/null; then
+            echo -e "${RED}✗ Possible hardcoded secret found in: $file${NC}"
+            SECRETS_FOUND=1
+        fi
+        
+        # Check for Stripe keys
+        if grep -qE "(sk_live_|pk_live_|sk_test_|pk_test_)" "$file" 2>/dev/null; then
+            echo -e "${RED}✗ Stripe key found in: $file${NC}"
+            SECRETS_FOUND=1
+        fi
+    fi
+done
+
+if [ $SECRETS_FOUND -eq 1 ]; then
+    echo -e "${RED}✗ Potential secrets detected!${NC}"
+    echo -e "${YELLOW}Remove secrets and use environment variables instead${NC}"
+    EXIT_CODE=1
+else
+    echo -e "${GREEN}✓ No secrets detected${NC}"
+fi
+echo ""
+
+# 4. Check for insecure Random() usage in staged files
+echo -e "${BLUE}🎲 Checking for secure RNG...${NC}"
+INSECURE_RANDOM=0
+for file in $STAGED_DART_FILES; do
+    if [ -f "$file" ]; then
+        # Check if file relates to randomness or roulette
+        if [[ "$file" == *"roulette"* ]] || [[ "$file" == *"random"* ]]; then
+            if grep -qE "Random\(\)" "$file" 2>/dev/null && ! grep -q "Random.secure()" "$file" 2>/dev/null; then
+                echo -e "${YELLOW}⚠️  Found Random() in: $file${NC}"
+                echo -e "${YELLOW}   Consider using Random.secure() for gambling/gaming${NC}"
+                # This is a warning, not an error
+            fi
+        fi
+    fi
+done
+echo -e "${GREEN}✓ RNG check complete${NC}"
+echo ""
+
+# Summary
+echo "======================================"
+if [ $EXIT_CODE -eq 0 ]; then
+    echo -e "${GREEN}✅ All pre-commit checks passed!${NC}"
+    echo -e "${GREEN}Ready to commit.${NC}"
+else
+    echo -e "${RED}❌ Pre-commit checks failed!${NC}"
+    echo -e "${YELLOW}Fix the issues above before committing.${NC}"
+    echo ""
+    echo -e "${BLUE}Tip: You can bypass these checks with:${NC}"
+    echo -e "  git commit --no-verify"
+    echo -e "${YELLOW}(Use only when absolutely necessary)${NC}"
+fi
+echo "======================================"
+
+exit $EXIT_CODE

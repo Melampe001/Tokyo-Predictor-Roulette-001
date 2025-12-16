@@ -1,0 +1,68 @@
+#!/bin/bash
+# Commit message hook for Tokyo Roulette Predictor
+# Validates commit messages follow Conventional Commits format
+
+set -e
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+COMMIT_MSG_FILE=$1
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# Skip merge commits
+if echo "$COMMIT_MSG" | grep -qE "^Merge "; then
+    exit 0
+fi
+
+# Skip revert commits
+if echo "$COMMIT_MSG" | grep -qE "^Revert "; then
+    exit 0
+fi
+
+# Conventional Commits pattern
+# Type: feat, fix, docs, style, refactor, test, chore, perf, ci, build
+PATTERN="^(feat|fix|docs|style|refactor|test|chore|perf|ci|build)(\(.+\))?: .{3,}"
+
+if ! echo "$COMMIT_MSG" | grep -qE "$PATTERN"; then
+    echo -e "${RED}❌ Invalid commit message format!${NC}"
+    echo ""
+    echo -e "${YELLOW}Commit message must follow Conventional Commits format:${NC}"
+    echo ""
+    echo -e "${BLUE}Format:${NC}"
+    echo -e "  <type>[optional scope]: <description>"
+    echo ""
+    echo -e "${BLUE}Types:${NC}"
+    echo -e "  ${GREEN}feat:${NC}     New feature"
+    echo -e "  ${GREEN}fix:${NC}      Bug fix"
+    echo -e "  ${GREEN}docs:${NC}     Documentation changes"
+    echo -e "  ${GREEN}style:${NC}    Code style changes (formatting, etc.)"
+    echo -e "  ${GREEN}refactor:${NC} Code refactoring"
+    echo -e "  ${GREEN}test:${NC}     Adding or updating tests"
+    echo -e "  ${GREEN}chore:${NC}    Maintenance tasks"
+    echo -e "  ${GREEN}perf:${NC}     Performance improvements"
+    echo -e "  ${GREEN}ci:${NC}       CI/CD changes"
+    echo -e "  ${GREEN}build:${NC}    Build system changes"
+    echo ""
+    echo -e "${BLUE}Examples:${NC}"
+    echo -e "  ${GREEN}feat: add Martingale strategy calculator${NC}"
+    echo -e "  ${GREEN}fix: correct balance calculation in RouletteLogic${NC}"
+    echo -e "  ${GREEN}docs: update README with installation steps${NC}"
+    echo -e "  ${GREEN}test: add tests for predictNext function${NC}"
+    echo -e "  ${GREEN}refactor(ui): extract wheel widget to separate file${NC}"
+    echo ""
+    echo -e "${YELLOW}Your commit message:${NC}"
+    echo -e "  $COMMIT_MSG"
+    echo ""
+    echo -e "${BLUE}Tip: You can bypass this check with:${NC}"
+    echo -e "  git commit --no-verify"
+    echo ""
+    exit 1
+fi
+
+echo -e "${GREEN}✓ Commit message format is valid${NC}"
+exit 0
