@@ -26,6 +26,10 @@ on:
 jobs:
   run-bots:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write  # For PR comments
+      actions: read  # For artifacts
     
     steps:
       - name: Checkout code
@@ -98,6 +102,10 @@ jobs:
   security-scan:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' || github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      issues: write  # For creating security issues
+      actions: read
     
     steps:
       - name: Checkout code
