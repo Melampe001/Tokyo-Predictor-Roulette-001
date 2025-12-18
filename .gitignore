@@ -16,9 +16,7 @@ migrate_working_dir/
 *.iws
 .idea/
 
-# VS Code personal settings
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code. We exclude personal settings but keep example files.
+# VS Code: Exclude personal settings but keep example files for team consistency
 .vscode/
 !.vscode/extensions.json
 !.vscode/settings.json.example
