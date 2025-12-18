@@ -109,7 +109,7 @@ class SentinelSecurityBot extends AutomationBot {
               final isTodo = lines[i].contains('TODO') || lines[i].contains('SEGURIDAD');
               final isComment = lines[i].trim().startsWith('//');
               
-              if (!isTodo || !isComment) {
+              if (!isTodo && !isComment) {
                 issues.add({
                   'type': entry.key,
                   'file': relativePath,

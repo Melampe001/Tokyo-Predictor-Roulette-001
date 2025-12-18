@@ -18,7 +18,7 @@ void main(List<String> args) async {
 
   final verbose = args.contains('--verbose') || args.contains('-v');
   final parallel = !args.contains('--sequential');
-  final outputDir = args.contains('--output')
+  final outputDir = args.contains('--output') && args.indexOf('--output') + 1 < args.length
       ? args[args.indexOf('--output') + 1]
       : 'test-results';
 

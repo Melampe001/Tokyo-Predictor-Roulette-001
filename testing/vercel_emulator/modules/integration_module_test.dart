@@ -30,7 +30,7 @@ class IntegrationModuleTest extends TestModule {
             }
 
             // 3. Ruleta gira y genera número
-            await Future.delayed(Duration(milliseconds: 50)); // Simular giro
+            await Future.delayed(Duration(milliseconds: 10)); // Minimized for speed
             final result = 7; // Número ganador
 
             // 4. Calcular resultado
@@ -103,7 +103,7 @@ class IntegrationModuleTest extends TestModule {
             }
 
             // 2. Procesar "pago" simulado
-            await Future.delayed(Duration(milliseconds: 50));
+            await Future.delayed(Duration(milliseconds: 10)); // Minimized for speed
             final paymentSuccess = true;
 
             // 3. Activar premium
@@ -148,7 +148,7 @@ class IntegrationModuleTest extends TestModule {
             credits -= betAmount;
 
             // 4. Simular giro
-            await Future.delayed(Duration(milliseconds: 50));
+            await Future.delayed(Duration(milliseconds: 10)); // Minimized for speed
             final result = 5; // Número ganador
 
             // 5. Verificar si ganó
@@ -177,7 +177,7 @@ class IntegrationModuleTest extends TestModule {
             final savedData = Map<String, dynamic>.from(session);
 
             // 3. Simular cierre y reapertura de app
-            await Future.delayed(Duration(milliseconds: 50));
+            await Future.delayed(Duration(milliseconds: 10)); // Minimized for speed
 
             // 4. "Cargar" sesión
             final loadedData = savedData;

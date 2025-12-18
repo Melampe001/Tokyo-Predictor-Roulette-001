@@ -44,19 +44,15 @@ class TestResults {
 
   Duration get totalDuration => endTime.difference(startTime);
 
-  static TestResults aggregate(List<ModuleTestResult> results) {
-    final now = DateTime.now();
+  static TestResults aggregate(
+    List<ModuleTestResult> results,
+    DateTime startTime,
+    DateTime endTime,
+  ) {
     return TestResults(
       moduleResults: results,
-      startTime: now.subtract(
-        Duration(
-          milliseconds: results.fold(
-            0,
-            (sum, r) => sum + r.duration.inMilliseconds,
-          ),
-        ),
-      ),
-      endTime: now,
+      startTime: startTime,
+      endTime: endTime,
     );
   }
 }
