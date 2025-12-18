@@ -16,10 +16,12 @@ migrate_working_dir/
 *.iws
 .idea/
 
+# VS Code personal settings
 # The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
+# VS Code. We exclude personal settings but keep example files.
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json.example
 
 # Flutter/Dart/Pub related
 **/doc/api/
