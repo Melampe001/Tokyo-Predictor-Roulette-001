@@ -1,0 +1,56 @@
+name: Lint Code
+
+# Workflow para análisis estático de código
+# Se ejecuta en cada push o pull request para garantizar calidad de código
+
+on:
+  push:
+    branches: [ "main", "master", "develop" ]
+  pull_request:
+    branches: [ "main", "master", "develop" ]
+
+# Permisos necesarios
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  lint:
+    name: Analizar Código con Flutter Analyze
+    runs-on: ubuntu-latest
+    
+    steps:
+    # Paso 1: Checkout del código
+    - name: Checkout del repositorio
+      uses: actions/checkout@v4
+    
+    # Paso 2: Configurar Flutter SDK
+    - name: Configurar Flutter SDK
+      uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+        cache: true
+    
+    # Paso 3: Verificar versión de Flutter
+    - name: Verificar versión de Flutter
+      run: flutter --version
+    
+    # Paso 4: Obtener dependencias
+    - name: Obtener dependencias (flutter pub get)
+      run: flutter pub get
+    
+    # Paso 5: Ejecutar análisis estático
+    - name: Ejecutar Flutter Analyze
+      run: flutter analyze --no-fatal-infos
+    
+    # Paso 6: Verificar formateo de código
+    - name: Verificar formateo de código (dart format)
+      run: dart format --set-exit-if-changed .
+      continue-on-error: true
+    
+    # Paso 7: Comentario en PR (solo si es PR)
+    - name: Comentar resultados en PR
+      if: github.event_name == 'pull_request'
+      run: |
+        echo "✅ Análisis de código completado"
+        echo "Revisa los logs arriba para cualquier warning o error"
