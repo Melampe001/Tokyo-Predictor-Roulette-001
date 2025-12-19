@@ -521,7 +521,7 @@ flutter run --profile
 @override
 void dispose() {
   myController.dispose();
-  myStream.cancel();
+  myStreamSubscription.cancel(); // Cancel subscription, not stream
   super.dispose();
 }
 ```

@@ -62,19 +62,28 @@ print(numbers.length); // 37
 
 ---
 
-#### `history` (List<int>)
+#### `history` (managed internally)
 
-**Tipo:** `List<int>` (read-only)
+**Nota:** En la implementación actual de `roulette_logic.dart`, el historial NO es una propiedad pública de la clase. El método `predictNext` recibe el historial como parámetro.
 
-**Descripción:** Historial de los últimos giros (máximo 20).
-
-**Límite:** 20 elementos (FIFO cuando se excede)
+Si necesitas mantener un historial en tu aplicación, debes gestionarlo externamente:
 
 **Ejemplo:**
 ```dart
-roulette.generateSpin();
-roulette.generateSpin();
-print(roulette.history); // [7, 23] (ejemplo)
+final roulette = RouletteLogic();
+final myHistory = <int>[];
+
+// Agregar spins al historial
+final spin = roulette.generateSpin();
+myHistory.add(spin);
+
+// Limitar a 20 elementos
+if (myHistory.length > 20) {
+  myHistory.removeAt(0);
+}
+
+// Usar para predicción
+final prediction = roulette.predictNext(myHistory);
 ```
 
 ---
@@ -150,41 +159,42 @@ try {
 
 ---
 
-#### `predictNext()`
+#### `predictNext(List<int> history)`
 
-Genera predicciones simples basadas en historial.
+Genera predicción simple basada en historial proporcionado.
 
 **Firma:**
 ```dart
-List<int> predictNext({int count = 5})
+int predictNext(List<int> history)
 ```
 
 **Parámetros:**
-- `count` (int, opcional): Cantidad de predicciones. Default: 5
+- `history` (List<int>): Lista de números de giros previos
 
-**Retorna:** `List<int>` - Lista de números sugeridos
+**Retorna:** `int` - Número sugerido (0-36)
 
 **Algoritmo:**
-1. Si historial < 10: Retorna números aleatorios
-2. Si historial >= 10:
-   - Analiza frecuencias
-   - Identifica menos comunes
-   - Sugiere basándose en análisis
+1. Si historial está vacío: Retorna número aleatorio
+2. Si historial tiene datos:
+   - Calcula frecuencias de cada número
+   - Retorna el número más frecuente
 
 **Nota:** Las predicciones son educativas, no tienen valor real.
 
 **Ejemplo:**
 ```dart
-// Sin historial suficiente
-print(roulette.predictNext()); // [random numbers]
+// Sin historial
+print(roulette.predictNext([])); // Random number
 
 // Con historial
-for (var i = 0; i < 15; i++) {
-  roulette.generateSpin();
-}
+final history = [5, 5, 5, 1, 2];
+final prediction = roulette.predictNext(history);
+print('Predicción: $prediction'); // 5 (más frecuente)
 
-final predictions = roulette.predictNext(count: 3);
-print('Predicciones: $predictions'); // [7, 14, 23] (ejemplo)
+// Historial balanceado
+final balancedHistory = [1, 2, 3, 4, 5];
+final pred = roulette.predictNext(balancedHistory);
+print('Predicción: $pred'); // Cualquiera de los más frecuentes
 ```
 
 **Complejidad:** O(n) donde n es el tamaño del historial
@@ -193,26 +203,7 @@ print('Predicciones: $predictions'); // [7, 14, 23] (ejemplo)
 
 ### Métodos Privados
 
-#### `_updateHistory(int number)`
-
-**Firma:**
-```dart
-void _updateHistory(int number)
-```
-
-**Descripción:** Agrega número al historial manteniendo límite de 20.
-
-**Implementación:**
-```dart
-void _updateHistory(int number) {
-  history.add(number);
-  if (history.length > 20) {
-    history = history.sublist(history.length - 20);
-  }
-}
-```
-
-**Nota:** Uso interno, no llamar directamente.
+Nota: La implementación actual de `RouletteLogic` no tiene métodos privados. El historial se gestiona externamente por la aplicación que usa la clase.
 
 ---
 
@@ -306,16 +297,18 @@ void main() {
 ```dart
 void playMultipleRounds() {
   final roulette = RouletteLogic();
+  final history = <int>[];
   
   print('=== Jugando 10 rondas ===');
   for (var i = 0; i < 10; i++) {
     final number = roulette.generateSpin();
     final color = roulette.getColor(number);
+    history.add(number);
     print('Ronda ${i + 1}: $number ($color)');
   }
   
   print('\n=== Historial ===');
-  print(roulette.history);
+  print(history);
 }
 ```
 
@@ -324,23 +317,25 @@ void playMultipleRounds() {
 ```dart
 void playWithPredictions() {
   final roulette = RouletteLogic();
+  final history = <int>[];
   
   // Construir historial
   print('Construyendo historial...');
   for (var i = 0; i < 15; i++) {
-    roulette.generateSpin();
+    final spin = roulette.generateSpin();
+    history.add(spin);
   }
   
-  // Obtener predicciones
-  final predictions = roulette.predictNext(count: 5);
-  print('Predicciones: $predictions');
+  // Obtener predicción
+  final prediction = roulette.predictNext(history);
+  print('Predicción basada en historial: $prediction');
   
   // Siguiente giro
   final next = roulette.generateSpin();
-  print('Resultado: $next');
+  print('Resultado real: $next');
   
   // Verificar si acertó
-  if (predictions.contains(next)) {
+  if (prediction == next) {
     print('¡Predicción correcta!');
   } else {
     print('Predicción incorrecta');
@@ -491,20 +486,17 @@ void main() {
       expect(() => roulette.getColor(37), throwsArgumentError);
     });
 
-    test('historial mantiene máximo 20 elementos', () {
-      for (var i = 0; i < 25; i++) {
-        roulette.generateSpin();
-      }
-      expect(roulette.history.length, lessThanOrEqualTo(20));
+    test('predictNext retorna número basado en historial', () {
+      final history = [5, 5, 5, 1, 2];
+      final prediction = roulette.predictNext(history);
+      expect(prediction, greaterThanOrEqualTo(0));
+      expect(prediction, lessThanOrEqualTo(36));
     });
 
-    test('predictNext retorna lista no vacía', () {
-      for (var i = 0; i < 15; i++) {
-        roulette.generateSpin();
-      }
-      final predictions = roulette.predictNext();
-      expect(predictions, isNotEmpty);
-      expect(predictions.length, greaterThan(0));
+    test('predictNext con historial vacío retorna número válido', () {
+      final prediction = roulette.predictNext([]);
+      expect(prediction, greaterThanOrEqualTo(0));
+      expect(prediction, lessThanOrEqualTo(36));
     });
   });
 }
