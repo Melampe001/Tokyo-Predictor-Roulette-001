@@ -212,6 +212,14 @@ Si un PR/issue fue cerrado por error:
 - [Estado Post-Limpieza](docs/POST_CLEANUP_TRACKING.md) - Tracking de PRs cerrados y priorizados
 - [Script Ejecutable](close_stale_prs.sh) - Script bash para ejecutar limpieza
 
+### Limpieza Automatizada
+Ejecuta la limpieza periódica para consolidar PRs y ramas:
+```bash
+bash scripts/run_full_cleanup.sh
+```
+
+Ver [docs/CLEANUP_GUIDE.md](docs/CLEANUP_GUIDE.md) para detalles completos.
+
 ## Configuración de Keystore para Android
 
 Para firmar la APK en modo release, necesitas configurar un keystore:
