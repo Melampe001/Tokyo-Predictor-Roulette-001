@@ -180,7 +180,7 @@ Para preguntas, sugerencias o reportar problemas:
 
 ## 🧹 Mantenimiento del Repositorio
 
-**Última limpieza:** 2024-12-14
+**Última limpieza de PRs/Issues:** 2024-12-14
 
 ### Política de Mantenimiento
 

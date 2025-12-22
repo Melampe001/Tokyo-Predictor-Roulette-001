@@ -1,5 +1,8 @@
 # 🗂️ Índice de Documentación de Limpieza
 
+> **📦 NOTA: ARCHIVO HISTÓRICO**  
+> Este documento y todos los archivos en este directorio son documentación histórica del proceso de limpieza realizado en diciembre de 2024. Las fechas y metadatos se preservan intencionalmente para mantener el contexto histórico.
+
 Este documento es un índice completo de toda la documentación relacionada con la limpieza masiva de PRs e issues del repositorio Tokyo-Predictor-Roulette-001.
 
 ---
