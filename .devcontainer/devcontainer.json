@@ -1,0 +1,29 @@
+{
+  "name": "Unity ML-Agents Roulette Simulator",
+  "image": "mcr.microsoft.com/devcontainers/python:3.10",
+  "features": {
+    "ghcr.io/devcontainers/features/dotnet:latest": {},
+    "ghcr.io/devcontainers/features/node:latest": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csharp",
+        "ms-python.python",
+        "tobiah.unity-tools",
+        "visualstudiotoolsforunity.vstuc",
+        "redhat.vscode-yaml"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "omnisharp.useModernNet": true
+      }
+    }
+  },
+  "postCreateCommand": "bash scripts/setup.sh",
+  "forwardPorts": [5005, 6006],
+  "portsAttributes": {
+    "5005": {"label": "Unity Debugger"},
+    "6006": {"label": "TensorBoard"}
+  }
+}
