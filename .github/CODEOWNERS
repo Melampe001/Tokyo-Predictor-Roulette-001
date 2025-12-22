@@ -1,0 +1,33 @@
+# CODEOWNERS for Tokyo Roulette Predictor
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global owners - will be requested for review on all PRs
+* @Melampe001
+
+# Flutter/Dart code
+*.dart @Melampe001
+lib/ @Melampe001
+test/ @Melampe001
+
+# Android configuration
+android/ @Melampe001
+*.gradle @Melampe001
+AndroidManifest.xml @Melampe001
+
+# Documentation
+*.md @Melampe001
+docs/ @Melampe001
+
+# GitHub configuration
+.github/ @Melampe001
+.github/workflows/ @Melampe001
+
+# Configuration files
+pubspec.yaml @Melampe001
+analysis_options.yaml @Melampe001
+.gitignore @Melampe001
+
+# Security-related files
+SECURITY.md @Melampe001
+proguard-rules.pro @Melampe001
+network_security_config.xml @Melampe001
