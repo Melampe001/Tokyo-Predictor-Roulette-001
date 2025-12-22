@@ -200,6 +200,13 @@ Para preguntas, sugerencias o reportar problemas:
 4. Marca PRs activos con label `priority` si son críticos
 5. Actualiza la descripción del PR con el estado actual
 
+## Construir APK
+Para una guía completa de construcción y configuración, consulta [BUILD_APK.md](BUILD_APK.md).
+
+Comando rápido:
+```bash
+flutter build apk --release
+```
 ### Proceso de Reapertura
 Si un PR/issue fue cerrado por error:
 1. Actualiza el contenido del PR/issue
