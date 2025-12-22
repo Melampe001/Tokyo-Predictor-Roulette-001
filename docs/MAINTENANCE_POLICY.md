@@ -335,4 +335,5 @@ Para sugerir cambios a estas políticas:
 **Aprobado por**: @Melampe001  
 **Fecha de Aprobación**: 2024-12-14  
 **Próxima Revisión**: 2025-03-14  
-**Versión**: 1.0
+**Versión**: 1.0  
+**Última actualización**: Diciembre 2025

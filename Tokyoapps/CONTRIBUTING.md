@@ -42,3 +42,7 @@ Abre un Issue si tienes dudas.
 ---
 
 🏭 El Taller de Los Cinco Mandamases
+
+---
+
+**Última actualización**: Diciembre 2025

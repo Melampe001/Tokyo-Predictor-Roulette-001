@@ -111,7 +111,7 @@ cat reports/project-health-report-*.md
 - ✅ Genera reportes con score de salud (0-100)
 - ✅ Se ejecuta automáticamente cada semana vía GitHub Actions
 
-**Score actual**: 🟢 92/100 (Excelente)
+**Score actual**: 🟢 95/100 (Excelente)
 
 Para más detalles, consulta [docs/HEALTH_AGENT.md](docs/HEALTH_AGENT.md).
 
@@ -176,28 +176,23 @@ Para preguntas, sugerencias o reportar problemas:
 
 **Versión**: 1.0.0  
 **Estado**: ✅ Proyecto Completado  
-**Última Actualización**: Diciembre 2024
+**Última Actualización**: Diciembre 2025
 
 ## 🧹 Mantenimiento del Repositorio
 
-**Última limpieza:** 2024-12-14
+**Última limpieza de PRs/Issues:** 2024-12-14
 
-### Estado de PRs
-- ✅ Abiertas activas: ~14-16
-- ⏸️ Drafts en desarrollo: ~8-10
-- ❌ Cerradas en limpieza: 16
+### Política de Mantenimiento
 
-### Política de PRs
+Para información completa sobre políticas de PRs, issues y mantenimiento del repositorio, consulta:
+- [MAINTENANCE_POLICY.md](docs/MAINTENANCE_POLICY.md)
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+
+### Resumen de Políticas
 - PRs inactivas >30 días serán marcadas como `stale`
 - Drafts sin actividad >60 días serán cerrados automáticamente
-- Duplicados se cierran automáticamente con comentario explicativo
 - PRs sin respuesta a comentarios en 14 días se marcan para cierre
-
-### Cómo Evitar Cierres Automáticos
-1. Mantén PRs actualizados con commits regulares
-2. Responde a comentarios en <7 días
-3. Sincroniza con `main` regularmente
-4. Marca PRs activos con label `priority` si son críticos
+- Mantén PRs actualizados con commits regulares y responde a comentarios en <7 días
 5. Actualiza la descripción del PR con el estado actual
 
 ### Proceso de Reapertura

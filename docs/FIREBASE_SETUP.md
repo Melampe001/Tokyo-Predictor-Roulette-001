@@ -213,3 +213,7 @@ void main() {
 - [FlutterFire GitHub](https://github.com/firebase/flutterfire)
 - [Firebase Auth Flutter](https://firebase.flutter.dev/docs/auth/overview)
 - [Firestore Flutter](https://firebase.flutter.dev/docs/firestore/overview)
+
+---
+
+**Última actualización**: Diciembre 2025

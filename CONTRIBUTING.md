@@ -476,3 +476,7 @@ Al contribuir, aceptas que tus contribuciones se licenciarán bajo la misma lice
 ---
 
 ¡Gracias por contribuir a Tokyo Roulette Predicciones! 🎰✨
+
+---
+
+**Última actualización**: Diciembre 2025

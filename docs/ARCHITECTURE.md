@@ -670,4 +670,4 @@ LineChart(
 **Documento**: Arquitectura Técnica v1.0  
 **Autor**: Equipo de Desarrollo  
 **Fecha**: Diciembre 2024  
-**Última revisión**: Diciembre 2024
+**Última revisión**: Diciembre 2025
