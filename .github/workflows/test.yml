@@ -1,0 +1,67 @@
+name: Run Tests
+
+# Workflow para ejecutar tests automáticamente
+# Se ejecuta en cada push o pull request para garantizar que los tests pasen
+
+on:
+  push:
+    branches: [ "main", "master", "develop" ]
+  pull_request:
+    branches: [ "main", "master", "develop" ]
+
+# Permisos necesarios
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  test:
+    name: Ejecutar Tests de Flutter
+    runs-on: ubuntu-latest
+    
+    steps:
+    # Paso 1: Checkout del código
+    - name: Checkout del repositorio
+      uses: actions/checkout@v4
+    
+    # Paso 2: Configurar Flutter SDK
+    - name: Configurar Flutter SDK
+      uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+        cache: true
+    
+    # Paso 3: Verificar versión de Flutter
+    - name: Verificar versión de Flutter
+      run: flutter --version
+    
+    # Paso 4: Obtener dependencias
+    - name: Obtener dependencias (flutter pub get)
+      run: flutter pub get
+    
+    # Paso 5: Ejecutar tests unitarios
+    - name: Ejecutar tests unitarios
+      run: flutter test --reporter expanded
+    
+    # Paso 6: Generar reporte de cobertura
+    - name: Generar reporte de cobertura
+      run: flutter test --coverage
+      continue-on-error: true
+    
+    # Paso 7: Subir cobertura como artefacto
+    - name: Subir reporte de cobertura
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: coverage-report
+        path: coverage/lcov.info
+        retention-days: 30
+    
+    # Paso 8: Mostrar resumen
+    - name: Mostrar resumen de tests
+      if: always()
+      run: |
+        echo "============================================"
+        echo "Tests completados"
+        echo "Reporte de cobertura disponible en artefactos"
+        echo "============================================"

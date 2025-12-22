@@ -5,12 +5,32 @@
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS-lightgrey)
 ![Status](https://img.shields.io/badge/Status-Completed-success)
+![GitHub Issues](https://img.shields.io/github/issues/Melampe001/Tokyo-Predictor-Roulette-001)
+![GitHub Pull Requests](https://img.shields.io/github/issues-pr/Melampe001/Tokyo-Predictor-Roulette-001)
+![Last Commit](https://img.shields.io/github/last-commit/Melampe001/Tokyo-Predictor-Roulette-001)
 
 Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y modelo freemium. Incluye integraciones con Stripe para pagos y Firebase para configuraciones remotas.
 
+## 📑 Tabla de Contenidos
+
+- [Características](#-características-implementadas)
+- [Capturas de Pantalla](#-capturas-de-pantalla)
+- [Inicio Rápido](#-inicio-rápido)
+- [Construir APK](#-construir-apk)
+- [Ejecutar Tests](#-ejecutar-tests)
+- [Documentación](#-documentación)
+- [Project Health Agent](#-project-health-agent)
+- [Uso Básico](#-uso-básico)
+- [Configuración](#-configuración)
+- [Tecnologías](#-tecnologías-utilizadas)
+- [Contribuir](#-contribuir)
+- [Licencia](#-licencia)
+- [Disclaimer](#️-disclaimer)
+- [Contacto](#-contacto)
+
 ## 📱 Capturas de Pantalla
 
-> Ver las imágenes en la raíz del proyecto: `Screenshot_*.png`
+> Ver capturas de pantalla en: [assets/screenshots/](assets/screenshots/)
 
 ## ✨ Características Implementadas
 
