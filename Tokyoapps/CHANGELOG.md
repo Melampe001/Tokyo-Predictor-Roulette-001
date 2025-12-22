@@ -21,3 +21,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 ---
 
 🌹 *Y esa rosa...* 🌹
+
+---
+
+**Última actualización**: Diciembre 2025

@@ -347,3 +347,7 @@ El proyecto **Tokyo Roulette Predicciones v1.0.0** está **COMPLETO** y listo pa
 - **Licencia**: MIT + Educational Disclaimer
 
 **¡Gracias por utilizar Tokyo Roulette Predicciones!** 🎰✨
+
+---
+
+**Última actualización**: Diciembre 2025
