@@ -1,0 +1,32 @@
+name: Unity Android Build
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Cache Unity Library
+        uses: actions/cache@v3
+        with:
+          path: unity-project/Library
+          key: Library-${{ hashFiles('unity-project/Assets/**') }}
+      
+      - name: Build Android APK
+        uses: game-ci/unity-builder@v3
+        with:
+          projectPath: unity-project
+          targetPlatform: Android
+          buildMethod: BuildScript.BuildAndroid
+      
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: roulette-simulator-android
+          path: build/Android/*.apk

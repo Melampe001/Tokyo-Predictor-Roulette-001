@@ -118,3 +118,54 @@ lib/generated_plugin_registrant.dart
 
 # Project Health Agent - Generated reports
 reports/
+
+# Unity ML-Agents related
+unity-project/Library/
+unity-project/Temp/
+unity-project/Obj/
+unity-project/Build/
+unity-project/Builds/
+unity-project/*.sln
+unity-project/*.csproj
+unity-project/*.userprefs
+unity-project/*.pidb
+unity-project/*.booproj
+unity-project/*.svd
+unity-project/*.pdb
+unity-project/*.mdb
+unity-project/*.opendb
+unity-project/*.VC.db
+unity-project/ExportedObj/
+unity-project/.consulo/
+unity-project/*.unityproj
+unity-project/*.suo
+unity-project/*.tmp
+unity-project/*.user
+unity-project/*.userprefs
+unity-project/*.pidb.meta
+unity-project/*.pdb.meta
+unity-project/*.mdb.meta
+unity-project/sysinfo.txt
+unity-project/*.apk
+unity-project/*.unitypackage
+unity-project/crashlytics-build.properties
+
+# ML-Agents training results
+results/
+models/
+summaries/
+*.nn
+*.onnx
+
+# TensorBoard logs
+events.out.tfevents.*
+
+# Python virtual environments
+venv/
+env/
+ENV/
+.venv
+*.egg-info/
+dist/
+__pycache__/
+
