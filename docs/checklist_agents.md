@@ -83,3 +83,7 @@ Ejemplo:
 Notas finales:
 - Rellenar <nombre del agente/job> con los valores reales del repo.
 - Si quiere, puedo abrir un PR que agregue este archivo y/o insertar la sección en un archivo de checklist existente si me indica la ruta del archivo a modificar.
+
+---
+
+**Última actualización**: Diciembre 2025

@@ -573,5 +573,6 @@ Para implementar los agentes faltantes:
 **Versión:** 1.0
 **Autor:** Sistema de Análisis de Agentes
 **Proyecto:** Tokyo Roulette Predicciones
+**Última actualización:** Diciembre 2025
 
 *Este análisis debe actualizarse conforme se implementen nuevos agentes*

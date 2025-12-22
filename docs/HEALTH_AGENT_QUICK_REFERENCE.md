@@ -92,3 +92,7 @@ Edita `.project-health.yml` para:
 📖 **Full Documentation**: [docs/HEALTH_AGENT.md](HEALTH_AGENT.md)  
 🐛 **Report Issues**: [GitHub Issues](../../issues)  
 📝 **Main README**: [README.md](../README.md)
+
+---
+
+**Last Updated**: December 2025
