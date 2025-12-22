@@ -103,9 +103,10 @@ bash scripts/run_tests.sh
 Si necesitas agregar nuevos scripts de automatización:
 
 1. Crea el script en este directorio
-2. Hazlo ejecutable: `chmod +x script-name.sh` o `chmod +x script-name.py`
-3. Documenta su uso en este README
-4. Considera agregar un workflow de GitHub Actions si debe ejecutarse automáticamente
+2. Para scripts Bash: Hazlo ejecutable con `chmod +x script-name.sh`
+3. Para scripts Python: Incluye shebang `#!/usr/bin/env python3` si deseas ejecutarlos directamente
+4. Documenta su uso en este README
+5. Considera agregar un workflow de GitHub Actions si debe ejecutarse automáticamente
 
 ## 📝 Convenciones
 
@@ -117,12 +118,13 @@ Si necesitas agregar nuevos scripts de automatización:
 
 ## ⚠️ Permisos de Ejecución
 
-Algunos scripts shell pueden requerir permisos de ejecución. Para otorgarlos:
+Scripts Bash requieren permisos de ejecución:
 
 ```bash
 chmod +x scripts/*.sh
-chmod +x scripts/*.py
 ```
+
+Scripts Python generalmente se ejecutan con `python3 scripts/script.py` y no requieren `chmod +x`.
 
 ## 🔗 Recursos
 

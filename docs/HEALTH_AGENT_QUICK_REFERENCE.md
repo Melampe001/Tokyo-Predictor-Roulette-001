@@ -95,4 +95,4 @@ Edita `.project-health.yml` para:
 
 ---
 
-**Last Updated**: December 2025
+**Last Updated**: Diciembre 2025
