@@ -245,5 +245,5 @@ Si tú o alguien que conoces tiene problemas con el juego, busca ayuda:
 ---
 
 **Versión**: 1.0.0  
-**Última actualización**: Diciembre 2024  
+**Última actualización**: Diciembre 2025  
 **Desarrollado con**: Flutter 3.0+

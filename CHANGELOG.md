@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2025-12-22
+
+### Documentation
+- **Updated all documentation files** to reflect December 2025
+  - Updated "Última Actualización" dates across all major docs
+  - Updated Project Health score from 92 to 95 in README.md
+  - Removed outdated PR statistics (GitHub CLI unavailable)
+  - Simplified maintenance section with links to policy docs
+- **Created docs/archive/** directory for historical documentation
+  - Moved cleanup-related docs to archive (README_CLEANUP.md, COMMENT_TEMPLATES.md, etc.)
+  - Added archive README explaining historical context
+- **Updated documentation files**:
+  - README.md: Health score, dates, maintenance section
+  - docs/USER_GUIDE.md: Last updated date
+  - docs/ARCHITECTURE.md: Last revision date
+  - docs/FIREBASE_SETUP.md: Last updated date
+  - docs/HEALTH_AGENT.md: Last updated date
+- **Maintained consistency** across all documentation
+  - Ensured all dates are current
+  - Verified version numbers match pubspec.yaml (1.0.0)
+  - Preserved educational focus and disclaimers
+
 ## [1.0.0] - 2024-12-12
 
 ### Added
