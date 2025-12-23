@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 // import 'package:firebase_core/firebase_core.dart';
 // import 'package:flutter_stripe/flutter_stripe.dart';
 import 'roulette_logic.dart';
+import 'services/pattern_grokker.dart';
 // TODO: Genera firebase_options.dart con: flutterfire configure
 // import 'firebase_options.dart';
 
@@ -134,6 +135,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   final RouletteLogic _rouletteLogic = RouletteLogic();
   final MartingaleAdvisor _martingaleAdvisor = MartingaleAdvisor();
+  final PatternGrokker _patternGrokker = PatternGrokker();
   
   String result = 'Presiona Girar';
   List<int> history = [];
@@ -142,13 +144,17 @@ class _MainScreenState extends State<MainScreen> {
   double currentBet = 10.0;
   bool useMartingale = false;
   String lastBetResult = '';
+  PatternAnalysis? _patternAnalysis;
 
   void spinRoulette() {
     // Genera predicción antes del giro
     if (history.isNotEmpty) {
       prediction = _rouletteLogic.predictNext(history);
+      // Grok pattern analysis for deep insights
+      _patternAnalysis = _patternGrokker.grokHistory(history);
     } else {
       prediction = null;
+      _patternAnalysis = null;
     }
     
     // Usa RouletteLogic con RNG seguro
@@ -203,6 +209,7 @@ class _MainScreenState extends State<MainScreen> {
       currentBet = 10.0;
       prediction = null;
       lastBetResult = '';
+      _patternAnalysis = null;
       _martingaleAdvisor.reset();
       _martingaleAdvisor.baseBet = currentBet;
     });
@@ -355,6 +362,84 @@ class _MainScreenState extends State<MainScreen> {
                       const Text(
                         '(basada en historial reciente)',
                         style: TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            const SizedBox(height: 16),
+            
+            // Grok Pattern Analysis - Deep Insights
+            if (_patternAnalysis != null && _patternAnalysis!.recommendations.isNotEmpty)
+              Card(
+                color: Colors.purple.shade50,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.psychology, size: 28, color: Colors.purple.shade700),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Análisis Grok (Comprensión Profunda)',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      ..._patternAnalysis!.recommendations.take(2).map((rec) {
+                        final confidencePercent = (rec.confidence * 100).toStringAsFixed(0);
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12.0),
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.purple.shade200),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        color: Colors.purple.shade700,
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Text(
+                                        'Número ${rec.suggestedNumber}',
+                                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    Text(
+                                      'Confianza: $confidencePercent%',
+                                      style: TextStyle(
+                                        color: Colors.purple.shade700,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  rec.reasoning,
+                                  style: const TextStyle(fontSize: 13),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      const Text(
+                        'ℹ️ Análisis educativo basado en patrones históricos. La ruleta es aleatoria.',
+                        style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: Colors.grey),
                       ),
                     ],
                   ),
