@@ -98,13 +98,23 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    // Firebase (descomentar cuando se configure)
-    // implementation platform('com.google.firebase:firebase-bom:32.7.0')
-    // implementation 'com.google.firebase:firebase-analytics'
-    // implementation 'com.google.firebase:firebase-auth'
-    // implementation 'com.google.firebase:firebase-firestore'
-    // implementation 'com.google.firebase:firebase-messaging'
+    
+    // Firebase BoM - manages versions of all Firebase dependencies
+    implementation platform('com.google.firebase:firebase-bom:32.7.0')
+    
+    // Firebase dependencies (versions managed by BoM)
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-auth-ktx'
+    implementation 'com.google.firebase:firebase-firestore-ktx'
+    implementation 'com.google.firebase:firebase-messaging-ktx'
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
+    implementation 'com.google.firebase:firebase-perf-ktx'
+    implementation 'com.google.firebase:firebase-config-ktx'
+    implementation 'com.google.firebase:firebase-storage-ktx'
 }
 
-// Firebase (descomentar cuando se configure google-services.json)
+// Firebase plugins (apply at the end)
+// Uncomment when google-services.json is configured
 // apply plugin: 'com.google.gms.google-services'
+// apply plugin: 'com.google.firebase.crashlytics'
+// apply plugin: 'com.google.firebase.firebase-perf'
