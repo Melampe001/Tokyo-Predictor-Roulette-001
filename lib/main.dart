@@ -9,17 +9,17 @@ import 'roulette_logic.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // TODO: Descomentar cuando firebase_options.dart esté configurado
   // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  
+
   // SEGURIDAD: NO hardcodear claves. Usar variables de entorno o configuración segura
   // TODO: Configurar Stripe key desde variables de entorno
   // const stripeKey = String.fromEnvironment('STRIPE_PUBLISHABLE_KEY');
   // if (stripeKey.isNotEmpty) {
   //   Stripe.publishableKey = stripeKey;
   // }
-  
+
   runApp(const MyApp());
 }
 
@@ -59,26 +59,26 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _validateAndContinue() {
     final email = _emailController.text.trim();
-    
+
     if (email.isEmpty) {
       setState(() {
         _emailError = 'Por favor ingresa un email';
       });
       return;
     }
-    
+
     if (!_isValidEmail(email)) {
       setState(() {
         _emailError = 'Por favor ingresa un email válido';
       });
       return;
     }
-    
+
     // Email válido, continuar
     setState(() {
       _emailError = null;
     });
-    
+
     // TODO: Implementar lógica de registro/Auth aquí con Firebase Auth
     // Por ahora, esto es solo una simulación educativa sin backend
     Navigator.push(
@@ -134,7 +134,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   final RouletteLogic _rouletteLogic = RouletteLogic();
   final MartingaleAdvisor _martingaleAdvisor = MartingaleAdvisor();
-  
+
   String result = 'Presiona Girar';
   List<int> history = [];
   int? prediction;
@@ -150,18 +150,18 @@ class _MainScreenState extends State<MainScreen> {
     } else {
       prediction = null;
     }
-    
+
     // Usa RouletteLogic con RNG seguro
     final res = _rouletteLogic.generateSpin();
-    
+
     // Simula resultado de apuesta (ejemplo: apostar al color rojo)
     final bool isRed = _isRedNumber(res);
     final bool won = isRed; // Simplificado: asumimos que apostamos a rojo
-    
+
     setState(() {
       result = res.toString();
       history.add(res);
-      
+
       // Actualiza balance
       if (won) {
         balance += currentBet;
@@ -172,7 +172,7 @@ class _MainScreenState extends State<MainScreen> {
         if (balance < 0) balance = 0;
         lastBetResult = 'Perdiste -${currentBet.toStringAsFixed(2)}';
       }
-      
+
       // Actualiza apuesta según Martingale si está activado
       if (useMartingale) {
         currentBet = _martingaleAdvisor.getNextBet(won);
@@ -181,20 +181,39 @@ class _MainScreenState extends State<MainScreen> {
           currentBet = balance;
         }
       }
-      
+
       // Limita el historial a los últimos 20 números
       if (history.length > 20) {
         history = history.sublist(history.length - 20);
       }
     });
   }
-  
+
   bool _isRedNumber(int number) {
     // Números rojos en la ruleta europea
-    const redNumbers = {1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36};
+    const redNumbers = {
+      1,
+      3,
+      5,
+      7,
+      9,
+      12,
+      14,
+      16,
+      18,
+      19,
+      21,
+      23,
+      25,
+      27,
+      30,
+      32,
+      34,
+      36,
+    };
     return redNumbers.contains(number);
   }
-  
+
   void _resetGame() {
     setState(() {
       history.clear();
@@ -207,7 +226,7 @@ class _MainScreenState extends State<MainScreen> {
       _martingaleAdvisor.baseBet = currentBet;
     });
   }
-  
+
   void _showSettingsDialog() {
     showDialog(
       context: context,
@@ -252,10 +271,7 @@ class _MainScreenState extends State<MainScreen> {
             icon: const Icon(Icons.settings),
             onPressed: _showSettingsDialog,
           ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _resetGame,
-          ),
+          IconButton(icon: const Icon(Icons.refresh), onPressed: _resetGame),
         ],
       ),
       body: SingleChildScrollView(
@@ -272,7 +288,10 @@ class _MainScreenState extends State<MainScreen> {
                   children: [
                     Text(
                       'Balance: \$${balance.toStringAsFixed(2)}',
-                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -286,7 +305,9 @@ class _MainScreenState extends State<MainScreen> {
                           lastBetResult,
                           style: TextStyle(
                             fontSize: 16,
-                            color: lastBetResult.contains('Ganaste') ? Colors.green : Colors.red,
+                            color: lastBetResult.contains('Ganaste')
+                                ? Colors.green
+                                : Colors.red,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -296,7 +317,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Resultado actual
             Card(
               child: Padding(
@@ -305,16 +326,19 @@ class _MainScreenState extends State<MainScreen> {
                   children: [
                     const Text(
                       'Resultado',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Container(
                       width: 100,
                       height: 100,
                       decoration: BoxDecoration(
-                        color: result == 'Presiona Girar' 
-                          ? Colors.grey.shade300
-                          : _getNumberColor(int.tryParse(result) ?? -1),
+                        color: result == 'Presiona Girar'
+                            ? Colors.grey.shade300
+                            : _getNumberColor(int.tryParse(result) ?? -1),
                         shape: BoxShape.circle,
                       ),
                       child: Center(
@@ -333,7 +357,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Predicción
             if (prediction != null)
               Card(
@@ -342,15 +366,25 @@ class _MainScreenState extends State<MainScreen> {
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
-                      const Icon(Icons.lightbulb_outline, size: 32, color: Colors.amber),
+                      const Icon(
+                        Icons.lightbulb_outline,
+                        size: 32,
+                        color: Colors.amber,
+                      ),
                       const SizedBox(height: 8),
                       const Text(
                         'Predicción sugerida',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                       Text(
                         prediction.toString(),
-                        style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const Text(
                         '(basada en historial reciente)',
@@ -361,7 +395,7 @@ class _MainScreenState extends State<MainScreen> {
                 ),
               ),
             const SizedBox(height: 16),
-            
+
             // Botón girar
             ElevatedButton.icon(
               onPressed: balance >= currentBet ? spinRoulette : null,
@@ -372,7 +406,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Historial
             Card(
               child: Padding(
@@ -382,11 +416,17 @@ class _MainScreenState extends State<MainScreen> {
                   children: [
                     const Text(
                       'Historial Reciente',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 12),
                     if (history.isEmpty)
-                      const Text('No hay giros todavía', style: TextStyle(color: Colors.grey))
+                      const Text(
+                        'No hay giros todavía',
+                        style: TextStyle(color: Colors.grey),
+                      )
                     else
                       Wrap(
                         spacing: 8,
@@ -416,7 +456,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Info sobre Martingale
             if (useMartingale)
               Card(
@@ -445,7 +485,7 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                 ),
               ),
-            
+
             // Disclaimer
             const SizedBox(height: 16),
             const Card(
@@ -464,7 +504,7 @@ class _MainScreenState extends State<MainScreen> {
       ),
     );
   }
-  
+
   Color _getNumberColor(int number) {
     if (number == 0) return Colors.green;
     if (_isRedNumber(number)) return Colors.red.shade700;
