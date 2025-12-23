@@ -9,18 +9,30 @@ dependencies:
     sdk: flutter
   flutter_stripe: ^10.0.0  # Para cobros Stripe
   in_app_purchase: ^3.2.0  # Soporte in-app
+  
+  # Firebase Core Services
   firebase_core: ^2.24.2  # Firebase base
-  firebase_remote_config: ^4.3.12  # Para updates dinámicos cada 4 meses
-  cloud_firestore: ^4.15.3  # Almacenar emails
-  firebase_auth: ^4.16.0  # Auth para emails
+  firebase_auth: ^4.15.3  # Autenticación
+  cloud_firestore: ^4.13.6  # Base de datos
+  firebase_analytics: ^10.7.4  # Analytics
+  firebase_messaging: ^14.7.9  # Push notifications
+  firebase_remote_config: ^4.3.8  # Configuración remota
+  firebase_crashlytics: ^3.4.8  # Reportes de errores
+  firebase_performance: ^0.9.3+8  # Monitoreo de rendimiento
+  firebase_storage: ^11.5.6  # Almacenamiento en la nube
+  
+  # Google Sign-In
+  google_sign_in: ^6.1.6  # Autenticación con Google
+  
+  # Local Notifications
+  flutter_local_notifications: ^16.3.0  # Notificaciones locales
+  
+  # Utilities
   intl: ^0.18.1  # Idioma/país
   device_info_plus: ^9.1.2  # Info dispositivo/plataforma
   url_launcher: ^6.2.4  # Comentarios via email
   shared_preferences: ^2.2.2  # Storage local
-  # NOTA: charts_flutter está deprecado. Considera usar fl_chart o community_charts_flutter
-  # charts_flutter: ^0.12.0  # Gráficos (DEPRECADO)
-  fl_chart: ^0.65.0  # Gráficos modernos (reemplazo de charts_flutter)
-  firebase_messaging: ^14.7.10  # Notificaciones para invitaciones
+  fl_chart: ^0.65.0  # Gráficos modernos
 dev_dependencies:
   flutter_test:
     sdk: flutter
