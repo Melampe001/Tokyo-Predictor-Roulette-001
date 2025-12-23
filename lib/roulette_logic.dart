@@ -2,7 +2,7 @@ import 'dart:math';
 
 /// Lógica de ruleta europea (0-36)
 class RouletteLogic {
-  final List<int> wheel = List.generate(37, (i) => i);  // Ruleta europea
+  final List<int> wheel = List.generate(37, (i) => i); // Ruleta europea
   final Random rng = Random.secure();
 
   /// Genera un número aleatorio de la ruleta usando RNG seguro
@@ -15,7 +15,7 @@ class RouletteLogic {
   /// cada giro es independiente y no se puede predecir.
   int predictNext(List<int> history) {
     if (history.isEmpty) return rng.nextInt(37);
-    
+
     // Predicción simple: número más frecuente en historial
     final freq = <int, int>{};
     for (final num in history) {
