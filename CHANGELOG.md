@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2024-12-13
+
+### Added
+
+#### New Features
+- **Predicción Licuado**: Nueva modalidad de predicción que utiliza ponderación exponencial
+  - Da mayor peso a los números más recientes en el historial
+  - Algoritmo de suavizado basado en tendencias recientes
+  - Toggle en configuración para alternar entre predicción estándar y licuado
+  - Indicador visual cuando el modo licuado está activo
+  - Tarjeta informativa explicando el funcionamiento del modo licuado
+
+#### Testing
+- Tests unitarios para `predictNextLicuado()`:
+  - Validación de rangos de números (0-36)
+  - Predicción con historial vacío
+  - Priorización de números recientes
+  - Comparación con predicción estándar
+
+### Changed
+- Actualizado el diálogo de configuración para incluir el toggle de predicción licuado
+- Mejorada la tarjeta de predicción para mostrar el modo activo
+- Actualizada documentación en README.md
+
 ## [1.0.0] - 2024-12-12
 
 ### Added
