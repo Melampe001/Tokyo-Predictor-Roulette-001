@@ -214,12 +214,118 @@ Si un PR/issue fue cerrado por error:
 - [Estado Post-Limpieza](docs/POST_CLEANUP_TRACKING.md) - Tracking de PRs cerrados y priorizados
 - [Script Ejecutable](close_stale_prs.sh) - Script bash para ejecutar limpieza
 
+## 🤖 Automatización y CI/CD
+
+Este proyecto incluye un sistema completo de automatización para desarrollo, builds y releases.
+
+### AGENTE 5: Release Master 🚀
+
+Scripts para gestión de releases y builds de producción:
+
+#### Scripts Disponibles
+
+```bash
+# Build APK/AAB release firmado
+./scripts/release_builder.sh --all
+
+# Gestionar keystore
+./scripts/keystore_manager.sh --generate
+./scripts/keystore_manager.sh --create-properties
+
+# Gestionar versiones
+./scripts/version_manager.sh current
+./scripts/version_manager.sh patch  # 1.0.0 -> 1.0.1
+./scripts/version_manager.sh minor  # 1.0.0 -> 1.1.0
+./scripts/version_manager.sh major  # 1.0.0 -> 2.0.0
+```
+
+**Documentación completa:** [docs/RELEASE_PROCESS.md](docs/RELEASE_PROCESS.md)
+
+### AGENTE 7: CI/CD Master ⚙️
+
+Scripts para cobertura de tests y seguridad:
+
+```bash
+# Generar reporte de cobertura
+./scripts/coverage_reporter.sh --html
+
+# Escaneo de seguridad
+./scripts/security_scanner.sh
+```
+
+**Documentación completa:** [docs/CI_CD_SETUP.md](docs/CI_CD_SETUP.md)
+
+### GitHub Actions Workflows
+
+El proyecto incluye tres workflows automáticos:
+
+1. **CI** (`.github/workflows/ci.yml`)
+   - ✅ Lint y análisis de código
+   - ✅ Tests unitarios con coverage
+   - ✅ Build APK debug
+   - ✅ Escaneo de seguridad
+   - 🚀 Ejecuta en cada push y PR
+
+2. **Release** (`.github/workflows/release.yml`)
+   - 🚀 Build APK/AAB release firmado
+   - 📦 Crear GitHub Release automáticamente
+   - 📄 Generar release notes
+   - 🚀 Ejecuta al crear tags `v*.*.*`
+
+3. **PR Checks** (`.github/workflows/pr-checks.yml`)
+   - 📝 Validar formato de código
+   - 🧪 Verificar cobertura de tests (≥80%)
+   - 🔒 Escaneo de seguridad
+   - 💬 Comentarios automáticos en PR
+   - 🚀 Ejecuta en cada PR
+
+### Proceso de Release Automático
+
+```bash
+# 1. Incrementar versión
+./scripts/version_manager.sh minor
+
+# 2. Commit cambios
+git add pubspec.yaml CHANGELOG.md
+git commit -m "Bump version to 1.1.0"
+git push origin main
+
+# 3. Crear y push tag (dispara release automático)
+git tag -a v1.1.0 -m "Release version 1.1.0"
+git push origin v1.1.0
+
+# El workflow automáticamente:
+# - Build APK/AAB firmado
+# - Crea GitHub Release
+# - Sube archivos como assets
+```
+
 ## Configuración de Keystore para Android
 
-Para firmar la APK en modo release, necesitas configurar un keystore:
+Para firmar la APK en modo release, usa el script automatizado:
 
-### Opción 1: Archivo key.properties (desarrollo local)
-Crea un archivo `key.properties` en el directorio raíz del proyecto con:
+### Configuración Rápida (Recomendado)
+
+```bash
+# 1. Generar keystore
+./scripts/keystore_manager.sh --generate
+
+# 2. Crear key.properties automáticamente
+./scripts/keystore_manager.sh --create-properties
+
+# 3. Verificar configuración
+./scripts/keystore_manager.sh --check-gradle
+
+# 4. Ver instrucciones para GitHub Secrets (CI/CD)
+./scripts/keystore_manager.sh --github-secrets
+```
+
+### Configuración Manual
+
+Si prefieres configurar manualmente:
+
+#### Opción 1: Archivo key.properties (desarrollo local)
+Crea un archivo `android/key.properties` con:
 ```properties
 storeFile=/ruta/a/tu/keystore.jks
 storePassword=tu_password_del_keystore
@@ -227,14 +333,19 @@ keyAlias=tu_alias
 keyPassword=tu_password_de_la_key
 ```
 
-### Opción 2: Variables de entorno (CI/CD)
-Define las siguientes variables de entorno en tu sistema de CI:
+#### Opción 2: Variables de entorno (CI/CD)
+Define las siguientes variables de entorno:
 - `ANDROID_KEYSTORE_PATH`: Ruta al archivo keystore
 - `KEYSTORE_PASSWORD`: Contraseña del keystore
 - `KEY_ALIAS`: Alias de la key
 - `KEY_PASSWORD`: Contraseña de la key
 
-**Nota**: Nunca commits el archivo `key.properties` o el keystore al repositorio.
+**⚠️ IMPORTANTE**: 
+- Nunca commitees el archivo `key.properties` o el keystore al repositorio
+- Los archivos ya están en `.gitignore`
+- Para CI/CD, usa GitHub Secrets (ver [docs/CI_CD_SETUP.md](docs/CI_CD_SETUP.md))
+
+**Documentación completa:** [docs/RELEASE_PROCESS.md](docs/RELEASE_PROCESS.md)
 
 ---
 
