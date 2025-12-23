@@ -1,431 +1,773 @@
-# ⚙️ Configuración de CI/CD - Tokyo Roulette Predictor
+# ⚙️ CI/CD Configuration - Tokyo Roulette Predictor
 
-Este documento describe cómo configurar y usar el sistema de CI/CD con GitHub Actions.
+This document describes how to configure and use the CI/CD system with GitHub Actions.
 
-## 📋 Tabla de Contenidos
+## 📋 Table of Contents
 
-1. [Visión General](#visión-general)
-2. [Workflows Disponibles](#workflows-disponibles)
-3. [Configuración de Secretos](#configuración-de-secretos)
-4. [Uso de Workflows](#uso-de-workflows)
-5. [Troubleshooting](#troubleshooting)
-
----
-
-## Visión General
-
-El proyecto incluye tres workflows principales de GitHub Actions:
-
-1. **CI (Continuous Integration)** - `.github/workflows/ci.yml`
-   - Se ejecuta en cada push y PR
-   - Lint, tests, build debug, seguridad
-   
-2. **Release** - `.github/workflows/release.yml`
-   - Se ejecuta al crear tags v*.*.*
-   - Build release firmado, crear GitHub Release
-   
-3. **PR Checks** - `.github/workflows/pr-checks.yml`
-   - Se ejecuta en Pull Requests
-   - Validaciones específicas de PR con comentarios automáticos
+1. [Overview](#overview)
+2. [CI/CD Workflow](#cicd-workflow)
+3. [Secrets Configuration](#secrets-configuration)
+4. [How to Trigger Builds](#how-to-trigger-builds)
+5. [Download Artifacts](#download-artifacts)
+6. [Create Releases](#create-releases)
+7. [Keystore Management](#keystore-management)
+8. [Troubleshooting](#troubleshooting)
 
 ---
 
-## Workflows Disponibles
+## Overview
 
-### 1. CI - Continuous Integration
+The project uses a unified CI/CD workflow in `.github/workflows/ci-cd.yml` that handles:
 
-**Trigger**: Push y Pull Request a main/master/develop
+1. **Build and Test** (on push/PR to main and develop)
+   - Code analysis and linting
+   - Unit tests with coverage
+   - Build debug APK
+   - Upload artifacts
 
-**Jobs**:
-- ✅ **Lint**: Análisis de código y formato
-- ✅ **Test**: Tests unitarios con coverage
-- ✅ **Build Debug**: Compilar APK debug
-- ✅ **Security**: Escaneo de seguridad
-- ✅ **Summary**: Resumen de resultados
+2. **Release** (only on push to main)
+   - Decode keystore from GitHub Secrets
+   - Build signed release APK
+   - Build signed App Bundle (AAB)
+   - Upload signed artifacts
+   - Create GitHub Release (if tag is pushed)
 
-**Artifacts generados**:
-- Coverage report (30 días)
-- Debug APK (90 días)
-- Security report (30 días)
+### Additional Workflows
 
-**Ejemplo de ejecución**:
+- **CI** - `.github/workflows/ci.yml` - Comprehensive CI checks
+- **PR Checks** - `.github/workflows/pr-checks.yml` - PR-specific validations
+- **CodeQL** - `.github/workflows/codeql.yml` - Security scanning
+
+---
+
+## CI/CD Workflow
+
+The unified CI/CD workflow (`.github/workflows/ci-cd.yml`) provides automated building, testing, and releasing.
+
+### Build and Test Job
+
+**Triggers**:
+- Push to `main` or `develop` branches
+- Pull requests to `main` or `develop` branches
+- Push of tags matching `v*.*.*`
+
+**What it does**:
+1. ✅ Checkout code
+2. ✅ Setup Java 17 (required for Android builds)
+3. ✅ Setup Flutter (latest stable)
+4. ✅ Setup Python 3.11 (for automation scripts)
+5. ✅ Install Python dependencies (if requirements.txt exists)
+6. ✅ Run `flutter doctor -v`
+7. ✅ Get Flutter dependencies (`flutter pub get`)
+8. ✅ Analyze code (`flutter analyze`)
+9. ✅ Run tests (`flutter test --coverage`)
+10. ✅ Upload coverage to Codecov
+11. ✅ Build debug APK
+12. ✅ Upload debug APK as artifact (7-day retention)
+
+**Artifacts generated**:
+- `debug-apk-{sha}`: Debug APK for testing (7 days retention)
+- Coverage report uploaded to Codecov
+
+**Example execution**:
 ```bash
+# On any push to main or develop, or PR creation
 git add .
-git commit -m "feat: nueva funcionalidad"
+git commit -m "feat: add new feature"
 git push origin main
-# El workflow CI se ejecutará automáticamente
+# Workflow runs automatically
 ```
 
-### 2. Release - Automated Release
+### Release Job
 
-**Trigger**: Push de tags con formato v*.*.*
+**Triggers**:
+- Push to `main` branch only (not PRs, not develop)
+- Runs after build-and-test job succeeds
 
-**Jobs**:
-- 🚀 **Release**: Build APK/AAB firmado y crear GitHub Release
+**Requirements**:
+- GitHub Secrets must be configured (see [Secrets Configuration](#secrets-configuration))
+- `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`
 
-**Artifacts generados**:
-- APK release firmado
-- AAB release firmado
-- Checksums SHA-256
+**What it does**:
+1. ✅ Checkout code
+2. ✅ Setup Java 17 and Flutter
+3. ✅ Get Flutter dependencies
+4. ✅ Decode keystore from GitHub Secrets
+5. ✅ Create `key.properties` file with signing credentials
+6. ✅ Build release APK (`flutter build apk --release`)
+7. ✅ Build App Bundle AAB (`flutter build appbundle --release`)
+8. ✅ Generate SHA-256 checksums
+9. ✅ Upload release APK as artifact (30-day retention)
+10. ✅ Upload release AAB as artifact (30-day retention)
+11. ✅ Create GitHub Release (if tag was pushed)
 
-**Ejemplo de ejecución**:
+**Artifacts generated**:
+- `release-apk-{sha}`: Signed release APK + SHA-256 checksum (30 days)
+- `release-aab-{sha}`: Signed App Bundle + SHA-256 checksum (30 days)
+
+**Example execution**:
 ```bash
-# Crear tag
+# Push to main triggers release build
+git push origin main
+
+# Push a tag to create a GitHub Release
 git tag -a v1.0.0 -m "Release version 1.0.0"
 git push origin v1.0.0
-# El workflow Release se ejecutará automáticamente
+# Release job runs and creates a GitHub Release with APK/AAB attached
 ```
-
-### 3. PR Checks - Pull Request Validation
-
-**Trigger**: Abrir, actualizar o reabrir Pull Request
-
-**Jobs**:
-- 📝 **Format Check**: Verificar formato de código
-- 🧪 **Coverage Check**: Verificar cobertura de tests (≥80%)
-- 🔒 **Security Check**: Escaneo de seguridad
-- 🔑 **Secrets Check**: Detectar secretos hardcodeados
-- 📊 **Summary**: Comentar resumen en PR
-
-**Comentarios automáticos en PR**:
-- Estado de formato
-- Porcentaje de cobertura
-- Issues de seguridad
-- Detección de secretos
-- Resumen general
 
 ---
 
-## Configuración de Secretos
+## Secrets Configuration
 
-Para que el workflow de **Release** pueda firmar APKs/AABs, necesitas configurar secretos en GitHub.
+The **Release** job requires GitHub Secrets to sign APKs and AABs with your keystore.
 
-### Paso 1: Generar Keystore (si no tienes uno)
+### Step 1: Generate Keystore (if you don't have one)
+
+You can use the provided script:
 
 ```bash
 ./scripts/keystore_manager.sh --generate
 ```
 
-Guarda las contraseñas que ingreses.
-
-### Paso 2: Codificar Keystore en Base64
+Or manually using keytool:
 
 ```bash
-base64 ~/upload-keystore.jks > keystore.base64.txt
+keytool -genkey -v -keystore upload-keystore.jks \
+  -keyalg RSA -keysize 2048 -validity 10000 \
+  -alias upload
 ```
 
-### Paso 3: Agregar Secretos en GitHub
+**Save the passwords you enter!** You'll need them for GitHub Secrets.
 
-1. Ve a tu repositorio en GitHub
-2. Click en **Settings** → **Secrets and variables** → **Actions**
-3. Click en **New repository secret**
-4. Agrega los siguientes secretos:
-
-| Nombre | Valor | Descripción |
-|--------|-------|-------------|
-| `KEYSTORE_BASE64` | Contenido de `keystore.base64.txt` | Keystore codificado en base64 |
-| `KEYSTORE_PASSWORD` | Tu contraseña del keystore | Password del keystore |
-| `KEY_ALIAS` | `upload` (o tu alias) | Alias de la key |
-| `KEY_PASSWORD` | Tu contraseña de la key | Password de la key |
-
-**⚠️ IMPORTANTE**: 
-- Nunca commitees el keystore o las contraseñas al repositorio
-- Los secretos solo son accesibles en workflows
-- No se muestran en logs
-
-### Paso 4: Ver Instrucciones Completas
+### Step 2: Encode Keystore to Base64
 
 ```bash
-./scripts/keystore_manager.sh --github-secrets
+base64 upload-keystore.jks > keystore.base64.txt
 ```
 
-### Verificar Configuración
-
-Una vez configurados los secretos, el próximo release automático los usará:
+Or on macOS:
 
 ```bash
-# Crear un tag de prueba
-git tag -a v0.0.1-test -m "Test release"
-git push origin v0.0.1-test
+base64 -i upload-keystore.jks -o keystore.base64.txt
+```
 
-# Monitorear en: https://github.com/[tu-usuario]/[repo]/actions
+### Step 3: Add Secrets to GitHub
+
+1. Go to your repository on GitHub
+2. Click **Settings** → **Secrets and variables** → **Actions**
+3. Click **New repository secret**
+4. Add the following secrets:
+
+| Name | Value | Description |
+|------|-------|-------------|
+| `KEYSTORE_BASE64` | Content of `keystore.base64.txt` | Base64-encoded keystore file |
+| `KEYSTORE_PASSWORD` | Your keystore password | Password for the keystore |
+| `KEY_ALIAS` | `upload` (or your alias) | Alias of the signing key |
+| `KEY_PASSWORD` | Your key password | Password for the signing key |
+
+**⚠️ IMPORTANT**: 
+- **NEVER** commit the keystore or passwords to the repository
+- Secrets are only accessible in workflows
+- Secrets are not displayed in logs
+- `.gitignore` already excludes `*.jks`, `*.keystore`, and `key.properties`
+
+### Step 4: Verify Configuration
+
+Once secrets are configured, the next push to `main` will use them:
+
+```bash
+# Push to main to trigger a signed release build
+git push origin main
+
+# Monitor at: https://github.com/Melampe001/Tokyo-Predictor-Roulette-001/actions
+```
+
+### Security Best Practices
+
+- 🔒 Keep keystore backup in a secure location (not in git)
+- 🔒 Rotate keystore only if compromised (requires re-signing all versions)
+- 🔒 Never share passwords or keystore files
+- 🔒 Use different keystores for debug and release builds
+
+---
+
+## How to Trigger Builds
+
+### Automatic Triggers
+
+The CI/CD workflow runs automatically on:
+
+1. **Push to main or develop**:
+   - Runs build-and-test job
+   - If push is to main, also runs release job
+   
+2. **Pull request to main or develop**:
+   - Runs build-and-test job only
+   - No release artifacts created
+   
+3. **Push a tag (v*.*.*))**:
+   - Runs both jobs
+   - Creates a GitHub Release with signed APK/AAB
+
+### Manual Triggers
+
+You can also trigger workflows manually:
+
+1. Go to **Actions** tab in GitHub
+2. Select the **CI/CD** workflow
+3. Click **Run workflow**
+4. Choose the branch
+5. Click **Run workflow** button
+
+### Common Scenarios
+
+**Scenario 1: Test changes before merging**
+```bash
+# Create a feature branch
+git checkout -b feature/new-feature
+git add .
+git commit -m "feat: implement new feature"
+git push origin feature/new-feature
+
+# Create PR to main
+# CI/CD runs build-and-test job automatically
+# Download debug APK from artifacts to test
+```
+
+**Scenario 2: Merge to main and get signed release**
+```bash
+# After PR is approved and merged to main
+# CI/CD runs both build-and-test and release jobs
+# Download signed APK/AAB from artifacts
+```
+
+**Scenario 3: Create a new release**
+```bash
+# Update version in pubspec.yaml first
+# Commit and push changes
+git add pubspec.yaml
+git commit -m "chore: bump version to 1.0.0"
+git push origin main
+
+# Create and push tag
+git tag -a v1.0.0 -m "Release version 1.0.0"
+git push origin v1.0.0
+
+# CI/CD creates a GitHub Release with signed APK/AAB
+# Check: https://github.com/Melampe001/Tokyo-Predictor-Roulette-001/releases
 ```
 
 ---
 
-## Uso de Workflows
+## Download Artifacts
 
-### Ejecutar CI Localmente (Simulado)
+Artifacts are files generated by the workflow runs (APKs, AABs, checksums).
 
-Aunque los workflows se ejecutan en GitHub, puedes simular las verificaciones localmente:
+### How to Download
+
+1. Go to **Actions** tab: https://github.com/Melampe001/Tokyo-Predictor-Roulette-001/actions
+2. Click on the workflow run you're interested in
+3. Scroll down to the **Artifacts** section
+4. Click on the artifact name to download
+
+### Available Artifacts
+
+| Artifact Name | Contents | Retention | When Created |
+|--------------|----------|-----------|--------------|
+| `debug-apk-{sha}` | Debug APK | 7 days | Every build-and-test run |
+| `release-apk-{sha}` | Signed APK + SHA-256 | 30 days | Push to main only |
+| `release-aab-{sha}` | Signed AAB + SHA-256 | 30 days | Push to main only |
+
+### Verify Integrity
+
+After downloading a release artifact, verify its integrity:
 
 ```bash
-# Lint y análisis
-flutter analyze
+# Extract the artifact ZIP
+unzip release-apk-*.zip
 
-# Tests con coverage
-flutter test --coverage
+# Verify the checksum
+sha256sum -c app-release.apk.sha256
 
-# Security scan
-./scripts/security_scanner.sh
-
-# Coverage report
-./scripts/coverage_reporter.sh --html
+# Expected output: app-release.apk: OK
 ```
 
-### Monitorear Workflows
+### Install Debug APK
 
-1. Ve a: https://github.com/[tu-usuario]/Tokyo-Predictor-Roulette-001/actions
-2. Selecciona el workflow que quieres ver
-3. Click en una ejecución específica
-4. Revisa los logs de cada job
+```bash
+# Install on connected device
+adb install app-debug.apk
 
-### Descargar Artifacts
-
-Los artifacts están disponibles en la página del workflow:
-
-1. Ve a la ejecución del workflow
-2. Scroll hasta "Artifacts"
-3. Click en el artifact para descargar
-
-**Artifacts disponibles**:
-- `coverage-report`: Reporte de cobertura
-- `app-debug-apk`: APK debug
-- `security-report`: Reporte de seguridad
+# Or drag and drop to emulator
+```
 
 ---
 
-## Configuración Avanzada
+## Create Releases
 
-### Agregar Notificaciones
+Creating a GitHub Release makes your APK/AAB easily downloadable by users.
 
-Puedes agregar notificaciones de Slack/Discord/Email al final de los workflows.
+### Automatic Release Creation
 
-Ejemplo para Slack:
+The CI/CD workflow automatically creates a GitHub Release when you push a tag:
 
-```yaml
-- name: Notificar a Slack
-  if: always()
-  uses: 8398a7/action-slack@v3
-  with:
-    status: ${{ job.status }}
-    webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+```bash
+# 1. Update version in pubspec.yaml
+flutter pub get  # Updates pubspec.lock
+
+# 2. Commit version change
+git add pubspec.yaml pubspec.lock
+git commit -m "chore: bump version to 1.2.3"
+
+# 3. Push to main
+git push origin main
+
+# 4. Create and push tag
+git tag -a v1.2.3 -m "Release version 1.2.3"
+git push origin v1.2.3
+
+# 5. Wait for workflow to complete
+# Release will be at: https://github.com/Melampe001/Tokyo-Predictor-Roulette-001/releases
 ```
 
-### Ejecutar en Múltiples Versiones de Flutter
+### Release Contents
 
-Modifica el workflow para usar matrix:
+Each GitHub Release includes:
 
-```yaml
-strategy:
-  matrix:
-    flutter-version: ['3.16.0', '3.19.0', 'stable']
+- **Signed APK**: For direct Android installation
+- **Signed AAB**: For Google Play Store submission
+- **SHA-256 checksums**: For integrity verification
+- **Automatically generated release notes**: Based on commits since last release
+- **Custom description**: Educational notice and installation instructions
 
-steps:
-  - uses: subosito/flutter-action@v2
-    with:
-      flutter-version: ${{ matrix.flutter-version }}
+### Version Numbering
+
+Follow [Semantic Versioning](https://semver.org/):
+
+- **MAJOR** (1.0.0): Breaking changes
+- **MINOR** (1.1.0): New features (backwards compatible)
+- **PATCH** (1.1.1): Bug fixes
+
+### Using the Version Manager Script
+
+```bash
+# Check current version
+./scripts/version_manager.sh current
+
+# Increment patch version (1.0.0 → 1.0.1)
+./scripts/version_manager.sh patch
+
+# Increment minor version (1.0.1 → 1.1.0)
+./scripts/version_manager.sh minor
+
+# Increment major version (1.1.0 → 2.0.0)
+./scripts/version_manager.sh major
 ```
 
-### Cache de Dependencias
+---
 
-Los workflows ya incluyen cache, pero puedes ajustar:
+## Keystore Management
 
-```yaml
-- name: Configurar Flutter
-  uses: subosito/flutter-action@v2
-  with:
-    channel: 'stable'
-    cache: true
-    cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
+The keystore is used to sign release APKs and AABs, ensuring their authenticity.
+
+### What is a Keystore?
+
+A keystore is a binary file containing:
+- Private key for signing
+- Certificate identifying the developer
+- Alias name for the key
+
+**CRITICAL**: 
+- ⚠️ If you lose the keystore, you cannot update the app on Play Store
+- ⚠️ Keep secure backups in multiple locations
+- ⚠️ Never commit to git (already in .gitignore)
+
+### Generate a New Keystore
+
+Using the provided script:
+
+```bash
+./scripts/keystore_manager.sh --generate
 ```
+
+Or manually:
+
+```bash
+keytool -genkey -v -keystore ~/upload-keystore.jks \
+  -keyalg RSA -keysize 2048 -validity 10000 \
+  -alias upload
+```
+
+You'll be prompted for:
+- Keystore password (remember it!)
+- Key password (remember it!)
+- Name, organization, etc. (can be anything)
+
+### Validate Your Keystore
+
+```bash
+# Using the script
+./scripts/keystore_manager.sh --validate
+
+# Or manually
+keytool -list -v -keystore ~/upload-keystore.jks -alias upload
+```
+
+### Backup Your Keystore
+
+```bash
+# Create encrypted backup
+cp ~/upload-keystore.jks ~/Dropbox/keystore-backup-$(date +%Y%m%d).jks
+
+# Or use the script
+./scripts/keystore_manager.sh --backup
+```
+
+Store backups in:
+- 💾 Encrypted cloud storage (Dropbox, Google Drive, etc.)
+- 💾 Password manager (as a secure note)
+- 💾 Hardware USB drive in a safe location
+
+### Configure for Local Builds
+
+Create `android/key.properties` for local release builds:
+
+```bash
+./scripts/keystore_manager.sh --create-properties
+```
+
+Or manually:
+
+```properties
+storePassword=your_keystore_password
+keyPassword=your_key_password
+keyAlias=upload
+storeFile=/path/to/upload-keystore.jks
+```
+
+**Important**: This file is already in `.gitignore` and will never be committed.
 
 ---
 
 ## Troubleshooting
 
-### Workflow Falla: "Flutter command not found"
+### Build Failures
 
-Verifica que el workflow usa `subosito/flutter-action@v2`:
+#### "Flutter command not found"
+
+Ensure the workflow uses `subosito/flutter-action@v2`:
 
 ```yaml
-- name: Configurar Flutter
+- name: Setup Flutter
   uses: subosito/flutter-action@v2
   with:
     channel: 'stable'
+    cache: true
 ```
 
-### Workflow Falla: "Keystore not found"
+#### "Keystore not found" during Release
 
-Verifica que los secretos estén configurados correctamente:
+Check that secrets are configured:
 
-1. Settings → Secrets and variables → Actions
-2. Verifica que existen: `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`
+1. Go to: Settings → Secrets and variables → Actions
+2. Verify these secrets exist:
+   - `KEYSTORE_BASE64`
+   - `KEYSTORE_PASSWORD`
+   - `KEY_ALIAS`
+   - `KEY_PASSWORD`
 
-### Workflow Falla: "Tests failed"
+If missing, follow [Secrets Configuration](#secrets-configuration).
 
-Si los tests fallan en CI pero pasan localmente:
+#### "Tests failed" in CI but pass locally
+
+Clean and rebuild:
 
 ```bash
-# Limpiar y ejecutar tests
 flutter clean
 flutter pub get
 flutter test
 ```
 
-Si aún fallan, revisa los logs del workflow para ver el error específico.
+Check for:
+- Platform-specific tests (may fail on Linux CI)
+- Timezone or locale dependencies
+- Random test failures (flaky tests)
 
-### Workflow Tarda Mucho
+#### "Gradle build failed"
 
-Optimizaciones:
+Common causes:
+- Java version mismatch (workflow uses Java 17)
+- Missing dependencies in build.gradle
+- Corrupted Gradle cache
 
-1. **Cache de pub**: Ya está activado con `cache: true`
-2. **Paralelizar jobs**: Los jobs independientes ya corren en paralelo
-3. **Reducir retención de artifacts**: Ajusta `retention-days`
+Local debugging:
 
-### PR Checks No Comentan en PR
-
-Verifica permisos del workflow:
-
-```yaml
-permissions:
-  contents: read
-  pull-requests: write  # Necesario para comentar
+```bash
+cd android
+./gradlew clean
+./gradlew build --info
 ```
 
-### Release No Se Crea Automáticamente
+### Workflow Performance
 
-Verifica:
-1. El tag sigue el formato `v*.*.*` (ej: v1.0.0, no 1.0.0)
-2. Hiciste push del tag: `git push origin v1.0.0`
-3. El workflow tiene permisos: `contents: write`
+#### Workflow is slow
 
----
+Optimizations already implemented:
+- ✅ Gradle caching enabled
+- ✅ Flutter pub caching enabled
+- ✅ Parallel job execution
 
-## Scripts Disponibles
+Additional tips:
+- Reduce test suite size
+- Use `flutter test --plain` to reduce output
+- Consider splitting into multiple workflows
 
-Además de los workflows, puedes usar estos scripts localmente:
+#### Artifact upload fails
 
-### Bot 5A: ReleaseBuilder
+Check:
+- File size limits (artifacts have size limits)
+- Correct file paths in workflow
+- Sufficient storage quota
+
+### Release Issues
+
+#### Release not created when tag pushed
+
+Verify:
+1. Tag follows format `v*.*.*` (e.g., v1.0.0, not 1.0.0)
+2. Tag was pushed: `git push origin v1.0.0`
+3. Workflow has permission: `contents: write`
+4. No build failures in release job
+
+#### APK not signed properly
+
+Debug signing:
+
 ```bash
-# Build APK/AAB release
-./scripts/release_builder.sh --all
+# Download release APK from artifacts
+# Verify signature
+jarsigner -verify -verbose -certs app-release.apk
 
-# Solo verificar signing
-./scripts/release_builder.sh --verify
+# Expected: "jar verified."
 ```
 
-### Bot 5B: KeystoreManager
+Check:
+- All 4 secrets are configured correctly
+- Base64 decoding succeeded (check workflow logs)
+- `key.properties` was created (check logs)
+
+#### AAB generation fails
+
+Ensure `build.gradle` has correct configuration:
+
+```gradle
+buildTypes {
+    release {
+        if (keystorePropertiesFile.exists()) {
+            signingConfig signingConfigs.release
+        }
+        minifyEnabled true
+        shrinkResources true
+    }
+}
+```
+
+### Secret Management
+
+#### How to rotate keystore
+
+⚠️ **Warning**: Rotating the keystore means you cannot update existing Play Store apps.
+
+Only rotate if compromised:
+
+1. Generate new keystore
+2. Update GitHub Secrets with new values
+3. Build and sign with new keystore
+4. Upload as **new app** to Play Store (different package name)
+
+#### Secret appears in logs
+
+GitHub automatically masks secrets in logs. If you see exposure:
+
+1. Delete the secret immediately
+2. Generate new keystore
+3. Update all secrets
+4. Review workflow logs for the exposure source
+
+### Local Testing
+
+#### Simulate CI locally
+
+Run the same commands as CI:
+
 ```bash
-# Generar keystore
-./scripts/keystore_manager.sh --generate
+# Setup
+flutter doctor -v
+flutter pub get
 
-# Validar keystore
-./scripts/keystore_manager.sh --validate
+# Lint
+flutter analyze --no-fatal-infos
 
-# Crear key.properties
+# Test
+flutter test --coverage
+
+# Build debug
+flutter build apk --debug
+
+# Build release (requires key.properties)
+flutter build apk --release
+```
+
+#### Test signing locally
+
+```bash
+# Create key.properties first
 ./scripts/keystore_manager.sh --create-properties
+
+# Build release
+flutter build apk --release
+
+# Verify signature
+jarsigner -verify -verbose -certs build/app/outputs/flutter-apk/app-release.apk
 ```
 
-### Bot 5C: VersionManager
-```bash
-# Ver versión actual
-./scripts/version_manager.sh current
+### Getting Help
 
-# Incrementar versión
-./scripts/version_manager.sh patch
-./scripts/version_manager.sh minor
-./scripts/version_manager.sh major
-```
+If you encounter issues not covered here:
 
-### Bot 7B: CoverageReporter
-```bash
-# Generar reporte de cobertura
-./scripts/coverage_reporter.sh --html
-
-# Con umbral personalizado
-./scripts/coverage_reporter.sh --threshold 90
-```
-
-### Bot 7C: SecurityScanner
-```bash
-# Escaneo de seguridad
-./scripts/security_scanner.sh
-
-# Sin fallar en issues
-./scripts/security_scanner.sh --no-fail
-```
+1. Check workflow logs in Actions tab
+2. Search existing issues: https://github.com/Melampe001/Tokyo-Predictor-Roulette-001/issues
+3. Create new issue with:
+   - Workflow name and run ID
+   - Error message from logs
+   - Steps to reproduce
+   - Expected vs actual behavior
 
 ---
 
-## Mejores Prácticas
+## Best Practices
 
-### 1. Commits Frecuentes
+### 1. Frequent Commits
 
-Haz commits pequeños y frecuentes para detectar problemas temprano:
+Make small, frequent commits to catch issues early:
 
 ```bash
 git add .
-git commit -m "feat: implementar funcionalidad X"
-git push origin feature/nueva-funcionalidad
+git commit -m "feat: add feature X"
+git push origin feature/new-feature
 ```
 
 ### 2. Branch Protection
 
-Configura branch protection en GitHub:
+Configure branch protection for `main`:
 
 1. Settings → Branches → Branch protection rules
-2. Proteger `main`:
+2. Protect `main` branch:
    - ✅ Require status checks to pass
    - ✅ Require branches to be up to date
-   - ✅ Require pull request reviews
+   - ✅ Require pull request reviews before merging
+   - ✅ Require conversation resolution
 
-### 3. Revisar Artifacts
+### 3. Review Artifacts Before Release
 
-Siempre descarga y prueba los artifacts antes de un release:
+Always download and test artifacts:
 
 ```bash
-# Descargar APK del workflow
-# Instalar en dispositivo
+# Download debug APK from PR
+# Install on device
 adb install app-debug.apk
-# Verificar funcionalidad
+
+# Test all functionality
+# If OK, approve PR and merge
 ```
 
-### 4. Mantener Secretos Seguros
+### 4. Maintain Test Coverage
 
-- 🔒 Rota el keystore solo en caso de compromiso
-- 🔒 Nunca compartas las contraseñas
-- 🔒 Mantén backup del keystore en lugar seguro
-
-### 5. Monitorear Cobertura
-
-Mantén la cobertura de tests ≥80%:
+Keep test coverage ≥80%:
 
 ```bash
+# Generate coverage report
+flutter test --coverage
+
+# View in browser
 ./scripts/coverage_reporter.sh --html
-# Abre coverage/html/index.html
+# Opens coverage/html/index.html
 ```
+
+### 5. Keep Secrets Secure
+
+- 🔒 Rotate only if compromised
+- 🔒 Never share passwords or keystore
+- 🔒 Keep backups in secure location
+- 🔒 Use different keystores for development/production
+
+### 6. Monitor Workflow Runs
+
+- 📊 Check Actions tab regularly
+- 📊 Fix failing workflows promptly
+- 📊 Review build times for optimization
+- 📊 Clean up old artifacts periodically
 
 ---
 
-## Referencias
+## Workflow Status Badge
+
+Add this badge to your README.md to show CI/CD status:
+
+```markdown
+![CI/CD](https://github.com/Melampe001/Tokyo-Predictor-Roulette-001/actions/workflows/ci-cd.yml/badge.svg)
+```
+
+This displays the current status of the CI/CD workflow.
+
+---
+
+## Additional Resources
 
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 - [Flutter CI/CD Best Practices](https://docs.flutter.dev/deployment/cd)
 - [Android App Signing](https://developer.android.com/studio/publish/app-signing)
 - [Semantic Versioning](https://semver.org/)
+- [Gradle Build Cache](https://docs.gradle.org/current/userguide/build_cache.html)
 
 ---
 
-## Estado de Workflows
+## Quick Reference
 
-| Workflow | Estado | Último Run |
-|----------|--------|------------|
-| CI | ![CI](https://github.com/[usuario]/Tokyo-Predictor-Roulette-001/workflows/CI/badge.svg) | - |
-| Release | ![Release](https://github.com/[usuario]/Tokyo-Predictor-Roulette-001/workflows/Release/badge.svg) | - |
-| PR Checks | ![PR Checks](https://github.com/[usuario]/Tokyo-Predictor-Roulette-001/workflows/PR%20Checks/badge.svg) | - |
+### Common Commands
+
+```bash
+# View current version
+./scripts/version_manager.sh current
+
+# Bump version
+./scripts/version_manager.sh patch
+
+# Generate keystore
+./scripts/keystore_manager.sh --generate
+
+# Create key.properties
+./scripts/keystore_manager.sh --create-properties
+
+# Local release build
+flutter build apk --release
+
+# Verify signing
+jarsigner -verify -verbose build/app/outputs/flutter-apk/app-release.apk
+
+# Create and push tag
+git tag -a v1.0.0 -m "Release 1.0.0"
+git push origin v1.0.0
+```
+
+### Workflow URLs
+
+- **Actions**: https://github.com/Melampe001/Tokyo-Predictor-Roulette-001/actions
+- **Releases**: https://github.com/Melampe001/Tokyo-Predictor-Roulette-001/releases
+- **Secrets**: https://github.com/Melampe001/Tokyo-Predictor-Roulette-001/settings/secrets/actions
 
 ---
 
-**Última actualización**: 2025-12-15  
-**Versión del documento**: 1.0
+**Last Updated**: December 2024  
+**Document Version**: 2.0
