@@ -93,7 +93,7 @@ void main() {
       advisor.getNextBet(false); // 8.0
       advisor.getNextBet(false); // 16.0
       advisor.getNextBet(false); // 32.0
-      
+
       // La apuesta puede crecer más allá del balance disponible
       // La limitación debe hacerse en la lógica de la UI
       expect(advisor.currentBet, equals(32.0));
