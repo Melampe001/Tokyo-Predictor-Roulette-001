@@ -45,6 +45,47 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
+  String? _emailError;
+
+  bool _isValidEmail(String email) {
+    // Basic email validation regex for educational app
+    // Note: This is intentionally simple. Full auth will be implemented
+    // when Firebase Auth is configured (see TODO below).
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
+    return emailRegex.hasMatch(email);
+  }
+
+  void _validateAndContinue() {
+    final email = _emailController.text.trim();
+    
+    if (email.isEmpty) {
+      setState(() {
+        _emailError = 'Por favor ingresa un email';
+      });
+      return;
+    }
+    
+    if (!_isValidEmail(email)) {
+      setState(() {
+        _emailError = 'Por favor ingresa un email válido';
+      });
+      return;
+    }
+    
+    // Email válido, continuar
+    setState(() {
+      _emailError = null;
+    });
+    
+    // TODO: Implementar lógica de registro/Auth aquí con Firebase Auth
+    // Por ahora, esto es solo una simulación educativa sin backend
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const MainScreen()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,16 +97,24 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             TextField(
               controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                // TODO: Implementar lógica de registro/Auth aquí
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const MainScreen()),
-                );
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                labelText: 'Email',
+                hintText: 'ejemplo@correo.com',
+                errorText: _emailError,
+              ),
+              onChanged: (value) {
+                // Clear error when user types
+                if (_emailError != null) {
+                  setState(() {
+                    _emailError = null;
+                  });
+                }
               },
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _validateAndContinue,
               child: const Text('Registrar y Continuar'),
             ),
           ],
