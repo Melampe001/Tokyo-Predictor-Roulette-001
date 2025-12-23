@@ -144,6 +144,8 @@ Los siguientes workflows de GitHub Actions utilizan estos scripts:
 - **CI** (`.github/workflows/ci.yml`): Lint, tests, build debug, seguridad
 - **Release** (`.github/workflows/release.yml`): Build release automático con signing
 - **PR Checks** (`.github/workflows/pr-checks.yml`): Validaciones de Pull Requests
+- **Auto-close Duplicates** (`.github/workflows/auto-close-duplicates.yml`): Detección y cierre de issues duplicados
+- **Project Health Check** (`.github/workflows/project-health-check.yml`): Auditoría semanal de salud del proyecto
 
 Ver [docs/CI_CD_SETUP.md](../docs/CI_CD_SETUP.md) para configuración completa.
 
@@ -184,6 +186,75 @@ git push origin v1.1.0
 - Incluir documentación en comentarios al inicio del archivo
 - Usar nombres descriptivos en minúsculas con guiones: `mi-script.sh`
 
+### AGENTE 8: Issue Management 🧹
+
+Scripts para automatización de gestión de issues.
+
+#### `close_duplicate_issues.sh` (Bot 8A)
+
+Cierre automático de issues duplicados de Copilot setup.
+
+**Uso básico:**
+```bash
+# Dry run (simular sin ejecutar)
+./scripts/close_duplicate_issues.sh --dry-run
+
+# Ejecutar cierre real
+./scripts/close_duplicate_issues.sh
+```
+
+**Funcionalidad:**
+- Cierra issues duplicados en múltiples repositorios
+- Agrega comentario explicativo automático
+- Marca issues como "not planned"
+- Registra estadísticas de ejecución
+
+**Repositorios afectados:**
+- Tokyo-Predictor-Roulette-001
+- bug-free-octo-winner-Tokyo-IA2
+- skills-introduction-to-github
+- Tokyoapps
+
+#### `create_master_copilot_issue.sh` (Bot 8B)
+
+Creación de issue maestro consolidado para Copilot.
+
+**Uso básico:**
+```bash
+# Ver contenido sin crear
+./scripts/create_master_copilot_issue.sh --dry-run
+
+# Crear issue maestro
+./scripts/create_master_copilot_issue.sh
+```
+
+**Funcionalidad:**
+- Crea issue consolidado con checklist completo
+- Tabla de estado por repositorio
+- Referencias a documentación
+- Enlaces a issues cerrados
+
+**Documentación completa:** Ver [docs/COPILOT_SETUP.md](../docs/COPILOT_SETUP.md)
+
+## 🤖 Workflows Automatizados
+
+### Auto-close Duplicates (`.github/workflows/auto-close-duplicates.yml`)
+
+Detecta y cierra automáticamente issues duplicados de Copilot setup.
+
+**Triggers:**
+- Cuando se abre un nuevo issue
+- Cuando se agrega un label
+- Semanalmente (domingos a medianoche UTC)
+- Manualmente desde GitHub Actions
+
+**Funcionalidad:**
+- Busca patrones de "Copilot setup"
+- Identifica duplicados
+- Cierra los más antiguos
+- Mantiene el más reciente como "master issue"
+- Agrega comentarios y labels automáticamente
+
 ## 🆘 Ayuda
 
 Todos los scripts incluyen ayuda integrada:
@@ -194,4 +265,6 @@ Todos los scripts incluyen ayuda integrada:
 ./scripts/version_manager.sh --help
 ./scripts/coverage_reporter.sh --help
 ./scripts/security_scanner.sh --help
+./scripts/close_duplicate_issues.sh --help
+./scripts/create_master_copilot_issue.sh --help
 ```

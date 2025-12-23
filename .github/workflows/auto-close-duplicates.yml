@@ -1,0 +1,190 @@
+# .github/workflows/auto-close-duplicates.yml
+#
+# 🤖 Workflow para detectar y cerrar automáticamente issues duplicados
+#
+# Triggers:
+#   - Cuando se abre un issue nuevo
+#   - Cuando se agrega un label a un issue
+#   - Semanalmente (domingo a medianoche UTC)
+
+name: Auto-close Duplicate Issues
+
+on:
+  issues:
+    types: [opened, labeled]
+  schedule:
+    - cron: '0 0 * * 0'  # Domingo a medianoche UTC
+  workflow_dispatch:  # Permite ejecución manual
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  close-duplicates:
+    runs-on: ubuntu-latest
+    name: Detectar y cerrar issues duplicados
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Detectar y cerrar duplicados
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const duplicatePatterns = [
+              'Set up Copilot instructions',
+              'Copilot setup',
+              'Configure Copilot',
+              'copilot-instructions',
+              'GitHub Copilot configuration'
+            ];
+            
+            console.log('🔍 Buscando issues duplicados...');
+            
+            // Obtener todos los issues abiertos
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 100
+            });
+            
+            console.log(`📋 Total de issues abiertos: ${issues.length}`);
+            
+            // Buscar duplicados basados en patrones
+            const duplicates = issues.filter(issue => {
+              // No procesar PRs
+              if (issue.pull_request) return false;
+              
+              return duplicatePatterns.some(pattern => 
+                issue.title.toLowerCase().includes(pattern.toLowerCase()) ||
+                (issue.body && issue.body.toLowerCase().includes(pattern.toLowerCase()))
+              );
+            });
+            
+            console.log(`🎯 Issues que coinciden con patrones: ${duplicates.length}`);
+            
+            if (duplicates.length === 0) {
+              console.log('✅ No se encontraron issues duplicados');
+              return;
+            }
+            
+            // Ordenar por fecha de creación (más antiguos primero)
+            duplicates.sort((a, b) => 
+              new Date(a.created_at) - new Date(b.created_at)
+            );
+            
+            // Si hay más de 1, cerrar los más antiguos excepto el más reciente
+            if (duplicates.length > 1) {
+              console.log(`🧹 Se encontraron ${duplicates.length} duplicados. Cerrando los más antiguos...`);
+              
+              const toClose = duplicates.slice(0, -1);  // Todos excepto el último (más reciente)
+              const masterIssue = duplicates[duplicates.length - 1];
+              
+              for (const issue of toClose) {
+                console.log(`  🔄 Cerrando issue #${issue.number}: ${issue.title}`);
+                
+                try {
+                  // Agregar comentario explicativo
+                  const closeComment = [
+                    '🤖 **Issue duplicado cerrado automáticamente**',
+                    '',
+                    'Este issue es un duplicado detectado por el sistema automático.',
+                    '',
+                    `**Issue maestro**: #${masterIssue.number}`,
+                    '**Configuración actual**: `.github/copilot-instructions.md`',
+                    '**Documentación**: `docs/COPILOT_SETUP.md`',
+                    '',
+                    `La configuración de Copilot ya está implementada en este repositorio. Si necesitas hacer cambios, por favor comenta en el issue maestro #${masterIssue.number}.`,
+                    '',
+                    '---',
+                    '_Cerrado automáticamente por Bot_Cleanup | Workflow: auto-close-duplicates.yml_'
+                  ].join('\n');
+                  
+                  await github.rest.issues.createComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    body: closeComment
+                  });
+                  
+                  // Agregar label de duplicado
+                  await github.rest.issues.addLabels({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    labels: ['duplicate', 'auto-closed']
+                  });
+                  
+                  // Cerrar el issue
+                  await github.rest.issues.update({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    state: 'closed',
+                    state_reason: 'not_planned'
+                  });
+                  
+                  console.log(`  ✅ Issue #${issue.number} cerrado exitosamente`);
+                } catch (error) {
+                  console.error(`  ❌ Error cerrando issue #${issue.number}: ${error.message}`);
+                }
+              }
+              
+              // Comentar en el issue maestro
+              try {
+                const masterComment = [
+                  '🤖 **Sistema de limpieza automática activado**',
+                  '',
+                  `Se cerraron ${toClose.length} issue(s) duplicado(s):`,
+                  ...toClose.map(i => `- #${i.number}: ${i.title}`),
+                  '',
+                  'Este es el issue maestro para la configuración de Copilot.',
+                  '',
+                  '---',
+                  '_Actualizado automáticamente por Bot_Cleanup_'
+                ].join('\n');
+                
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: masterIssue.number,
+                  body: masterComment
+                });
+                
+                // Agregar label de master issue
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: masterIssue.number,
+                  labels: ['copilot', 'master-issue', 'documentation']
+                });
+                
+                console.log(`  📌 Issue maestro actualizado: #${masterIssue.number}`);
+              } catch (error) {
+                console.error(`  ⚠️  Error actualizando issue maestro: ${error.message}`);
+              }
+              
+              console.log('');
+              console.log('✅ Proceso de limpieza completado');
+              console.log(`📊 Estadísticas:`);
+              console.log(`   - Issues procesados: ${duplicates.length}`);
+              console.log(`   - Issues cerrados: ${toClose.length}`);
+              console.log(`   - Issue maestro: #${masterIssue.number}`);
+            } else {
+              console.log('ℹ️  Solo hay 1 issue relacionado con Copilot, no hay duplicados que cerrar');
+            }
+      
+      - name: Crear resumen
+        if: always()
+        run: |
+          echo "## 🧹 Resumen de Limpieza de Duplicados" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Workflow ejecutado exitosamente" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Repositorio**: ${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Fecha**: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Para más detalles, revisa los logs del workflow." >> $GITHUB_STEP_SUMMARY
