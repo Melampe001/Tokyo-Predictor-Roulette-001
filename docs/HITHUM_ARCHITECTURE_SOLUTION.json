@@ -1,0 +1,158 @@
+{
+  "arquitectura": [
+    "Frontend en Vercel con Next.js + Firebase SDK para auth y Firestore en tiempo real",
+    "Backend en Cloud Run con APIs REST autenticadas vía Firebase Auth tokens",
+    "AI Agents en Cloud Run separado con Vertex AI (Gemini Pro) para automatización",
+    "Firestore para datos estructurados + Security Rules granulares por colección",
+    "Cloud Tasks para ejecución asíncrona con reintentos automáticos",
+    "Cloud Logging + Monitoring para logs centralizados y dashboards en tiempo real",
+    "Secret Manager para credenciales y API keys (nunca en código)",
+    "Rate limiting multi-nivel (por minuto/hora/día) con quotas en Firestore"
+  ],
+  "servicios": {
+    "autenticacion_datos": [
+      "Firebase Auth: Gestión de usuarios con JWT tokens y custom claims para roles (admin, premium, free)",
+      "Firestore: Base de datos principal con colecciones (users, content, ai_logs, notifications)",
+      "Cloud Storage: Almacenamiento de archivos multimedia con signed URLs",
+      "Security Rules: Control granular de acceso a nivel de documento en Firestore"
+    ],
+    "ejecucion_agentes": [
+      "Cloud Run: Servicios backend containerizados con autoescalado (hithum-api, hithum-ai-agent)",
+      "Vertex AI Gemini Pro: Modelo de IA para generación de texto, resúmenes y clasificación",
+      "Cloud Tasks: Cola de tareas asíncronas con reintentos automáticos y rate limiting",
+      "Service Accounts: Identidades con permisos mínimos para cada servicio"
+    ],
+    "monitoreo_logs": [
+      "Cloud Logging: Logs estructurados JSON con retention 7-30 días",
+      "Cloud Monitoring: Dashboards personalizados accesibles desde laptop y móvil",
+      "Cloud Trace: Análisis de latencia distribuida en requests complejos",
+      "Error Reporting: Tracking automático de errores con agrupación inteligente",
+      "Alertas: Notificaciones por email/Slack para error rate, latencia y costos altos"
+    ]
+  },
+  "pasos": [
+    "Semana 1: Setup Google Cloud project + Firebase (Auth, Firestore, Storage) + Security Rules robustas",
+    "Semana 2: Desarrollar API backend en Cloud Run con autenticación Firebase y rate limiting",
+    "Semana 3: Implementar AI Agent service con Vertex AI Gemini + logging completo de decisiones",
+    "Semana 3-4: Integrar frontend Vercel con Firebase SDK y APIs backend autenticadas",
+    "Semana 4: Configurar Cloud Monitoring dashboards responsive + alertas críticas automáticas",
+    "Semana 5: Testing end-to-end + load testing (k6) + deploy canary a producción",
+    "Post-launch: Monitoreo 24/7 desde Cloud Console App (mobile) y dashboards web PWA",
+    "Optimización continua: Ajustar rate limits, costos y escalado basado en métricas reales"
+  ],
+  "seguridad": {
+    "controles": [
+      "Zero Trust: Todo request requiere autenticación con Firebase Auth JWT",
+      "Policy de acciones: Whitelist de acciones permitidas por tier (free: 10 req/día, premium: 100 req/día)",
+      "Rate limiting: Límites por minuto/hora/día en Firestore para prevenir abuso",
+      "Logging obligatorio: Toda acción del agente registrada con userId, timestamp, modelo, costo",
+      "Service Account isolation: AI Agent no accede a datos sensibles directamente",
+      "Secret Manager: API keys y credenciales nunca en código",
+      "Security Rules: Validación en Firestore de permisos a nivel documento",
+      "HTTPS forzado: Solo comunicación encriptada entre servicios"
+    ],
+    "logs_auditoria": {
+      "estructura": {
+        "userId": "string (identificador usuario)",
+        "action": "string (generate_summary, classify_content, etc.)",
+        "model": "string (gemini-pro, gemini-pro-vision)",
+        "timestamp": "datetime (servidor)",
+        "duration_ms": "integer (tiempo ejecución)",
+        "cost_usd": "float (costo aproximado)",
+        "status": "string (success, error)",
+        "inputTokens": "integer",
+        "outputTokens": "integer",
+        "rateLimit": {
+          "used": "integer (requests usados)",
+          "limit": "integer (límite diario)",
+          "remaining": "integer"
+        }
+      },
+      "retention": "30 días en Cloud Logging",
+      "consulta": "Accesible vía Cloud Console web y app móvil + dashboard personalizado en Firestore"
+    }
+  },
+  "ejemplo_flujo_agente": {
+    "entrada": "Usuario solicita generar resumen de un documento largo",
+    "pasos": [
+      "1. Frontend envía request POST /generate-summary con Firebase Auth token",
+      "2. Cloud Run API valida token y extrae userId + custom claims (role)",
+      "3. Verifica rate limit en Firestore (¿usuario alcanzó límite diario?)",
+      "4. Si OK, invoca AI Agent service vía HTTP interno autenticado",
+      "5. AI Agent valida acción en policy whitelist según role",
+      "6. Invoca Vertex AI Gemini Pro con prompt sanitizado",
+      "7. Recibe respuesta, calcula tokens y costo",
+      "8. Guarda log completo en Firestore collection ai_logs",
+      "9. Actualiza contador de quota del usuario",
+      "10. Retorna resumen al frontend con metadata (costo, tokens, logId)"
+    ],
+    "salida": {
+      "summary": "string (resumen generado)",
+      "metadata": {
+        "duration_ms": 1250,
+        "tokens": {
+          "input": 450,
+          "output": 100
+        },
+        "cost_usd": 0.002,
+        "remaining_quota": 35,
+        "logId": "log_abc123"
+      }
+    }
+  },
+  "acceso_mobile": {
+    "laptop": [
+      "Cloud Console web: https://console.cloud.google.com",
+      "Dashboard personalizado Next.js responsive en Vercel",
+      "Logs y métricas en tiempo real vía Firestore onSnapshot",
+      "Alertas por email con enlace directo a dashboard"
+    ],
+    "celular": [
+      "Google Cloud Console App (iOS/Android) - Ver dashboards, logs, alertas push",
+      "Dashboard web PWA instalable en home screen con notificaciones push",
+      "Firestore real-time updates desde cualquier dispositivo",
+      "Alertas críticas vía SMS/push configurables en Cloud Monitoring"
+    ]
+  },
+  "costos_estimados": {
+    "escenario_1000_usuarios_mes": {
+      "firebase_auth": "$0 (hasta 50k usuarios gratis)",
+      "firestore": "$35 (2M reads, 500K writes)",
+      "cloud_run_api": "$20 (5M requests)",
+      "cloud_run_ai_agent": "$50 (50K requests)",
+      "vertex_ai_gemini": "$35 (5M tokens input, 1M output)",
+      "cloud_storage": "$3 (50 GB)",
+      "cloud_logging": "$25 (50 GB logs)",
+      "cloud_monitoring": "$10 (dashboards + alertas)",
+      "total_mensual": "$178"
+    },
+    "optimizaciones": [
+      "Caching de respuestas frecuentes: -30% costo Vertex AI",
+      "Batching de writes a Firestore: -20% costo Firestore",
+      "Log retention 7 días en lugar de 30: -60% costo Logging",
+      "1 instancia warm de Cloud Run: +$5/mes pero -80% latencia",
+      "Committed use discount: -25% con contrato anual"
+    ]
+  },
+  "ventajas_arquitectura": [
+    "Escalado automático: De 0 a miles de usuarios sin intervención manual",
+    "Pay-per-use: Solo pagas por lo que usas (sin servidores ociosos)",
+    "Seguridad nativa: Firebase Auth + IAM + Security Rules en múltiples capas",
+    "Monitoreo incluido: Cloud Operations Suite sin configuración adicional",
+    "Mobile-first: Dashboard y alertas accesibles desde cualquier dispositivo",
+    "Desarrollo rápido: Firebase SDK + Cloud Run reducen time-to-market",
+    "Compliance: Google Cloud cumple SOC 2, ISO 27001, GDPR",
+    "Multi-región: Deploy en múltiples regiones para baja latencia global"
+  ],
+  "proximos_pasos_inmediatos": [
+    "Crear proyecto en Google Cloud Console y habilitar APIs (5 minutos)",
+    "Configurar Firebase Authentication con email/password (10 minutos)",
+    "Diseñar schema de Firestore y escribir Security Rules (30 minutos)",
+    "Desarrollar endpoint simple en Cloud Run para validar setup (1 hora)",
+    "Integrar Vertex AI Gemini Pro en AI Agent con rate limiting (2 horas)",
+    "Crear dashboard básico en Vercel con Firebase SDK (2 horas)",
+    "Configurar logging estructurado y primera alerta (30 minutos)",
+    "Deploy canary a producción y validar con usuarios beta (1 día)"
+  ],
+  "documentacion_completa": "Ver docs/HITHUM_GOOGLE_CLOUD_ARCHITECTURE.md para guía detallada con código, comandos y ejemplos completos"
+}
