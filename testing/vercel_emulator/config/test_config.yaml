@@ -1,0 +1,76 @@
+# Configuración del Vercel Emulator
+# Este archivo define cómo se ejecutan las pruebas
+
+test_config:
+  # Ejecución paralela de módulos
+  parallel_execution: true
+  max_workers: 4
+  timeout_seconds: 300
+  
+  # Configuración de módulos
+  modules:
+    ui:
+      enabled: true
+      critical: true
+      timeout: 60
+      description: "Pruebas de componentes de interfaz de usuario"
+      
+    ml:
+      enabled: true
+      critical: true
+      timeout: 120
+      description: "Pruebas de lógica de ML y predicciones de ruleta"
+      
+    data:
+      enabled: true
+      critical: false
+      timeout: 30
+      description: "Pruebas de persistencia y almacenamiento de datos"
+      
+    integration:
+      enabled: true
+      critical: true
+      timeout: 180
+      description: "Pruebas de integración end-to-end"
+  
+  # Configuración de reporters
+  reporters:
+    - console
+    - html
+    - json
+  
+  # Artifacts a generar
+  artifacts:
+    screenshots: true
+    coverage: true
+    logs: true
+    html_report: true
+    json_report: true
+    
+  # Checks pre-deployment
+  deployment_checks:
+    - name: "Build Size"
+      max_size_mb: 50
+      description: "Verificar que el APK no exceda 50MB"
+      
+    - name: "Startup Time"
+      max_ms: 3000
+      description: "Verificar tiempo de inicio de la app"
+      
+    - name: "Memory Usage"
+      max_mb: 512
+      description: "Verificar uso de memoria en ejecución"
+      
+    - name: "Test Coverage"
+      min_percentage: 70
+      description: "Cobertura mínima de pruebas"
+
+  # Configuración de entorno
+  environment:
+    flutter_version: ">=3.0.0"
+    dart_version: ">=3.0.0"
+    
+  # Umbrales de éxito
+  thresholds:
+    min_pass_rate: 95.0  # 95% de tests deben pasar
+    max_failed_critical: 0  # 0 tests críticos pueden fallar

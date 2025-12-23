@@ -118,3 +118,8 @@ lib/generated_plugin_registrant.dart
 
 # Project Health Agent - Generated reports
 reports/
+
+# Test Results and Bot Logs
+test-results/
+logs/bots/
+*.log
