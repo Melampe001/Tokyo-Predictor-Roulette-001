@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 // import 'package:firebase_core/firebase_core.dart';
 // import 'package:flutter_stripe/flutter_stripe.dart';
 import 'roulette_logic.dart';
+import 'theme/app_theme.dart';
 // TODO: Genera firebase_options.dart con: flutterfire configure
 // import 'firebase_options.dart';
 
@@ -30,7 +31,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Tokyo Roulette Predicciones',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
+      debugShowCheckedModeBanner: false,
       home: const LoginScreen(),
     );
   }

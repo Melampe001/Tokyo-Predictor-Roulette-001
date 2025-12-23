@@ -21,6 +21,13 @@ dependencies:
   # charts_flutter: ^0.12.0  # Gráficos (DEPRECADO)
   fl_chart: ^0.65.0  # Gráficos modernos (reemplazo de charts_flutter)
   firebase_messaging: ^14.7.10  # Notificaciones para invitaciones
+  
+  # UI/UX Enhancement packages
+  flutter_animate: ^4.3.0  # Animaciones declarativas
+  shimmer: ^3.0.0  # Efectos shimmer para loading
+  lottie: ^2.7.0  # Animaciones Lottie
+  cached_network_image: ^3.3.0  # Caché de imágenes
+  flutter_svg: ^2.0.9  # Soporte SVG
 dev_dependencies:
   flutter_test:
     sdk: flutter
