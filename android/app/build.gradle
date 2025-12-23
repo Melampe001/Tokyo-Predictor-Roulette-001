@@ -98,13 +98,20 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    // Firebase (descomentar cuando se configure)
-    // implementation platform('com.google.firebase:firebase-bom:32.7.0')
-    // implementation 'com.google.firebase:firebase-analytics'
-    // implementation 'com.google.firebase:firebase-auth'
-    // implementation 'com.google.firebase:firebase-firestore'
-    // implementation 'com.google.firebase:firebase-messaging'
+    
+    // Firebase BoM (Bill of Materials) - gestiona versiones automáticamente
+    implementation platform('com.google.firebase:firebase-bom:32.7.0')
+    
+    // Firebase Services - las versiones son gestionadas por el BoM
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-firestore'
+    implementation 'com.google.firebase:firebase-messaging'
+    implementation 'com.google.firebase:firebase-remote-config'
+    implementation 'com.google.firebase:firebase-crashlytics'
+    implementation 'com.google.firebase:firebase-perf'
+    implementation 'com.google.firebase:firebase-storage'
 }
 
-// Firebase (descomentar cuando se configure google-services.json)
-// apply plugin: 'com.google.gms.google-services'
+// Aplicar plugin de Google Services (debe estar al final del archivo)
+apply plugin: 'com.google.gms.google-services'

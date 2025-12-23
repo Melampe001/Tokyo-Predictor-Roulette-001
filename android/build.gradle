@@ -10,8 +10,8 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:8.1.4'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        // Firebase (descomentar cuando se configure)
-        // classpath 'com.google.gms:google-services:4.4.0'
+        // Firebase Google Services Plugin
+        classpath 'com.google.gms:google-services:4.4.0'
     }
 }
 

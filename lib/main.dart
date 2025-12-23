@@ -1,17 +1,32 @@
 import 'package:flutter/material.dart';
-// Removed unused imports: firebase_core and flutter_stripe.
-// Uncomment and initialize when configured:
-// import 'package:firebase_core/firebase_core.dart';
-// import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'roulette_logic.dart';
+import 'services/auth_service.dart';
+import 'services/analytics_service.dart';
+import 'services/crashlytics_service.dart';
+import 'services/remote_config_service.dart';
+import 'services/notification_service.dart';
 // TODO: Genera firebase_options.dart con: flutterfire configure
 // import 'firebase_options.dart';
+
+// Servicios de Firebase globales (singleton pattern)
+final authService = AuthService();
+final analyticsService = AnalyticsService();
+final crashlyticsService = CrashlyticsService();
+final remoteConfigService = RemoteConfigService();
+final notificationService = NotificationService();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // TODO: Descomentar cuando firebase_options.dart esté configurado
+  // Inicializar Firebase (descomentar cuando firebase_options.dart esté configurado)
   // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  
+  // Inicializar servicios de Firebase (descomentar cuando Firebase esté configurado)
+  // await crashlyticsService.initialize();
+  // await remoteConfigService.initialize();
+  // await notificationService.initialize();
+  // await analyticsService.logAppOpen();
   
   // SEGURIDAD: NO hardcodear claves. Usar variables de entorno o configuración segura
   // TODO: Configurar Stripe key desde variables de entorno
@@ -78,6 +93,9 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       _emailError = null;
     });
+    
+    // Log analytics event (descomentar cuando Firebase esté configurado)
+    // analyticsService.logLogin('email');
     
     // TODO: Implementar lógica de registro/Auth aquí con Firebase Auth
     // Por ahora, esto es solo una simulación educativa sin backend
@@ -166,12 +184,19 @@ class _MainScreenState extends State<MainScreen> {
       if (won) {
         balance += currentBet;
         lastBetResult = '¡Ganaste! +${currentBet.toStringAsFixed(2)}';
+        // Log analytics (descomentar cuando Firebase esté configurado)
+        // analyticsService.logGameResult(won: true, amount: currentBet, predictedNumber: prediction, resultNumber: res);
       } else {
         balance -= currentBet;
         // Asegura que el balance no sea negativo
         if (balance < 0) balance = 0;
         lastBetResult = 'Perdiste -${currentBet.toStringAsFixed(2)}';
+        // Log analytics (descomentar cuando Firebase esté configurado)
+        // analyticsService.logGameResult(won: false, amount: currentBet, predictedNumber: prediction, resultNumber: res);
       }
+      
+      // Log roulette spin (descomentar cuando Firebase esté configurado)
+      // analyticsService.logRouletteSpin(result: res, predicted: prediction);
       
       // Actualiza apuesta según Martingale si está activado
       if (useMartingale) {

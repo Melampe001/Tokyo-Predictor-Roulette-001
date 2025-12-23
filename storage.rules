@@ -1,0 +1,67 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Función helper para verificar autenticación
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Función helper para verificar propietario
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Función helper para verificar tamaño de archivo (máximo 10MB)
+    function isValidSize() {
+      return request.resource.size <= 10 * 1024 * 1024;
+    }
+    
+    // Función helper para verificar tipo de imagen
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+    
+    // ==================== AVATARES DE USUARIO ====================
+    match /users/{userId}/avatars/{filename} {
+      // Lectura: Todos pueden leer (avatares públicos)
+      allow read: if true;
+      
+      // Escritura: Solo el propietario
+      allow write: if isOwner(userId)
+        && isImage()
+        && isValidSize();
+      
+      // Eliminación: Solo el propietario
+      allow delete: if isOwner(userId);
+    }
+    
+    // ==================== ARCHIVOS TEMPORALES ====================
+    match /users/{userId}/temp/{allPaths=**} {
+      // Lectura: Solo el propietario
+      allow read: if isOwner(userId);
+      
+      // Escritura: Solo el propietario
+      allow write: if isOwner(userId)
+        && isValidSize();
+      
+      // Eliminación: Solo el propietario
+      allow delete: if isOwner(userId);
+    }
+    
+    // ==================== ASSETS PÚBLICOS ====================
+    match /assets/{allPaths=**} {
+      // Lectura: Todos los usuarios autenticados
+      allow read: if isAuthenticated();
+      
+      // Escritura: No permitido desde cliente
+      allow write: if false;
+    }
+    
+    // ==================== REGLAS POR DEFECTO ====================
+    // Denegar todo lo demás
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
