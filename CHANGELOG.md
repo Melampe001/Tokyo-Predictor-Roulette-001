@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- **Reorganización del Repositorio**: Limpieza y mejora de la estructura del proyecto
+  - Movidos 6 archivos de screenshots (3.9 MB total) desde la raíz a `docs/images/screenshots/`
+  - Movido script `close_stale_prs.sh` desde la raíz a la carpeta `scripts/`
+  - Actualizado README.md para reflejar nueva ubicación de screenshots
+  - Mejorado `.gitignore` para excluir apropiadamente `.vscode/` con excepciones para archivos de ejemplo
+  - Preservado el historial de git usando `git mv` en lugar de copiar/eliminar
+  - Preservados los permisos de ejecución en scripts
+
 ## [1.0.0] - 2024-12-12
 
 ### Added
