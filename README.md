@@ -23,8 +23,9 @@ Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y mod
 ✅ **Historial Visual** de últimos 20 giros con colores (rojo/negro/verde)  
 ✅ **Interfaz Moderna** con tarjetas, iconos y diseño limpio  
 ✅ **Configuración** de estrategias y opciones de juego  
-✅ **Tests Unitarios** para lógica de ruleta y Martingale  
-✅ **Tests de Widgets** para UI y flujos principales  
+✅ **Suite de Tests Completa** (170+ unit, 100+ widget, 10+ integration)  
+✅ **Cobertura de Tests** >80% con reportes automatizados  
+✅ **Tests de Rendimiento** para algoritmos críticos  
 ✅ **Disclaimer de Seguridad** sobre juego responsable
 
 ## 🚀 Inicio Rápido
@@ -62,23 +63,51 @@ flutter build apk --release
 
 La APK se generará en: `build/app/outputs/flutter-apk/app-release.apk`
 
-## 🧪 Ejecutar Tests
+## 🧪 Testing Suite
+
+Este proyecto cuenta con una **suite de tests completa** que incluye:
+
+### 📊 Test Statistics
+- **170+ Unit Tests**: Lógica de negocio y validadores
+- **100+ Widget Tests**: Componentes UI y flujos de usuario
+- **10+ Integration Tests**: Flujos end-to-end completos
+- **15+ Performance Tests**: Benchmarks de rendimiento
+
+### 🏃 Ejecutar Tests
 
 ```bash
 # Todos los tests
 flutter test
 
-# Tests específicos
-flutter test test/roulette_logic_test.dart
-flutter test test/widget_test.dart
+# Tests por categoría
+flutter test test/unit/          # Tests unitarios
+flutter test test/widget/        # Tests de widgets
+flutter test integration_test/   # Tests de integración
+flutter test test/performance/   # Tests de rendimiento
 
 # Con cobertura
 flutter test --coverage
+genhtml coverage/lcov.info -o coverage/html
+open coverage/html/index.html
+
+# Usando scripts
+./scripts/test.sh              # Suite completa con reporte
+./scripts/test_unit.sh         # Solo unitarios
+./scripts/test_widget.sh       # Solo widgets
+./scripts/test_integration.sh  # Solo integración
 ```
+
+### 🎯 Coverage Goals
+- **Overall**: >80%
+- **Business Logic**: >90%
+- **UI Components**: >70%
+
+Para más detalles, consulta **[docs/TESTING.md](docs/TESTING.md)**.
 
 ## 📚 Documentación
 
 - **[Guía de Usuario](docs/USER_GUIDE.md)**: Manual completo de uso de la aplicación
+- **[Guía de Testing](docs/TESTING.md)**: Documentación completa sobre testing
 - **[Arquitectura Técnica](docs/ARCHITECTURE.md)**: Diseño y estructura del código
 - **[Configuración Firebase](docs/FIREBASE_SETUP.md)**: Cómo integrar Firebase (opcional)
 - **[Health Agent](docs/HEALTH_AGENT.md)**: Sistema de auditoría de salud del proyecto
