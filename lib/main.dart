@@ -5,6 +5,16 @@ import 'package:flutter/material.dart';
 // import 'package:flutter_stripe/flutter_stripe.dart';
 import 'roulette_logic.dart';
 import 'theme/app_theme.dart';
+import 'widgets/custom_button.dart';
+import 'widgets/custom_card.dart';
+import 'widgets/roulette/animated_roulette_wheel.dart';
+import 'widgets/number_selector.dart';
+import 'widgets/win_animation.dart';
+import 'screens/settings_screen.dart';
+import 'screens/statistics_screen.dart';
+import 'screens/profile_screen.dart';
+import 'utils/responsive_helper.dart';
+import 'constants/app_constants.dart';
 // TODO: Genera firebase_options.dart con: flutterfire configure
 // import 'firebase_options.dart';
 
@@ -93,35 +103,98 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _emailController,
-              keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(
-                labelText: 'Email',
-                hintText: 'ejemplo@correo.com',
-                errorText: _emailError,
+      body: ResponsiveCenter(
+        maxWidth: 400,
+        child: Padding(
+          padding: ResponsiveHelper.responsivePadding(context),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // App logo/title
+              Icon(
+                Icons.casino,
+                size: 80,
+                color: theme.colorScheme.primary,
               ),
-              onChanged: (value) {
-                // Clear error when user types
-                if (_emailError != null) {
-                  setState(() {
-                    _emailError = null;
-                  });
-                }
-              },
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _validateAndContinue,
-              child: const Text('Registrar y Continuar'),
-            ),
-          ],
+              const SizedBox(height: 16),
+              Text(
+                'Tokyo Roulette',
+                style: theme.textTheme.headlineLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Simulador Educativo de Predicciones',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 48),
+              
+              // Email input
+              TextField(
+                controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  hintText: 'ejemplo@correo.com',
+                  errorText: _emailError,
+                  prefixIcon: const Icon(Icons.email_outlined),
+                ),
+                onChanged: (value) {
+                  // Clear error when user types
+                  if (_emailError != null) {
+                    setState(() {
+                      _emailError = null;
+                    });
+                  }
+                },
+                onSubmitted: (_) => _validateAndContinue(),
+              ),
+              const SizedBox(height: 24),
+              
+              // Login button
+              CustomButton(
+                text: 'Registrar y Continuar',
+                onPressed: _validateAndContinue,
+                icon: Icons.arrow_forward,
+                fullWidth: true,
+                type: ButtonType.primary,
+                size: ButtonSize.large,
+              ),
+              const SizedBox(height: 32),
+              
+              // Disclaimer
+              CustomCard(
+                color: theme.colorScheme.errorContainer.withOpacity(0.3),
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline,
+                      color: theme.colorScheme.error,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'App educativa - No promueve juegos de azar reales',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.error,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -139,339 +212,364 @@ class _MainScreenState extends State<MainScreen> {
   final RouletteLogic _rouletteLogic = RouletteLogic();
   final MartingaleAdvisor _martingaleAdvisor = MartingaleAdvisor();
   
-  String result = 'Presiona Girar';
+  int? result;
   List<int> history = [];
   int? prediction;
-  double balance = 1000.0;
-  double currentBet = 10.0;
+  double balance = AppConstants.defaultBalance;
+  double currentBet = AppConstants.defaultBet;
   bool useMartingale = false;
   String lastBetResult = '';
+  bool isSpinning = false;
+  bool showWinAnimation = false;
+  int _currentIndex = 0;
+
+  // Stats tracking
+  double totalWins = 0;
+  double totalLosses = 0;
+  int totalGames = 0;
+  double highScore = AppConstants.defaultBalance;
 
   void spinRoulette() {
-    // Genera predicción antes del giro
-    if (history.isNotEmpty) {
-      prediction = _rouletteLogic.predictNext(history);
-    } else {
-      prediction = null;
-    }
-    
-    // Usa RouletteLogic con RNG seguro
-    final res = _rouletteLogic.generateSpin();
-    
-    // Simula resultado de apuesta (ejemplo: apostar al color rojo)
-    final bool isRed = _isRedNumber(res);
-    final bool won = isRed; // Simplificado: asumimos que apostamos a rojo
-    
+    if (isSpinning || balance < currentBet) return;
+
     setState(() {
-      result = res.toString();
-      history.add(res);
-      
-      // Actualiza balance
-      if (won) {
-        balance += currentBet;
-        lastBetResult = '¡Ganaste! +${currentBet.toStringAsFixed(2)}';
+      isSpinning = true;
+      // Generate prediction before spin
+      if (history.isNotEmpty) {
+        prediction = _rouletteLogic.predictNext(history);
       } else {
-        balance -= currentBet;
-        // Asegura que el balance no sea negativo
-        if (balance < 0) balance = 0;
-        lastBetResult = 'Perdiste -${currentBet.toStringAsFixed(2)}';
+        prediction = null;
       }
+    });
+
+    // Simulate spin delay
+    Future.delayed(const Duration(milliseconds: 500), () {
+      final res = _rouletteLogic.generateSpin();
+      final bool isRed = _isRedNumber(res);
+      final bool won = isRed; // Simplified: assume betting on red
       
-      // Actualiza apuesta según Martingale si está activado
-      if (useMartingale) {
-        currentBet = _martingaleAdvisor.getNextBet(won);
-        // Asegura que la apuesta no exceda el balance
-        if (currentBet > balance) {
-          currentBet = balance;
+      setState(() {
+        result = res;
+        history.add(res);
+        totalGames++;
+        
+        // Update balance and track stats
+        if (won) {
+          balance += currentBet;
+          totalWins += currentBet;
+          lastBetResult = 'win';
+          showWinAnimation = true;
+          
+          // Update high score
+          if (balance > highScore) {
+            highScore = balance;
+          }
+        } else {
+          balance -= currentBet;
+          totalLosses += currentBet;
+          if (balance < 0) balance = 0;
+          lastBetResult = 'loss';
         }
+        
+        // Update bet according to Martingale if active
+        if (useMartingale) {
+          currentBet = _martingaleAdvisor.getNextBet(won);
+          if (currentBet > balance) {
+            currentBet = balance;
+          }
+        }
+        
+        // Limit history length
+        if (history.length > AppConstants.historyMaxLength) {
+          history = history.sublist(history.length - AppConstants.historyMaxLength);
+        }
+      });
+
+      // Hide win animation after delay
+      if (won) {
+        Future.delayed(const Duration(milliseconds: 2500), () {
+          if (mounted) {
+            setState(() {
+              showWinAnimation = false;
+            });
+          }
+        });
       }
-      
-      // Limita el historial a los últimos 20 números
-      if (history.length > 20) {
-        history = history.sublist(history.length - 20);
-      }
+
+      // Stop spinning animation
+      Future.delayed(const Duration(milliseconds: 4000), () {
+        if (mounted) {
+          setState(() {
+            isSpinning = false;
+          });
+        }
+      });
     });
   }
   
   bool _isRedNumber(int number) {
-    // Números rojos en la ruleta europea
-    const redNumbers = {1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36};
-    return redNumbers.contains(number);
+    return AppConstants.redNumbers.contains(number);
   }
   
   void _resetGame() {
     setState(() {
       history.clear();
-      result = 'Presiona Girar';
-      balance = 1000.0;
-      currentBet = 10.0;
+      result = null;
+      balance = AppConstants.defaultBalance;
+      currentBet = AppConstants.defaultBet;
       prediction = null;
       lastBetResult = '';
       _martingaleAdvisor.reset();
       _martingaleAdvisor.baseBet = currentBet;
+      isSpinning = false;
     });
-  }
-  
-  void _showSettingsDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Configuración'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SwitchListTile(
-              title: const Text('Usar estrategia Martingale'),
-              subtitle: const Text('Duplica la apuesta tras perder'),
-              value: useMartingale,
-              onChanged: (value) {
-                setState(() {
-                  useMartingale = value;
-                  if (value) {
-                    _martingaleAdvisor.baseBet = currentBet;
-                  }
-                });
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cerrar'),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    // Show different screens based on navigation
+    if (_currentIndex == 1) {
+      return StatisticsScreen(
+        history: history,
+        totalWins: totalWins,
+        totalLosses: totalLosses,
+        totalGames: totalGames,
+      );
+    } else if (_currentIndex == 2) {
+      return ProfileScreen(
+        email: 'usuario@ejemplo.com', // TODO: Get from auth
+        totalWins: totalWins,
+        totalLosses: totalLosses,
+        totalGames: totalGames,
+        highScore: highScore,
+      );
+    } else if (_currentIndex == 3) {
+      return const SettingsScreen();
+    }
+
+    // Main game screen
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tokyo Roulette Predicciones'),
+        title: const Text('Tokyo Roulette'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: _showSettingsDialog,
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
+          CustomIconButton(
+            icon: Icons.refresh,
             onPressed: _resetGame,
+            tooltip: 'Reiniciar juego',
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Balance y apuesta actual
-            Card(
-              color: Colors.blue.shade50,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    Text(
-                      'Balance: \$${balance.toStringAsFixed(2)}',
-                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Apuesta actual: \$${currentBet.toStringAsFixed(2)}',
-                      style: const TextStyle(fontSize: 18),
-                    ),
-                    if (lastBetResult.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Text(
-                          lastBetResult,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: lastBetResult.contains('Ganaste') ? Colors.green : Colors.red,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            
-            // Resultado actual
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  children: [
-                    const Text(
-                      'Resultado',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        color: result == 'Presiona Girar' 
-                          ? Colors.grey.shade300
-                          : _getNumberColor(int.tryParse(result) ?? -1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Text(
-                          result,
-                          style: const TextStyle(
-                            fontSize: 36,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            
-            // Predicción
-            if (prediction != null)
-              Card(
-                color: Colors.amber.shade50,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      const Icon(Icons.lightbulb_outline, size: 32, color: Colors.amber),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Predicción sugerida',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                      ),
-                      Text(
-                        prediction.toString(),
-                        style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-                      ),
-                      const Text(
-                        '(basada en historial reciente)',
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
-                      ),
-                    ],
+      body: Stack(
+        children: [
+          ResponsiveCenter(
+            child: SingleChildScrollView(
+              padding: ResponsiveHelper.responsivePadding(context),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Balance card
+                  BalanceCard(
+                    label: 'Balance Actual',
+                    amount: balance,
+                    icon: Icons.account_balance_wallet,
+                    color: theme.colorScheme.primary,
                   ),
-                ),
-              ),
-            const SizedBox(height: 16),
-            
-            // Botón girar
-            ElevatedButton.icon(
-              onPressed: balance >= currentBet ? spinRoulette : null,
-              icon: const Icon(Icons.play_circle_outline, size: 32),
-              label: const Text('Girar Ruleta', style: TextStyle(fontSize: 20)),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-              ),
-            ),
-            const SizedBox(height: 16),
-            
-            // Historial
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Historial Reciente',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  const SizedBox(height: 16),
+
+                  // Roulette wheel
+                  Center(
+                    child: AnimatedRouletteWheel(
+                      resultNumber: result,
+                      predictionNumber: prediction,
+                      size: ResponsiveHelper.isMobile(context) ? 280 : 350,
+                      isSpinning: isSpinning,
+                      onSpinComplete: () {
+                        // Animation complete callback
+                      },
                     ),
-                    const SizedBox(height: 12),
-                    if (history.isEmpty)
-                      const Text('No hay giros todavía', style: TextStyle(color: Colors.grey))
-                    else
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: history.reversed.map((num) {
-                          return Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: _getNumberColor(num),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Center(
-                              child: Text(
-                                num.toString(),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Result display
+                  if (result != null)
+                    Center(
+                      child: RouletteResultDisplay(
+                        number: result,
+                        size: 100,
+                        animate: true,
+                      ),
+                    ),
+                  const SizedBox(height: 16),
+
+                  // Prediction card
+                  if (prediction != null && isSpinning)
+                    PredictionDisplay(
+                      predictedNumber: prediction!,
+                      description: '(basada en historial reciente)',
+                    ),
+                  const SizedBox(height: 16),
+
+                  // Bet amount
+                  CustomCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Apuesta Actual',
+                          style: theme.textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Slider(
+                                value: currentBet,
+                                min: AppConstants.minBet,
+                                max: balance.clamp(AppConstants.minBet, AppConstants.maxBet),
+                                divisions: 20,
+                                label: '\$${currentBet.toStringAsFixed(0)}',
+                                onChanged: useMartingale ? null : (value) {
+                                  setState(() {
+                                    currentBet = value;
+                                  });
+                                },
                               ),
                             ),
-                          );
-                        }).toList(),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            
-            // Info sobre Martingale
-            if (useMartingale)
-              Card(
-                color: Colors.orange.shade50,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Row(
+                            const SizedBox(width: 12),
+                            Text(
+                              '\$${currentBet.toStringAsFixed(0)}',
+                              style: theme.textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        SwitchListTile(
+                          contentPadding: EdgeInsets.zero,
+                          title: const Text('Estrategia Martingale'),
+                          subtitle: const Text('Duplica apuesta tras perder'),
+                          value: useMartingale,
+                          onChanged: (value) {
+                            setState(() {
+                              useMartingale = value;
+                              if (value) {
+                                _martingaleAdvisor.baseBet = currentBet;
+                              }
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Spin button
+                  Center(
+                    child: SpinButton(
+                      onPressed: spinRoulette,
+                      isSpinning: isSpinning,
+                      isDisabled: balance < currentBet,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // History
+                  if (history.isNotEmpty)
+                    CustomCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(Icons.show_chart, color: Colors.orange),
-                          SizedBox(width: 8),
                           Text(
-                            'Estrategia Martingale Activa',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            'Historial Reciente',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          NumberHistory(
+                            numbers: history,
+                            highlightNumber: result,
+                            itemSize: 48,
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'La apuesta se duplicará automáticamente después de cada pérdida.',
-                        style: TextStyle(fontSize: 12),
-                      ),
-                    ],
+                    ),
+                  const SizedBox(height: 16),
+
+                  // Disclaimer
+                  CustomCard(
+                    color: theme.colorScheme.error.withOpacity(0.1),
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.warning_amber_rounded,
+                          color: theme.colorScheme.error,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            AppConstants.disclaimer,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.error,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ),
-            
-            // Disclaimer
-            const SizedBox(height: 16),
-            const Card(
-              color: Colors.red,
-              child: Padding(
-                padding: EdgeInsets.all(12.0),
-                child: Text(
-                  '⚠️ DISCLAIMER: Esta es una simulación educativa. No promueve juegos de azar reales. Las predicciones son aleatorias y no garantizan resultados.',
-                  style: TextStyle(color: Colors.white, fontSize: 12),
-                  textAlign: TextAlign.center,
-                ),
+                  const SizedBox(height: 24),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+          
+          // Win animation overlay
+          if (showWinAnimation)
+            WinAnimation(
+              amount: currentBet,
+              onComplete: () {
+                setState(() {
+                  showWinAnimation = false;
+                });
+              },
+            ),
+        ],
+      ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.casino_outlined),
+            selectedIcon: Icon(Icons.casino),
+            label: 'Jugar',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.bar_chart_outlined),
+            selectedIcon: Icon(Icons.bar_chart),
+            label: 'Estadísticas',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person),
+            label: 'Perfil',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.settings_outlined),
+            selectedIcon: Icon(Icons.settings),
+            label: 'Ajustes',
+          ),
+        ],
       ),
     );
-  }
-  
-  Color _getNumberColor(int number) {
-    if (number == 0) return Colors.green;
-    if (_isRedNumber(number)) return Colors.red.shade700;
-    return Colors.black;
   }
 }
