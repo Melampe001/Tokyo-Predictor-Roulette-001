@@ -1,0 +1,127 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Función helper para verificar autenticación
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Función helper para verificar propietario
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Función helper para verificar email verificado
+    function isEmailVerified() {
+      return isAuthenticated() && request.auth.token.email_verified == true;
+    }
+    
+    // ==================== COLECCIÓN USERS ====================
+    match /users/{userId} {
+      // Lectura: Solo el propio usuario
+      allow read: if isOwner(userId);
+      
+      // Creación: Solo el propio usuario puede crear su documento
+      allow create: if isOwner(userId)
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.keys().hasAll(['email', 'createdAt', 'updatedAt']);
+      
+      // Actualización: Solo el propio usuario
+      allow update: if isOwner(userId)
+        && request.resource.data.email == resource.data.email // No permitir cambio de email
+        && request.resource.data.createdAt == resource.data.createdAt; // No permitir cambio de fecha creación
+      
+      // Eliminación: Solo el propio usuario
+      allow delete: if isOwner(userId);
+    }
+    
+    // ==================== COLECCIÓN PREDICTIONS ====================
+    match /predictions/{predictionId} {
+      // Lectura: Solo predicciones del propio usuario
+      allow read: if isAuthenticated()
+        && resource.data.userId == request.auth.uid;
+      
+      // Creación: Solo usuarios autenticados
+      allow create: if isAuthenticated()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.keys().hasAll([
+          'userId', 
+          'predictedNumber', 
+          'betAmount', 
+          'result', 
+          'timestamp'
+        ])
+        && request.resource.data.predictedNumber >= 0
+        && request.resource.data.predictedNumber <= 36
+        && request.resource.data.betAmount > 0
+        && request.resource.data.betAmount <= 10000  // Límite de apuesta
+        && request.resource.data.result in ['pending', 'win', 'loss'];
+      
+      // Actualización: Solo el propietario puede actualizar
+      allow update: if isAuthenticated()
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == resource.data.userId
+        && request.resource.data.predictedNumber == resource.data.predictedNumber
+        && request.resource.data.timestamp == resource.data.timestamp;
+      
+      // Eliminación: Solo el propietario
+      allow delete: if isAuthenticated()
+        && resource.data.userId == request.auth.uid;
+    }
+    
+    // ==================== COLECCIÓN SESSIONS ====================
+    match /sessions/{sessionId} {
+      // Lectura: Solo sesiones del propio usuario
+      allow read: if isAuthenticated()
+        && resource.data.userId == request.auth.uid;
+      
+      // Creación: Solo usuarios autenticados
+      allow create: if isAuthenticated()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.keys().hasAll([
+          'userId', 
+          'startTime', 
+          'active', 
+          'initialBalance'
+        ])
+        && request.resource.data.active == true
+        && request.resource.data.initialBalance >= 0;
+      
+      // Actualización: Solo el propietario
+      allow update: if isAuthenticated()
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == resource.data.userId
+        && request.resource.data.startTime == resource.data.startTime
+        && request.resource.data.initialBalance == resource.data.initialBalance;
+      
+      // Eliminación: Solo el propietario
+      allow delete: if isAuthenticated()
+        && resource.data.userId == request.auth.uid;
+    }
+    
+    // ==================== COLECCIÓN ACHIEVEMENTS ====================
+    match /achievements/{achievementId} {
+      // Lectura: Todos los usuarios autenticados pueden leer
+      allow read: if isAuthenticated();
+      
+      // Escritura: Solo administradores (no permitido desde cliente)
+      allow write: if false;
+    }
+    
+    // ==================== COLECCIÓN CONFIG ====================
+    match /config/{document=**} {
+      // Lectura: Todos los usuarios autenticados
+      allow read: if isAuthenticated();
+      
+      // Escritura: Solo administradores (no permitido desde cliente)
+      allow write: if false;
+    }
+    
+    // ==================== REGLAS POR DEFECTO ====================
+    // Denegar todo lo demás
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
