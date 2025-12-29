@@ -14,7 +14,7 @@ dependencies:
   cloud_firestore: ^4.15.3  # Almacenar emails
   firebase_auth: ^4.16.0  # Auth para emails
   intl: ^0.18.1  # Idioma/país
-  device_info_plus: ^9.1.2  # Info dispositivo/plataforma
+  device_info_plus: ^12.3.0  # Info dispositivo/plataforma
   url_launcher: ^6.2.4  # Comentarios via email
   shared_preferences: ^2.2.2  # Storage local
   # NOTA: charts_flutter está deprecado. Considera usar fl_chart o community_charts_flutter
