@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Adaptive Icon - TokyoIA Roulette Predictor
+    
+    Este archivo define el icono adaptativo de la aplicación para Android 8.0+
+    
+    Ubicación: android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+    
+    INSTRUCCIONES:
+    1. Coloca ic_launcher_foreground.png en cada carpeta mipmap-* con los tamaños correctos
+    2. Coloca ic_launcher_background.png (o usa un color sólido)
+    3. Este archivo referencia ambos recursos
+    
+    TAMAÑOS REQUERIDOS para foreground/background:
+    - mipmap-mdpi:    108x108 px
+    - mipmap-hdpi:    162x162 px
+    - mipmap-xhdpi:   216x216 px
+    - mipmap-xxhdpi:  324x324 px
+    - mipmap-xxxhdpi: 432x432 px
+    
+    SAFE ZONE:
+    - El icono adaptativo usa una máscara que puede ser circular, cuadrada, 
+      squircle, etc. según el dispositivo
+    - Mantén el contenido importante dentro del 66% central
+    - El foreground debe tener fondo transparente
+    
+    ALTERNATIVA CON COLOR SÓLIDO:
+    Si prefieres un color sólido como background en lugar de imagen:
+    
+    <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+        <background android:drawable="@color/ic_launcher_background"/>
+        <foreground android:drawable="@mipmap/ic_launcher_foreground"/>
+    </adaptive-icon>
+    
+    Y define el color en res/values/colors.xml:
+    <color name="ic_launcher_background">#1A237E</color>
+-->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background: imagen o color sólido -->
+    <background android:drawable="@mipmap/ic_launcher_background"/>
+    
+    <!-- Foreground: tu logo con fondo transparente -->
+    <foreground android:drawable="@mipmap/ic_launcher_foreground"/>
+    
+    <!-- Monochrome (opcional, Android 13+): para themed icons -->
+    <!-- <monochrome android:drawable="@mipmap/ic_launcher_monochrome"/> -->
+</adaptive-icon>
