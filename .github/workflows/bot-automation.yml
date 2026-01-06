@@ -1,0 +1,138 @@
+name: Bot Automation Workflow
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  release:
+    types: [ published ]
+  schedule:
+    # Run maintenance bots weekly on Monday at 00:00 UTC
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+    inputs:
+      trigger_type:
+        description: 'Trigger type'
+        required: true
+        default: 'push'
+        type: choice
+        options:
+          - push
+          - pr
+          - release
+          - schedule
+
+jobs:
+  run-bots:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write  # For PR comments
+      actions: read  # For artifacts
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.0'
+          channel: 'stable'
+      
+      - name: Get dependencies
+        run: flutter pub get
+      
+      - name: Determine trigger type
+        id: trigger
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "type=--pr" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" = "release" ]; then
+            echo "type=--release" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" = "schedule" ]; then
+            echo "type=--schedule" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "type=--${{ github.event.inputs.trigger_type }}" >> $GITHUB_OUTPUT
+          else
+            echo "type=--push" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Run Bot Workflow
+        run: dart bots/run_bots.dart ${{ steps.trigger.outputs.type }} --parallel
+        continue-on-error: false
+      
+      - name: Upload bot logs
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: bot-execution-logs
+          path: logs/
+          if-no-files-found: ignore
+      
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const body = `## 🤖 Bot Automation Results
+            
+            The automated bot workflow has completed.
+            
+            **Trigger**: Pull Request
+            **Bots Executed**:
+            - 🏗️ Atlas Build Bot
+            - 🔮 Oracle Test Bot
+            - 🛡️ Sentinel Security Bot
+            - ☯️ Zen Code Quality Bot
+            - 📚 Mercury Docs Bot
+            
+            Check the workflow logs for detailed results.
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+  # Security scan job
+  security-scan:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      issues: write  # For creating security issues
+      actions: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.0'
+          channel: 'stable'
+      
+      - name: Get dependencies
+        run: flutter pub get
+      
+      - name: Run Sentinel Security Bot
+        run: dart bots/run_bots.dart --push --bot sentinel
+        continue-on-error: true
+      
+      - name: Create security issue if vulnerabilities found
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🛡️ Security vulnerabilities detected',
+              body: 'Sentinel Security Bot has detected potential security issues. Please review the workflow logs.',
+              labels: ['security', 'automated']
+            });

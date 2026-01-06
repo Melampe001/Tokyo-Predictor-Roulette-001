@@ -1,0 +1,152 @@
+# Registro Central de Bots Automatizados
+# Define todos los bots disponibles en el sistema
+
+bots:
+  atlas:
+    name: "Atlas Build Bot"
+    emoji: "🏗️"
+    role: "Build System Manager"
+    description: "Gestiona el proceso de compilación de la aplicación"
+    triggers:
+      - on_push
+      - on_pr
+    capabilities:
+      - flutter_build
+      - android_build
+      - web_build
+      - artifact_generation
+    priority: high
+    enabled: true
+    
+  oracle:
+    name: "Oracle Test Bot"
+    emoji: "🔮"
+    role: "Testing Oracle"
+    description: "Ejecuta tests y genera reportes de cobertura"
+    triggers:
+      - on_push
+      - on_pr
+      - schedule: "0 */6 * * *"  # Cada 6 horas
+    capabilities:
+      - unit_tests
+      - widget_tests
+      - integration_tests
+      - coverage_reports
+      - vercel_emulator
+    priority: critical
+    enabled: true
+    
+  sentinel:
+    name: "Sentinel Security Bot"
+    emoji: "🛡️"
+    role: "Security Guardian"
+    description: "Escanea vulnerabilidades y problemas de seguridad"
+    triggers:
+      - on_push
+      - on_pr
+      - schedule: "0 0 * * *"  # Diario
+    capabilities:
+      - dependency_scan
+      - code_analysis
+      - secret_detection
+      - vulnerability_check
+    priority: critical
+    enabled: true
+    
+  scout:
+    name: "Scout Dependency Bot"
+    emoji: "🔍"
+    role: "Dependency Scout"
+    description: "Monitorea y actualiza dependencias del proyecto"
+    triggers:
+      - schedule: "0 0 * * 1"  # Lunes
+    capabilities:
+      - dependency_updates
+      - compatibility_check
+      - license_audit
+      - outdated_detection
+    priority: medium
+    enabled: true
+    
+  zen:
+    name: "Zen Code Quality Bot"
+    emoji: "☯️"
+    role: "Code Quality Master"
+    description: "Mantiene la calidad y estilo del código"
+    triggers:
+      - on_push
+      - on_pr
+    capabilities:
+      - linting
+      - formatting
+      - complexity_analysis
+      - code_smells_detection
+    priority: high
+    enabled: true
+    
+  phoenix:
+    name: "Phoenix Deploy Bot"
+    emoji: "🔥"
+    role: "Deployment Orchestrator"
+    description: "Gestiona deployments y rollbacks"
+    triggers:
+      - on_release
+      - on_tag
+    capabilities:
+      - staging_deploy
+      - production_deploy
+      - rollback
+      - health_checks
+    priority: critical
+    enabled: true
+    
+  mercury:
+    name: "Mercury Docs Bot"
+    emoji: "📚"
+    role: "Documentation Curator"
+    description: "Genera y actualiza documentación automáticamente"
+    triggers:
+      - on_push
+      - on_pr
+      - schedule: "0 0 * * 0"  # Domingos
+    capabilities:
+      - doc_generation
+      - api_docs
+      - changelog_update
+      - readme_sync
+    priority: medium
+    enabled: true
+    
+  guardian:
+    name: "Guardian Monitor Bot"
+    emoji: "👁️"
+    role: "System Monitor"
+    description: "Monitorea la salud del sistema continuamente"
+    triggers:
+      - schedule: "*/15 * * * *"  # Cada 15 minutos
+    capabilities:
+      - health_monitoring
+      - performance_tracking
+      - error_reporting
+      - alerting
+    priority: high
+    enabled: true
+
+# Configuración global de bots
+config:
+  max_concurrent_bots: 3
+  bot_timeout_minutes: 30
+  retry_on_failure: true
+  max_retries: 2
+  
+  notifications:
+    on_failure: true
+    on_success: false
+    channels:
+      - github_issues
+      - console
+  
+  logging:
+    level: info
+    output: "logs/bots"
+    rotation: daily
