@@ -1,215 +1,537 @@
-# Guía de Configuración de Firebase (Opcional)
+# Firebase Complete Setup Guide
 
-Esta guía describe cómo configurar Firebase para habilitar las funcionalidades opcionales de autenticación y configuración remota.
+This is a comprehensive guide to configuring and using the Firebase integration in Tokyo Roulette Predictor.
 
-## ⚠️ Nota Importante
+## Quick Links
+- [Quick Start](#quick-start)
+- [Detailed Setup](#detailed-setup)
+- [Services Overview](#services-overview)
+- [Troubleshooting](#troubleshooting)
 
-Las funcionalidades de Firebase son **opcionales**. La aplicación funciona completamente sin Firebase, pero estas características añaden:
-- Autenticación de usuarios con email
-- Configuración remota para actualizar parámetros sin nueva versión
-- Almacenamiento de datos de usuario en Firestore
+## Quick Start
 
-## Prerequisitos
-
-1. Instalar Firebase CLI:
+### 1. Install Tools
 ```bash
 npm install -g firebase-tools
-```
-
-2. Instalar FlutterFire CLI:
-```bash
 dart pub global activate flutterfire_cli
 ```
 
-## Paso 1: Crear Proyecto en Firebase Console
-
-1. Ve a [Firebase Console](https://console.firebase.google.com/)
-2. Crea un nuevo proyecto o usa uno existente
-3. Habilita los siguientes servicios:
-   - **Authentication** (Email/Password provider)
-   - **Firestore Database**
-   - **Remote Config**
-
-## Paso 2: Configurar Firebase en Flutter
-
+### 2. Configure Firebase
 ```bash
-# Inicia sesión en Firebase
 firebase login
-
-# Configura el proyecto Flutter con Firebase
 flutterfire configure
 ```
 
-Este comando:
-- Crea automáticamente `firebase_options.dart`
-- Configura las credenciales para Android e iOS
-- Registra la app en tu proyecto Firebase
+### 3. Deploy Rules
+```bash
+firebase deploy --only firestore:rules
+firebase deploy --only storage:rules
+```
 
-## Paso 3: Habilitar Firebase en el Código
+### 4. Enable Services in Firebase Console
+- Authentication (Email/Password, Google, Anonymous)
+- Cloud Firestore
+- Cloud Storage
+- Cloud Messaging
 
-Una vez generado `firebase_options.dart`, descomentar las siguientes líneas en `lib/main.dart`:
+### 5. Update Code
+Uncomment Firebase initialization lines in:
+- `android/build.gradle` (classpaths)
+- `android/app/build.gradle` (apply plugin lines)
+- Update `lib/main.dart` to initialize Firebase services
+
+## Detailed Setup
+
+### Prerequisites
+
+1. **Firebase Account**: [console.firebase.google.com](https://console.firebase.google.com)
+2. **Firebase CLI**: `npm install -g firebase-tools`
+3. **FlutterFire CLI**: `dart pub global activate flutterfire_cli`
+4. **Flutter SDK**: Already installed
+
+### Step 1: Create Firebase Project
+
+1. Go to Firebase Console
+2. Create new project: "tokyo-roulette-predictor"
+3. Enable Google Analytics (recommended)
+4. Note your project ID
+
+### Step 2: Configure FlutterFire
+
+```bash
+# Navigate to project root
+cd Tokyo-Predictor-Roulette-001
+
+# Login to Firebase
+firebase login
+
+# Configure FlutterFire
+flutterfire configure
+
+# Select your project
+# Choose platforms: Android, iOS (as needed)
+```
+
+This generates:
+- `lib/config/firebase_options.dart` (DO NOT commit)
+- `android/app/google-services.json` (DO NOT commit)
+- `ios/Runner/GoogleService-Info.plist` (DO NOT commit)
+
+**Note**: These files are already in `.gitignore` for security.
+
+### Step 3: Enable Firebase Services
+
+#### Authentication
+1. Go to Firebase Console → Authentication
+2. Enable sign-in methods:
+   - **Email/Password**: For email authentication
+   - **Google**: For Google Sign-In (configure OAuth)
+   - **Anonymous**: For guest access
+
+#### Cloud Firestore
+1. Go to Firestore Database
+2. Create database in **production mode**
+3. Choose your region (closest to users)
+4. Deploy security rules: `firebase deploy --only firestore:rules`
+
+#### Cloud Storage (Optional)
+1. Go to Storage
+2. Click "Get Started"
+3. Choose same region as Firestore
+4. Deploy security rules: `firebase deploy --only storage:rules`
+
+#### Remote Config
+1. Go to Remote Config
+2. Add parameters (see table below)
+3. Publish changes
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| min_bet_amount | Number | 1.0 | Minimum bet |
+| max_bet_amount | Number | 1000.0 | Maximum bet |
+| initial_balance | Number | 1000.0 | Starting balance |
+| enable_martingale | Boolean | true | Enable strategy |
+| maintenance_mode | Boolean | false | Maintenance flag |
+
+### Step 4: Update Android Configuration
+
+**android/build.gradle**:
+Uncomment:
+```gradle
+classpath 'com.google.gms:google-services:4.4.0'
+classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.9'
+classpath 'com.google.firebase:perf-plugin:1.4.2'
+```
+
+**android/app/build.gradle**:
+Uncomment:
+```gradle
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'com.google.firebase.firebase-perf'
+```
+
+### Step 5: Initialize Firebase in App
+
+Update `lib/main.dart`:
 
 ```dart
-// En los imports (línea 4-5)
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
+import 'config/firebase_options.dart';
+import 'services/firebase_auth_service.dart';
+import 'services/analytics_service.dart';
+import 'services/crashlytics_service.dart';
+import 'services/performance_service.dart';
+import 'services/remote_config_service.dart';
+import 'services/notification_service.dart';
 
-// En main() (línea 14)
-await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-```
-
-## Paso 4: Implementar Autenticación (Opcional)
-
-En `lib/main.dart`, en la clase `_LoginScreenState`, reemplazar el TODO con:
-
-```dart
-import 'package:firebase_auth/firebase_auth.dart';
-
-// En el método onPressed del botón (línea 63)
-onPressed: () async {
-  try {
-    // Crear cuenta o iniciar sesión
-    await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: _emailController.text.trim(),
-      password: 'temporal123', // En producción, pedir contraseña al usuario
-    );
-    if (mounted) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const MainScreen()),
-      );
-    }
-  } catch (e) {
-    // Si el usuario ya existe, intentar login
-    try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: 'temporal123',
-      );
-      if (mounted) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const MainScreen()),
-        );
-      }
-    } catch (e2) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e2.toString()}')),
-        );
-      }
-    }
-  }
-},
-```
-
-## Paso 5: Guardar Datos en Firestore (Opcional)
-
-Para guardar el historial de giros en la nube:
-
-```dart
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
-// Después de cada giro exitoso
-void spinRoulette() async {
-  final res = _rouletteLogic.generateSpin();
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   
-  // ... código existente ...
+  // Initialize Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   
-  // Guardar en Firestore
-  final user = FirebaseAuth.instance.currentUser;
-  if (user != null) {
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .collection('spins')
-        .add({
-      'number': res,
-      'timestamp': FieldValue.serverTimestamp(),
-      'balance': balance,
-      'bet': currentBet,
-    });
-  }
+  // Initialize services
+  final crashlytics = CrashlyticsService();
+  await crashlytics.initialize();
+  
+  final analytics = AnalyticsService();
+  await analytics.logAppOpen();
+  
+  final remoteConfig = RemoteConfigService();
+  await remoteConfig.initialize();
+  
+  final notifications = NotificationService();
+  await notifications.initialize();
+  
+  runApp(const MyApp());
 }
 ```
 
-## Paso 6: Configurar Remote Config (Opcional)
+### Step 6: Test Firebase Integration
 
-Remote Config permite cambiar configuraciones sin publicar nueva versión:
+1. Run the app: `flutter run`
+2. Sign up a test user
+3. Check Firebase Console:
+   - Authentication: Verify user created
+   - Firestore: Check data saved
+   - Analytics: View events
+   - Crashlytics: Verify initialization
 
+## Services Overview
+
+### Authentication Service
+**File**: `lib/services/firebase_auth_service.dart`
+
+Features:
+- Email/Password authentication
+- Google Sign-In
+- Anonymous authentication
+- Password reset
+- Email verification
+- Account linking
+
+Usage:
 ```dart
-import 'package:firebase_remote_config/firebase_remote_config.dart';
+final authService = FirebaseAuthService();
 
-// En main(), después de inicializar Firebase
-final remoteConfig = FirebaseRemoteConfig.instance;
-await remoteConfig.setConfigSettings(RemoteConfigSettings(
-  fetchTimeout: const Duration(minutes: 1),
-  minimumFetchInterval: const Duration(hours: 4),
-));
+// Sign up
+await authService.signUpWithEmail(
+  email: 'user@example.com',
+  password: 'password123',
+);
 
-await remoteConfig.setDefaults({
-  'initial_balance': 1000.0,
-  'min_bet': 10.0,
-  'max_bet': 500.0,
-  'enable_predictions': true,
+// Sign in
+await authService.signInWithEmail(
+  email: 'user@example.com',
+  password: 'password123',
+);
+
+// Google Sign-In
+await authService.signInWithGoogle();
+
+// Anonymous
+await authService.signInAnonymously();
+```
+
+### Firestore Service
+**File**: `lib/services/firestore_service.dart`
+
+Features:
+- CRUD operations for users, predictions, game sessions
+- Real-time listeners
+- Pagination
+- Batch operations
+- Transactions
+
+Usage:
+```dart
+final firestoreService = FirestoreService();
+
+// Create user
+await firestoreService.createUser(userModel);
+
+// Get predictions
+final predictions = await firestoreService.getUserPredictions(
+  userId,
+  limit: 20,
+);
+
+// Listen to changes
+firestoreService.listenToUser(userId).listen((user) {
+  // Handle user updates
 });
-
-await remoteConfig.fetchAndActivate();
-
-// Usar los valores
-final initialBalance = remoteConfig.getDouble('initial_balance');
 ```
 
-## Consideraciones de Seguridad
+### Analytics Service
+**File**: `lib/services/analytics_service.dart`
 
-1. **Nunca** incluir claves API o secrets en el código
-2. Usar **Firestore Security Rules** para proteger datos:
-```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /users/{userId}/{document=**} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-  }
-}
-```
+Features:
+- Event tracking (app_open, user_signup, prediction_made, etc.)
+- User properties
+- Screen tracking
+- Custom parameters
 
-3. En Authentication, habilitar límites de tasa para prevenir abuso
-
-## Despliegue en CI/CD
-
-Para compilar con Firebase en GitHub Actions, agregar los secrets:
-- `FIREBASE_CONFIG_BASE64`: Base64 del archivo `firebase_options.dart`
-
-```yaml
-- name: Decodificar Firebase Config
-  run: echo "${{ secrets.FIREBASE_CONFIG_BASE64 }}" | base64 -d > lib/firebase_options.dart
-```
-
-## Testing sin Firebase
-
-Los tests pueden ejecutarse sin Firebase usando mocks:
-
+Usage:
 ```dart
-import 'package:firebase_core_platform_interface/firebase_core_platform_interface.dart';
-import 'package:flutter_test/flutter_test.dart';
+final analytics = AnalyticsService();
 
-void main() {
-  setupFirebaseCoreMocks(); // Mock Firebase
+// Log events
+await analytics.logAppOpen();
+await analytics.logPredictionMade(
+  predictedNumber: 7,
+  betAmount: 10.0,
+);
 
-  setUpAll(() async {
-    await Firebase.initializeApp();
-  });
+// Set user properties
+await analytics.setTotalPredictions(50);
+await analytics.setWinRate(0.45);
+```
 
-  // ... tests ...
+### Notification Service
+**File**: `lib/services/notification_service.dart`
+
+Features:
+- FCM token management
+- Foreground/background notifications
+- Topic subscriptions
+- Local notifications
+
+Usage:
+```dart
+final notifications = NotificationService();
+
+// Initialize
+await notifications.initialize();
+
+// Subscribe to topics
+await notifications.subscribeToDailyChallenges();
+
+// Get FCM token
+final token = notifications.fcmToken;
+```
+
+### Remote Config Service
+**File**: `lib/services/remote_config_service.dart`
+
+Features:
+- Dynamic configuration
+- Feature flags
+- A/B testing
+- Fetch and activate
+
+Usage:
+```dart
+final remoteConfig = RemoteConfigService();
+
+// Initialize
+await remoteConfig.initialize();
+
+// Get values
+final minBet = remoteConfig.minBetAmount;
+final maxBet = remoteConfig.maxBetAmount;
+final isMaintenanceMode = remoteConfig.isMaintenanceMode;
+```
+
+### Crashlytics Service
+**File**: `lib/services/crashlytics_service.dart`
+
+Features:
+- Automatic crash reporting
+- Custom error logging
+- User identification
+- Custom keys
+
+Usage:
+```dart
+final crashlytics = CrashlyticsService();
+
+// Log error
+await crashlytics.logError(
+  exception,
+  stackTrace,
+  reason: 'User action failed',
+);
+
+// Set user ID
+await crashlytics.setUserId(userId);
+
+// Set custom key
+await crashlytics.setCustomKey('game_level', 5);
+```
+
+### Performance Service
+**File**: `lib/services/performance_service.dart`
+
+Features:
+- Custom traces
+- HTTP metrics
+- Screen rendering traces
+- Operation timing
+
+Usage:
+```dart
+final performance = PerformanceService();
+
+// Trace operation
+await performance.traceOperation(
+  'load_data',
+  () async {
+    // Your operation
+  },
+);
+
+// Manual trace
+final trace = await performance.startScreenLoadTrace('HomeScreen');
+// ... do work ...
+await performance.stopTrace(trace);
+```
+
+## Security
+
+### Firestore Rules
+Located in `firestore.rules`. Key rules:
+- Users can only read/write their own data
+- Predictions require authentication
+- Game sessions are private
+- Input validation on create operations
+
+Deploy: `firebase deploy --only firestore:rules`
+
+### Storage Rules
+Located in `storage.rules`. Key rules:
+- Profile pictures are public read
+- Only owners can upload
+- File size limits enforced
+- Only images allowed
+
+Deploy: `firebase deploy --only storage:rules`
+
+### API Keys
+- Never commit `google-services.json`
+- Never commit `firebase_options.dart` (if using actual keys)
+- Use environment variables for CI/CD
+- All sensitive files in `.gitignore`
+
+## Troubleshooting
+
+### Firebase Not Initializing
+**Problem**: App crashes on startup
+
+**Solutions**:
+1. Check `firebase_options.dart` exists in `lib/config/`
+2. Verify `Firebase.initializeApp()` called before `runApp()`
+3. Run `flutterfire configure` again
+4. Clean build: `flutter clean && flutter pub get`
+
+### Authentication Errors
+**Problem**: Sign-in fails
+
+**Solutions**:
+1. Enable authentication method in Firebase Console
+2. For Google Sign-In: Configure OAuth consent screen
+3. For Google Sign-In on Android: Add SHA-1 fingerprint
+4. Check network connectivity
+5. Verify email format is valid
+
+### Firestore Permission Denied
+**Problem**: Cannot read/write to Firestore
+
+**Solutions**:
+1. Deploy security rules: `firebase deploy --only firestore:rules`
+2. Ensure user is authenticated
+3. Check user ID matches document owner
+4. Review rules in Firebase Console
+
+### Google Sign-In Not Working (Android)
+**Problem**: Google Sign-In button doesn't work
+
+**Solutions**:
+1. Get SHA-1 fingerprint:
+   ```bash
+   cd android
+   ./gradlew signingReport
+   ```
+2. Add SHA-1 in Firebase Console → Project Settings → Your App
+3. Download new `google-services.json`
+4. Add to `android/app/`
+5. Rebuild app
+
+### Build Errors After Adding Firebase
+**Problem**: Gradle build fails
+
+**Solutions**:
+1. Check `google-services.json` is in `android/app/`
+2. Verify Firebase plugin lines are uncommented
+3. Update Gradle version if needed
+4. Clean and rebuild:
+   ```bash
+   cd android
+   ./gradlew clean
+   cd ..
+   flutter clean
+   flutter pub get
+   flutter build apk
+   ```
+
+### FCM Not Receiving Notifications
+**Problem**: Push notifications don't arrive
+
+**Solutions**:
+1. Request notification permission
+2. Get FCM token and verify it's saved
+3. Test with Firebase Console → Cloud Messaging → Send test message
+4. Check app is not in battery saver mode
+5. Verify notification channel is created (Android)
+
+## Testing
+
+### Local Testing with Emulator
+```bash
+# Install Firebase emulators
+firebase init emulators
+
+# Start emulators
+firebase emulators:start
+
+# In app, connect to emulators (debug mode only):
+if (kDebugMode) {
+  FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
+  await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
 }
 ```
 
-## Recursos Adiciales
+### Testing Checklist
+- [ ] User can sign up with email
+- [ ] User can sign in with email
+- [ ] User can reset password
+- [ ] Google Sign-In works
+- [ ] Anonymous sign-in works
+- [ ] Data saves to Firestore
+- [ ] Data retrieved from Firestore
+- [ ] Real-time updates work
+- [ ] Analytics events logged
+- [ ] Remote Config values fetched
+- [ ] Push notifications received
+- [ ] App doesn't crash (Crashlytics)
+- [ ] Performance traces visible
 
-- [Firebase Flutter Documentation](https://firebase.google.com/docs/flutter/setup)
-- [FlutterFire GitHub](https://github.com/firebase/flutterfire)
-- [Firebase Auth Flutter](https://firebase.flutter.dev/docs/auth/overview)
-- [Firestore Flutter](https://firebase.flutter.dev/docs/firestore/overview)
+## Deployment Checklist
+
+Before production deployment:
+
+- [ ] Firebase project created
+- [ ] All services enabled
+- [ ] Security rules deployed
+- [ ] Remote Config configured
+- [ ] SHA-1 fingerprint added (Android)
+- [ ] OAuth consent configured (Google Sign-In)
+- [ ] Release keystore configured
+- [ ] ProGuard rules added (if minifying)
+- [ ] Budget alerts configured
+- [ ] Test on real devices
+- [ ] All sensitive files in `.gitignore`
+- [ ] Documentation updated
+
+## Additional Resources
+
+- [Firebase Documentation](https://firebase.google.com/docs)
+- [FlutterFire Documentation](https://firebase.flutter.dev)
+- [Firebase Console](https://console.firebase.google.com)
+- [Firebase CLI Reference](https://firebase.google.com/docs/cli)
+
+## Support
+
+For issues:
+1. Check this documentation
+2. Review Firebase Console logs
+3. Check Crashlytics dashboard
+4. Review FlutterFire GitHub issues
+5. Contact project maintainers
+
+---
+
+**Last Updated**: December 2024  
+**Version**: 1.0.0
