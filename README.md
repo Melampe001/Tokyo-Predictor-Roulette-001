@@ -117,6 +117,25 @@ cat reports/project-health-report-*.md
 
 Para más detalles, consulta [docs/HEALTH_AGENT.md](docs/HEALTH_AGENT.md).
 
+## 🧹 Estado del Repositorio
+
+**Última limpieza**: 2024-12-23  
+**PRs activos**: ~5 (reducción del 83%)  
+**Issues abiertos**: ~69  
+**Estado**: ✅ Organizado y listo para desarrollo
+
+Este repositorio ha sido sometido a una limpieza exhaustiva para mejorar la navegabilidad y eliminar duplicados. Se cerraron 40+ PRs obsoletos y 4 issues duplicados, manteniendo solo el trabajo activo y prioritario.
+
+**Documentación de limpieza**:
+- 📋 [Reporte Completo de Limpieza](CLEANUP_REPORT.md) - Análisis detallado (746 líneas)
+- 🚀 [Guía de Ejecución](CLEANUP_EXECUTION_GUIDE.md) - Script automático y pasos manuales
+- ✅ [Checklist de Ejecución](CLEANUP_CHECKLIST.md) - Lista de verificación práctica
+
+**PRs prioritarios post-limpieza**:
+- 🎯 **PR #91** - Repository completion (pendiente review)
+- 🎮 **PR #104** - Unity ML-Agents Codespaces (evaluar necesidad)
+- 🤖 **PR #105** - Auto-close duplicates workflow (automatización)
+
 ## 🔧 Configuración
 
 ### Opciones Disponibles
