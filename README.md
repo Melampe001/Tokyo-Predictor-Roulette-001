@@ -12,7 +12,7 @@ Simulador educativo de ruleta con predicciones, RNG, estrategia Martingale y mod
 
 ## 📱 Capturas de Pantalla
 
-> Ver las imágenes en la raíz del proyecto: `Screenshot_*.png`
+> Ver las imágenes en: `docs/images/screenshots/`
 
 ## ✨ Características Implementadas
 
