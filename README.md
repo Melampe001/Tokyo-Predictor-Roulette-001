@@ -78,6 +78,7 @@ flutter test --coverage
 
 ## 📚 Documentación
 
+- **[Informe General](INFORME_GENERAL.md)**: Análisis completo y métricas del proyecto
 - **[Guía de Usuario](docs/USER_GUIDE.md)**: Manual completo de uso de la aplicación
 - **[Arquitectura Técnica](docs/ARCHITECTURE.md)**: Diseño y estructura del código
 - **[Configuración Firebase](docs/FIREBASE_SETUP.md)**: Cómo integrar Firebase (opcional)
