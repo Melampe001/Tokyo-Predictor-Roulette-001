@@ -78,6 +78,7 @@ flutter test --coverage
 
 ## 📚 Documentación
 
+- **[Instrucciones Fijas del Repositorio](INSTRUCTIONS.md)**: Guía centralizada de workflows y checklists
 - **[Guía de Usuario](docs/USER_GUIDE.md)**: Manual completo de uso de la aplicación
 - **[Arquitectura Técnica](docs/ARCHITECTURE.md)**: Diseño y estructura del código
 - **[Configuración Firebase](docs/FIREBASE_SETUP.md)**: Cómo integrar Firebase (opcional)

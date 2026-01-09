@@ -2,6 +2,8 @@
 
 ¡Gracias por tu interés en contribuir a Tokyo Roulette Predicciones! Este documento te guiará a través del proceso de contribución.
 
+> 📋 **Nota**: Para una guía completa de workflows, checklists y comandos, consulta [INSTRUCTIONS.md](INSTRUCTIONS.md).
+
 ## Código de Conducta
 
 Al participar en este proyecto, te comprometes a mantener un ambiente respetuoso y acogedor para todos. Se espera:
@@ -399,10 +401,13 @@ Si encuentras una vulnerabilidad de seguridad:
 
 ### Documentación del Proyecto
 
-- [README.md](../README.md) - Inicio rápido
-- [USER_GUIDE.md](USER_GUIDE.md) - Guía de usuario
-- [ARCHITECTURE.md](ARCHITECTURE.md) - Arquitectura técnica
-- [FIREBASE_SETUP.md](FIREBASE_SETUP.md) - Configuración de Firebase
+- [INSTRUCTIONS.md](/INSTRUCTIONS.md) - Instrucciones fijas y workflows
+- [README.md](/README.md) - Inicio rápido
+- [Checklist de calidad para PRs](/.github/checklist.md)
+- [Detalles de agentes requeridos](/docs/checklist_agents.md)
+- [Guía de usuario](/docs/USER_GUIDE.md)
+- [Arquitectura técnica](/docs/ARCHITECTURE.md)
+- [Configuración de Firebase](/docs/FIREBASE_SETUP.md)
 
 ### Flutter/Dart
 
