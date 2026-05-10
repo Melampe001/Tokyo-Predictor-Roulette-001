@@ -11,7 +11,7 @@ void main() async {
 }
 
 class TokyoRouletteApp extends StatelessWidget {
-  const TokyoRouletteApp({Key? key}) : super(key: key);
+  const TokyoRouletteApp({super.key});
 
   @override
   Widget build(BuildContext context) {
